@@ -1,0 +1,46 @@
+;===================================
+set %Play F9
+set %Pausa F12
+;===================================
+set #sysmsgcol 4000
+
+if %Play <> N/A && %Pausa <> N/A
+{
+ loop_pause:
+ event sysmessage Script in Pausa, per riprendere %Play
+ repeat
+  onhotkey %Play
+  {
+   event sysmessage Script Play, per mettere in pausa %Pausa
+   goto start
+  }
+ until #false
+}
+
+start:
+onhotkey %Pausa
+ goto loop_pause
+if #enemyid <> N/A
+{
+ set #ltargetid #enemyid
+ if #ltargetid = #charid
+  goto start
+ event macro 49 1
+ set %targ #enemyid
+ set #ltargetkind 1
+ onhotkey %Pausa
+  goto loop_pause
+ target 2s
+ onhotkey %Pausa
+  goto loop_pause
+ event macro 22
+ loop:
+ onhotkey %Pausa
+  goto loop_pause
+ wait 0
+ if #enemyid <> %targ
+  goto start
+ else
+  goto loop
+}
+goto start

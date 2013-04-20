@@ -1,0 +1,89 @@
+;================================== 
+; Script Name: Multi-Pet Vet
+; Author: a Rookie
+; Version: 1.0
+; Client Tested with: 4.0.7a
+; EUO version tested with: V1.42
+; Shard OSI / FS: OSI
+; Revision Date: 01/14/05
+; Public Release: 01/08/05
+; Global Variables Used: N/A
+; Purpose: Uses baindaids, heals pets with different hotkeys, and if you like, plays a sound on a successful heal
+===================================
+set %sound 0 ; 1 = true, 0 = false (whether or not you wish to play a sound on a successful heal)
+set %soundfile ringout.wav ; set the whole path if the file is not in your easyuo directory
+set #targcurs 1
+event sysmessage Target Pet 1
+stilltarget1:
+if #targcurs = 1
+  goto stilltarget1
+set %Pet1 #ltargetid
+wait 15
+set #targcurs 1
+event sysmessage Target Pet 2
+stilltarget2:
+if #targcurs = 1
+  goto stilltarget2
+set %Pet2 #ltargetid
+wait 15
+set #targcurs 1
+event sysmessage Target Pet 3
+stilltarget3:
+if #targcurs = 1
+  goto stilltarget3
+set %Pet3 #ltargetid
+display ok Click ok to begin $
+goto loop:
+Loop:
+	onhotkey f1 ; default
+		{
+		set %Pettoheal %Pet1
+		goto Heal
+		}
+	onhotkey f2 ; default
+		{
+		set %Pettoheal %Pet2
+		goto Heal
+		}
+	onhotkey f3 ; default
+		{
+		set %Pettoheal %Pet3
+		goto Heal
+		}
+goto loop:
+
+Heal:
+Finditem ZLF C ; searching for bandaids
+If #Findkind = -1
+	DISPLAY You are out of bandaids.
+set #lobjectid #findid
+event macro 17 0
+target
+set #ltargetkind 1
+set #ltargetid %Pettoheal
+event macro 22 0
+wait 10
+scanjournal 1
+if that_being_is_not_damaged in #journal
+    	{
+      	deleteJournal
+	eventsysmessage Full life..
+	goto loop:
+    	}
+if that_is_too_far in #journal
+	{
+      	deletejournal
+      	event sysmessage Not close enough.
+      	wait 15
+      	goto loop:
+	}
+if finish_applying_the_bandages in #journal
+	{
+	deletejournal
+	if %sound = 1
+		{
+		sound %soundfile
+		}
+	goto loop:
+	}
+goto loop:

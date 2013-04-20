@@ -1,0 +1,60 @@
+;CONTATORE BOLAS (appare un contatore che vi indica tra quanto partirà la bolas)
+
+;========================================
+;Crafted by Narciso Anassi
+;avverte dell'arrivo di una bolas
+;alla pressione di .tasto dismonta
+;========================================
+
+set %jou #JINDEX
+set %tasto F1 shift
+
+_check:
+while #JINDEX > %jou
+{
+set %t #jindex - %jou
+scanjournal %t
+if begins_to_menacingly_swing_a_bola in #journal ;&& #JCOLOR = 9
+{
+set %end #scnt2 + 30
+sound
+for !i 1 30
+{
+set %remaining ( %end - #scnt2 )
+event ExMsg #charID 3 5 %remaining
+;onhotkey %tasto
+; {
+; set #lobjectid #charid
+; event macro 17 0
+; }
+}
+}
+set %jou %jou + 1
+}
+goto _check
+
+
+CONTATORE DIMOUNT (conta quanto tempo vi manca per risalire sul pet)
+
+
+set #lpc 20
+set %Journal #jindex
+
+main:
+if #jindex > %Journal
+{
+set %Journal %Journal + 1
+scanjournal %Journal
+if ( you_have_been_knocked_of in #journal || you_fall_off_of_your_mount in #journal ) && #jcolor = 946
+gosub contatore
+}
+goto main
+
+sub contatore
+for %i 1 10
+{
+set %cont 10 - %i
+wait 1s
+event ExMsg #charID 2 38 %cont
+}
+return

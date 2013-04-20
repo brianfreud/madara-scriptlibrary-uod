@@ -1,0 +1,84 @@
+;****************************************************
+;
+; il Male - Fuka e Suka v1.0
+;
+; author: il Male, Occhio-Bianco (-OB-) guild
+; licensed to: vendo ghey
+; version: 1.0
+;
+; comments: script eccezionalmente in italiano
+;
+;****************************************************
+
+
+;****************************************
+; Non modificare NULLA dopo questa riga!
+;****************************************
+
+; Credits:
+event sysmessage Fuka e Suka v1.0
+event sysmessage Powered by il Male -OB-
+
+; Init:
+msg $
+ignoreitem reset
+ignoreitem reset 1
+ignoreitem reset 2
+
+
+;***********
+; Main loop:
+set #lpc 200
+mainLoop:
+   onhotkey 6
+      gosub tira
+goto mainLoop
+
+
+;*******
+sub tira
+;*******
+; ?: tira una fuka o una suka a seconda della distanza
+;*******
+   finditem #enemyid G_10
+   if #findkind <> -1
+   {
+      set #ltargetkind 1
+      set #ltargetid #enemyid
+      if #finddist < 5
+      {
+         finditem MDP C_ , #backpackid
+         if #findstack > 0
+         {
+            ignoreitem #findid 1
+            set #lobjectid #findid
+            event macro 17 0
+            target 15
+            event macro 22 0
+            key ESC
+         }
+         else
+         {
+             ignoreitem reset 1
+         }
+      }
+      else
+      {
+         finditem MCP C_ , #backpackid
+         if #findstack > 0
+         {
+            ignoreitem #findid 2
+            set #lobjectid #findid
+            event macro 17 0
+            target 15
+            event macro 22 0
+            key ESC
+         }
+         else
+         {
+            ignoreitem reset 2
+         }
+      }
+   }
+return
+

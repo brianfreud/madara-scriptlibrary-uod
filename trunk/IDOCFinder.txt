@@ -1,0 +1,103 @@
+;================================== 
+; Script Name:  Bam's IDOC Finder
+; Author: Bam
+; Version: 1.0.02
+; Client Tested with: 4.0.6a (patch 3)
+; EUO version tested with: 1.42.009D
+; Shard OSI / FS: OSI Only
+; Revision Date: 11/23/04
+; Public Release: 11/23/04
+; Global Variables Used: 
+; Purpose: makes finding houses that are falling easy 
+;==================================
+; Many thanks to Roadkill for help on this script
+; Portions of script come from ideas or code from Puda, and Jebbit
+; Original script idea leading to the creation of this from jebbit's script
+initEvents
+; *************************************************** 
+; *********** Do Not Edit Anything  *********** 
+; *************************************************** 
+ignoreitem reset
+Set %sign MRE_AKE_ULE_KOE_KLE_WJE_GNE_MKE_UKE_EKE_GLE_
++CKE_ILE_IKE_YJE_CRE_GRE_OLE_IRE_GNE_INE_SNE_UNE_ONE_
++QNE_AOE_COE_ERE_WNE_YNE_IOE_EOE_GOE_SJE_UJE_OJE_QJE_
++SLE_QNE_QJE_ALE_ARE_CLE_ELE_GKE_KRE_MLE_OKE_QKE_QJE_
++QLE_QNE_SKE_WKE_WLE_YLE_YKE_YQE_KKE_YNE
+set %cond1 Slightly , #spc , Worn
+set %cond2 Somewhat , #spc , Worn
+set %cond3 Fairly , #spc , Worn
+set %cond4 Greatly , #spc , Worn
+set %cond5 Danger , #spc , Of , #spc , Collapsing
+
+
+; *************************************************** 
+; *********** Main Script Starts Here *********** 
+; *************************************************** 
+
+Mainloop:
+key P+CTRL
+finditem %sign G_12
+event Property #findid
+wait 5
+if public notin #property && private notin #property
+		GoTo Mainloop
+	for %i 1 5
+		{
+			set !cond cond , %i
+			set !cond % . !cond
+			if !cond in #property && condition in #property
+				{
+					gosub gettime
+					gosub getdate
+					event exmsg #charposx 3 33 Found !cond at %time %ampm %date
+			}
+	}
+if !cond notin #property && condition notin #property
+	{
+		event ExMsg #charposx 0 75 Skipped
+  }
+ignoreitem #findid
+GoTo Mainloop
+
+; ************************ 
+; *** Time Formatter *** 
+; *** Thanks Roadkill ***
+; ************************ 
+sub gettime
+	set %ampm am
+	str left #time 2
+	set %hours #strres
+	str mid #time 3 2
+	set %mins #strres
+	if %hours > 12
+		{
+			set %hours %hours - 12
+	}
+	if %hours = 12
+		{
+		set %ampm pm
+	}
+	if 10 > %mins 2
+		{
+		set %mins :0 , %mins
+	}
+	set %time %hours , %mins
+	else
+		{
+			set %time %hours , : , %mins
+	}
+return
+; ************************ 
+; *** Date Formatter *** 
+; *** Thanks Roadkill ***
+; ************************ 
+sub getdate
+	str left #date 2
+	set %year 20 , #strres
+	str mid #date 3 2
+	set %month #strres
+	str right #date 2
+	set %day #strres
+	set %date %month , - , %day , - , %year
+return
+;----end of script
