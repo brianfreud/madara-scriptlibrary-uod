@@ -1,0 +1,93 @@
+;==================================
+    ; Script Name: Anti Blood Oath
+    ; Author: Felix
+    ; Version: 3
+    ; Client Tested with: 6.0.13
+    ; EUO version tested with: 1.5.148
+    ; Shard FS: UODreams
+    ; Public Release: 27/07/2009
+    ; Purpose: turns off war-mode, whan blood oath
+    ; Requirments: ScanBuffBar
+    ;===========================================
+
+    ;;;;;;;;;;SETUP
+    set %BloodOathScanDelay 250
+
+
+    ;;;;;;;DON'T EDIT
+    set %InOldOath #false
+    set %NextBloodOathScan #systime
+    set %EndTurningOffWar 0
+    set %OathId xxyyxx
+
+    loop:
+         if %InOldOath && ( #systime <= %EndTurningOffWar || #enemyid = %OathId ) && G in #charstatus
+         {
+             if #enemyid = %OathId
+             {
+                finditem %OathId G
+                if #findtype = IS && #findrep = 6
+                {
+                   event property %OathId
+                   if revenant in #property
+                      set %OathId xxyyxx
+                }
+                if #systime > %EndTurningOffWar && #enemyid = %OathId
+                {
+                   event exmsg #charid 0 0 OATH2
+                   set %EndTurningOffWar #systime + 2000
+                }
+             }
+             while #systime <= %EndTurningOffWar && G in #charstatus
+             {
+                   event macro 6 0
+                   set %nexttoggle #systime + 300
+                   while #systime <= %nexttoggle && G in #charstatus
+                   {
+                         sleep 10
+                   }
+             }
+         }
+         if #systime >= %NextBloodOathScan
+            gosub AntiBloodOath
+         else
+             sleep 20
+    goto loop
+
+
+    sub AntiBloodOath
+        if G notin #charstatus && %InOldOath = #false
+        {
+           set %NextBloodOathScan #systime + %BloodOathScanDelay
+           return
+        }
+        Call ScanBuffBar
+        set %oathed _CurseBloodOath_ in %BuffBarIconNames
+        if %oathed
+        {
+           if G in #charstatus
+           {
+              if %InOldOath = #false && #systime > %EndTurningOffWar
+              {
+                 set %InOldOath #true
+                 set %EndTurningOffWar #systime + 2000
+                 if #enemyid <> n/a
+                    set %OathId #enemyid
+                 else
+                     set %OathId xxyyxx
+                 event exmsg #charid 0 0 OATH
+              }
+           }
+        }
+        else
+        {
+            if %InOldOath
+            {
+               set %InOldOath #false
+               if G notin #charstatus
+                  event macro 6 0
+               event exmsg #charid 0 0 go go go
+            }
+        }
+        set %NextBloodOathScan #systime + %BloodOathScanDelay
+    return

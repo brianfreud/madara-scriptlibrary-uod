@@ -1,0 +1,64 @@
+;==================================
+; Script Name:   Swoop Changeling Monitor
+; Author: Firebird
+; Version: 1.1
+; Client Tested with:5.01.d
+; EUO version tested with: 1.5.69
+; Shard OSI / FS: osi
+; Revision Date: 2/4/06
+; Public Release: 2/4/06
+; Global Variables Used: ?
+; Purpose: Everytime a changeling or changeling paragon comes on screen this script will automaticly use peacemaking target yourself and use magery to hide your charachter.  After you become unhidden the script loops back to the beginning.
+;
+**Note if you have less then 100 hit points you will have to change the #HITS number from 100 to your max hit points.**
+;==================================
+start:
+   goto health
+
+health:
+if #HITS < 100
+   { goto action }
+
+goto scan
+
+scan:
+scanJournal 1
+if (Paragon) in #journal
+{
+   if A_Cu_Sidhe_(Paragon) in #journal
+   {
+      goto start
+      deleteJournal 1
+   }
+   if A_Dryad_(Paragon) in #journal
+   {
+      goto start
+      deleteJournal 1
+   }
+deleteJournal 1
+goto action
+}
+if a_changeling in #journal
+{
+goto action
+deleteJournal 1
+}
+goto start
+
+action:
+Event macro 13 9  ;peacemaking
+Event macro 25    ;wait for target
+Event macro 23    ;target self
+Event macro 15 43 ;invisibility (mage spell)
+wait 3s
+Event macro 23    ;target self
+goto checkhidden
+
+checkhidden:
+if H in #charStatus
+{ goto hidden }
+goto start
+
+hidden:
+wait 1s
+goto checkhidden

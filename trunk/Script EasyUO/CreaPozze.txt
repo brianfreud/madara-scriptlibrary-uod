@@ -1,0 +1,870 @@
+; ############################################
+; Script Name: Guadah's Alchemist Assistant
+; Author: Guadah
+; Version: 1.0
+; Client Tested with: EA 6.0.9.2 (Patch 70)
+; EUO version tested with: 1.5 Version 142
+; Shard OSI / FS: OSI Servers
+; Revision Date:
+; Public Release: 7-11-2008
+; Purpose: To Craft Potions
+; Special Thanks:
+; * Trailmyx Persistant Variable Sub, advice & support - www.scriptuo.com
+; * Freddy for advice & support - www.winuo.org
+; ############################################
+set %alch_tool RQF
+set %alch_tools_needed 1
+set %tink_tool GTL_KTL_JTL
+set %tink_tools_needed 2
+set %bottle WUF
+set %ingot_type ENK
+set %board TLK
+set %size1 160
+set %size2 130
+set %pot_to_make 100
+set %amount_to_make 200
+set %resources WUF_ENK_TLK_XWS_YWS_YZF_KZF_KUF_RZF_MZF_JUF_WZF_SZF_JZF_TZF_YZF
+set %finished_pots ZUF_AVF_NUF_UUF_XUF_YUF_TUF_OUF
+set %catposx 30
+set %selposx 230
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXXXXXXXXXXXXXX MENU DESIGN XXXXXXXXXXXXXXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+;menu hideeuo
+menu window title Guadah's Alchemist Assistant
+menu window color silver
+menu window size 290 %size1
+menu font bgcolor gray
+menu shape potionbg 5 5 280 65 3 7 1 Black 7 Gray
+menu font align right
+menu text title 80 12 Resources:
+menu text title 80 42 Potions:
+menu font align left
+menu font bgcolor silver
+menu font size 10
+menu button target_resource_bag 175 10 30 24 Set
+menu button target_dump_bag 175 40 30 24 Set
+menu edit resource_bag 85 10 85 %resource_bag
+menu edit dump_bag 85 40 85 %dump_bag
+menu button start 170 105 55 25 Start
+menu button quit 230 105 55 25 Quit
+menu font size 9
+menu font color maroon
+menu button donate 230 135 55 20 Donate
+menu font color black
+menu text titles 20 110 Select Type
+menu text titles 115 110 Amount
+menu button add_more 175 135 20 20 +
+menu button remove 200 135 20 20 -
+; Status Box
+menu font bgcolor gray
+menu shape potionbg 5 75 280 25 3 7 1 Black 7 Gray
+menu text status_title 10 80 Status:
+menu font size 8
+menu font color black
+menu check tools 210 6 74 25 #true Make Tools
+;menu check pots 210 25 70 25 #true Fill Pots
+;menu check kegs 210 44 70 25 #false Fill Kegs
+menu font bgcolor silver
+menu combo create %pot_to_make 5 %size2 100
+menu combo add %pot_to_make Total Refreshment
+menu combo add %pot_to_make Greater Agility
+menu combo add %pot_to_make Night Sight
+menu combo add %pot_to_make Greater Heal
+menu combo add %pot_to_make Greater Strength
+menu combo add %pot_to_make Poison
+menu combo add %pot_to_make Greater Poison
+menu combo add %pot_to_make Deadly Poison
+menu combo add %pot_to_make Greater Cure
+menu combo add %pot_to_make Greater Explosion
+menu combo add %pot_to_make Greater Conflagration
+menu combo add %pot_to_make Greater Confusion Blast
+menu combo add %pot_to_make Invisibility
+menu combo add %pot_to_make Parasitic
+menu combo add %pot_to_make Darkglow
+menu edit %amount_to_make 110 %size2 50 0
+menu font bgcolor gray
+menu font color maroon
+menu font size 9
+menu text status 60 80 Please wait, Initializing Script...
+menu show
+check_container_status_loop:
+gosub TM_GetPersistantVariable resource_bag
+menu set resource_bag #result
+menu get resource_bag
+if #menures = N/A
+{
+menu set status Please set your Resource Chest
+}
+if #menures <> N/A
+{
+set %resource_bag #menures
+set #lobjectid %resource_bag
+event macro 17 0
+wait 10
+contpos 575 400
+wait 10
+}
+gosub TM_GetPersistantVariable dump_bag
+menu set dump_bag #result
+menu get dump_bag
+if #menures = N/A && %resource_bag <> N/A
+{
+menu set status Please set your bag for Finished Pots
+}
+if #menures <> N/A
+{
+set %dump_bag #menures
+set #lobjectid %dump_bag
+}
+if %resource_bag <> N/A && %dump_bag <> N/A
+{
+menu set status Select potions to make and click "Start"
+}
+menuloop:
+menu get pots
+if #menures = #true
+{
+menu set kegs #false
+}
+menu get kegs
+if #menures = #true
+{
+menu set pots #false
+}
+if #menuButton = target_resource_bag
+{
+set #targCurs 1
+set_resource_bag:
+if #targCurs = 1
+goto set_resource_bag
+Set %resource_bag #ltargetid
+Set #lobjectid %resource_bag
+Event Macro 17 0
+wait 10
+contpos 610 440
+wait 10
+menu font size 10
+menu set resource_bag %resource_bag
+gosub TM_SetPersistantVariable resource_bag %resource_bag
+set #menubutton N/A
+goto check_container_status_loop
+}
+if #menuButton = target_dump_bag
+{
+set #targCurs 1
+set_dump_bag:
+if #targCurs = 1
+goto set_dump_bag
+Set %dump_bag #ltargetid
+menu font size 10
+menu set dump_bag %dump_bag
+gosub TM_SetPersistantVariable dump_bag %dump_bag
+set #menubutton N/A
+}
+if #menubutton = add_more
+{
+gosub add_more
+set #menubutton N/A
+}
+if #menubutton = remove
+{
+gosub remove
+set #menubutton N/A
+}
+if #menubutton = Start
+{
+set #menubutton N/A
+set %size2 130
+set %pot_to_make 100
+set %finished %amount_to_make
+set %amount_to_make 200
+menu delete Start
+menu font bgcolor silver
+menu font color black
+menu button Pause 170 105 55 25 Pause
+gosub loop
+}
+if #menubutton = Quit
+{
+set #menubutton N/A
+display ok Thank you for using my script.$
++$
++Script is Halting$
+menu hide
+halt
+}
+if #menubutton = donate
+{
+set #menuButton N/A
+execute https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jim%2efries%40yahoo%2ecom&item_name=Guadahs%20Easy%20UO%20Script&no_shipping=0&no_note=1&currency_code=USD&lc=US&bn=PP%2dBuyNowBF&charset=UTF%2d8
+}
+goto menuloop
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXXXXXXX SUB TO ADD ANOTHER OPTION XXXXXXXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub add_more
+set %size1 ( %size1 + 25 )
+set %size2 ( %size2 + 25 )
+set %pot_to_make ( %pot_to_make + 1 )
+set %amount_to_make ( %amount_to_make + 1 )
+menu window size 290 %size1
+menu font size 8
+menu font color black
+menu font bgcolor silver
+menu combo create %pot_to_make 5 %size2 100
+menu combo add %pot_to_make Total Refreshment
+menu combo add %pot_to_make Greater Agility
+menu combo add %pot_to_make Night Sight
+menu combo add %pot_to_make Greater Heal
+menu combo add %pot_to_make Greater Strength
+menu combo add %pot_to_make Poison
+menu combo add %pot_to_make Greater Poison
+menu combo add %pot_to_make Deadly Poison
+menu combo add %pot_to_make Greater Cure
+menu combo add %pot_to_make Greater Explosion
+menu combo add %pot_to_make Greater Conflagration
+menu combo add %pot_to_make Greater Confusion Blast
+menu combo add %pot_to_make Invisibility
+menu combo add %pot_to_make Parasitic
+menu combo add %pot_to_make Darkglow
+menu edit %amount_to_make 110 %size2 50 0
+return
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXXXXXXXX SUB TO REMOVE AN OPTION XXXXXXXXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub remove
+if %pot_to_make = 100
+return
+set %size1 ( %size1 - 25 )
+set %size2 ( %size2 - 25 )
+menu window size 290 %size1
+menu delete %pot_to_make
+menu delete %amount_to_make
+set %pot_to_make ( %pot_to_make - 1 )
+set %amount_to_make ( %amount_to_make - 1 )
+return
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXXXXXXXXXX MAIN LOOP FOR SCRIPT XXXXXXXXXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub loop
+crafting_loop:
+gosub clear_pack %resources
+gosub clear_pots
+menu get tools
+if #menures = #true
+gosub check_tool %tink_tool %tink_tools_needed 110 130
+gosub check_tool %alch_tool %alch_tools_needed 110 90
+gosub potion_init
+gosub grab_resources %reagent1 %reagent2
+gosub craft_potion
+goto crafting_loop
+return
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXXX SUB TO FIND AND RETURN RESOURCES XXXXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub clear_pack
+gosub CheckPause
+menu set status Clearing pack of resources...
+finditem %1 C_ , #backpackid
+if #findcnt < 1
+return
+for %i 1 #findcnt
+{
+finditem %1 C_ , #backpackid
+exevent drag #findid #findstack
+wait 10
+exevent dropc %resource_bag
+wait 15
+}
+return
+
+sub clear_pots
+gosub CheckPause
+menu set status Clearing pack of finished potions...
+finditem %finished_pots C_ , #backpackid
+if #findcnt < 1
+return
+for %i 1 #findcnt
+{
+finditem %finished_pots C_ , #backpackid
+exevent drag #findid #findstack
+wait 10
+exevent dropc %dump_bag
+wait 15
+}
+return
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXXXXX SUB TO CHECK AND CRAFT TOOLS XXXXXXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub check_tool
+gosub CheckPause
+menu set status Checking for Tools
+finditem %1 C_ , #backpackid
+if #findcnt >= %2
+return
+menu get tools
+if #menures = #false
+{
+finditem %1 C_ , %resource_bag
+if #findcnt < 1
+{
+display ok You are out of %5 $
++You will need Alch Tools in your Resource Chest$
++Please get more and restart the script.$
++Script has halted$
+halt
+}
+exevent drag #findid
+wait 10
+exevent dropc #backpackid
+wait 15
+}
+menu set status Crafting required Tools
+set %to_make ( %2 - #findcnt ) ; Sets a number of tools to make
+set #lobjectid #findid
+; --------------------------------
+; This section looks for ingots, then pulls 100
+finditem %ingot_type C_ , %resource_bag
+for #findindex 1 #findcnt
+{
+event property #findid
+if copper || shadow || bronze || agapite || gold || verite || valorite in #property
+ignoreitem #findid
+if ingots in #property && shadow notin #property
+set %ingots #findid ; Finds only Iron Ingots
+}
+finditem %ingots C_ , %resource_bag
+if #findstack < 20
+{
+display ok You are out of ingots.$
++Please get more and resetart script.
+gosub clear_pack
+halt
+}
+finditem %ingots C_ , #backpackid
+if #findstack < 10
+{
+finditem %ingots C_ , %resource_bag
+exevent drag #findid 100
+wait 10
+exevent dropc #backpackid
+wait 15
+}
+; --------------------------------
+; Makes tool required, and loops %to_make (number of tools needed) times
+finditem %tink_tool C_ , #backpackid
+if #findcnt < 1
+{
+display ok You need at least one tinker tool to begin$
++Script has halted.$
+halt
+}
+set #lobjectid #findid
+event macro 17 0
+gosub gumpwait
+set %x #contposx + %catposx
+set %y #contposy + %3
+click %x %y ; Selects Category
+gosub gumpwait
+for %i 1 %to_make
+{
+set %x #contposx + %selposx
+set %y #contposy + %4
+click %x %y ; Selects Tool
+gosub gumpwait
+}
+finditem %1 C_ , #backpackid
+if #findcnt < %2
+gosub check_tool
+gosub clear_pack %ingot_type
+return
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXXX SETS ITEMS NEEDED FOR EACH POTION XXXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub potion_init
+gosub CheckPause
+menu set status Checking potion requirements
+menu get %pot_to_make
+if #menuRes = 1 ; Total Refreshment
+{
+set %potion_type Total , #spc , Refreshment
+set %reagent1 KUF ; Black Pearl
+set %reagent_name Black , #spc , Pearl
+set %reagent2 N/A ; N/A
+set %required_reagent1 5
+set %required_reagent2 N/A
+set %catposy 90
+set %selposy 90
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 2 ; Greater Agility
+{
+set %potion_type Greater , #spc , Agility
+set %reagent1 JUF ; Bloodmoss
+set %reagent_name Bloodmoss
+set %reagent2 N/A ; N/A
+set %required_reagent1 3
+set %required_reagent2 N/A
+set %catposy 110
+set %selposy 90
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 3 ; Night Sight
+{
+set %potion_type Night , #spc , Sight
+set %reagent1 RZF ; Spider's Silk
+set %reagent_name Spiders , #spc , Silk
+set %reagent2 N/A ; N/A
+set %required_reagent1 1
+set %required_reagent2 N/A
+set %catposy 130
+set %selposy 70
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 4 ; Greater Heal
+{
+set %potion_type Greater , #spc , Heal
+set %reagent1 JZF ; Ginseng
+set %reagent_name Ginseng
+set %reagent2 N/A ; N/A
+set %required_reagent1 7
+set %required_reagent2 N/A
+set %catposy 150
+set %selposy 110
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 5 ; Greater Strength
+{
+set %potion_type Greater , #spc , Strength
+set %reagent1 MZF ; Mandrake Root
+set %reagent_name Mandrake , #spc , Root
+set %reagent2 N/A ; N/A
+set %required_reagent1 5
+set %required_reagent2 N/A
+set %catposy 170
+set %selposy 90
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 6 ; Poison
+{
+set %potion_type Poison
+set %reagent1 WZF ; Nightshade
+set %reagent_name Nightshade
+set %reagent2 N/A ; N/A
+set %required_reagent1 2
+set %required_reagent2 N/A
+set %catposy 190
+set %selposy 90
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 7 ; Greater Poison
+{
+set %potion_type Greater , #spc , Poison
+set %reagent1 WZF ; Nightshade
+set %reagent_name Nightshade
+set %reagent2 N/A ; N/A
+set %required_reagent1 4
+set %required_reagent2 N/A
+set %catposy 190
+set %selposy 110
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 8 ; Deadly Poison
+{
+set %potion_type Deadly , #spc , Poison
+set %reagent1 WZF ; Nightshade
+set %reagent_name Nightshade
+set %reagent2 N/A ; N/A
+set %required_reagent1 8
+set %required_reagent2 N/A
+set %catposy 190
+set %selposy 130
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 9 ; Greater Cure
+{
+set %potion_type Greater , #spc , Cure
+set %reagent1 KZF ; Garlic
+set %reagent_name Garlic
+set %reagent2 N/A ; N/A
+set %required_reagent1 6
+set %required_reagent2 N/A
+set %catposy 210
+set %selposy 110
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 10 ; Greater Explosion
+{
+set %potion_type Greater , #spc , Explosion
+set %reagent1 SZF ; Sulfuric Ash
+set %reagent_name Sulfuric , #spc , Ash
+set %reagent2 N/A ; N/A
+set %required_reagent1 10
+set %required_reagent2 N/A
+set %catposy 230
+set %selposy 110
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 11 ; Greater Conflagration
+{
+set %potion_type Greater , #spc , Conflagration
+set %reagent1 TZF ; Grave Dust
+set %reagent_name Grave , #spc , Dust
+set %reagent2 N/A ; N/A
+set %required_reagent1 10
+set %required_reagent2 N/A
+set %catposy 250
+set %selposy 90
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 12 ; Greater Confusion Blast
+{
+set %potion_type Greater , #spc , Confusion , #spc , Blast
+set %reagent1 YZF ; Pig Iron
+set %reagent_name Pig , #spc , Iron
+set %reagent2 N/A ; N/A
+set %required_reagent1 10
+set %required_reagent2 N/A
+set %catposy 250
+set %selposy 130
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 13 ; Invisibility
+{
+set %potion_type Invisibility
+set %reagent1 JUF ; Bloodmoss
+set %reagent_name Bloodmoss
+set %reagent2 WZF ; Nightshade
+set %required_reagent1 4
+set %required_reagent2 3
+set %catposy 270
+set %selposy 70
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 14 ; Parasitic
+{
+set %potion_type Parasitic
+set %reagent1 YWS ; Parasitic Plant
+set %reagent_name Parasitic , #spc , Plant
+set %reagent2 N/A ; N/A
+set %required_reagent1 5
+set %required_reagent2 N/A
+set %catposy 270
+set %selposy 90
+menu getnum %amount_to_make
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+menu get %pot_to_make
+if #menuRes = 15 ; Darkglow
+{
+set %potion_type Darkglow
+set %reagent1 XWS ; Luminescent Fungi
+set %reagent_name Luminescent , #spc , Fungi
+set %reagent2 N/A ; N/A
+set %required_reagent1 5
+set %required_reagent2 N/A
+set %catposy 270
+set %selposy 110
+menu getnum %amount_to_make
+set %amount #menures
+if #menures = 0
+gosub if_menures_is_zero
+set %amount #menures
+}
+return
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXXXX SUB TO FIND AND GRAB RESOURCES XXXXXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub grab_resources
+if %amount >= 100
+{
+set %grab 100
+}
+if %amount < 100
+{
+set %grab %amount
+}
+; Finds and grabs Bottles
+repeat
+gosub CheckPause
+menu set status Grabbing Bottles
+finditem %bottle C_ , %resource_bag || %dump_bag
+if #findstack < %grab
+{
+display ok You do not have enough bottles.$
++Script is halting
+menu hide
+halt
+}
+exevent drag #findid %grab
+wait 10
+exevent dropc #backpackid
+wait 15
+until #findstack >= %grab
+; Finds and grabs Reagent #1
+repeat
+gosub CheckPause
+menu set status Grabbing %reagent_name
+finditem %1 C_ , %resource_bag
+if #findstack < 10
+{
+display ok You do not have enough %reagent_name in your resource bag$
++Script is halting
+menu hide
+halt
+}
+exevent drag #findid 500
+wait 10
+exevent dropc #backpackid
+wait 15
+until #findstack >= 10
+; Finds and grabs Reagent #2
+finditem %2 C_ , %resource_bag
+exevent drag #findid 500
+wait 10
+exevent dropc #backpackid
+wait 15
+return
+
+sub grab_more_resources
+gosub CheckPause
+; Finds and grabs Reagent #1
+menu set status Grabbing %reagent_name
+finditem %1 C_ , %resource_bag
+if #findstack < 500
+{
+display ok You do not have enough %reagent_name in your resource bag$
++Script is halting
+menu hide
+halt
+}
+exevent drag #findid 500
+wait 10
+exevent dropc #backpackid
+wait 15
+; Finds and grabs Reagent #2
+finditem %2 C_ , %resource_bag
+exevent drag #findid 500
+wait 10
+exevent dropc #backpackid
+wait 15
+return
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXXXXXXX SUB FOR MAKING THE POTIONS XXXXXXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub craft_potion
+repeat
+gosub CheckPause
+menu set status Crafting %potion_type
+finditem %reagent1 C_ , #backpackid
+if #findstack < %required_reagent1
+{
+menu set status Out of Regs!
+wait 5
+gosub grab_more_resources %reagent1
+}
+finditem %alch_tool C_ , #backpackid
+if #findcnt < %alch_tools_needed
+{
+menu set status Out of Tools!
+wait 5
+gosub check_tool %alch_tool %alch_tools_needed 110 90
+}
+set #lobjectid #findid
+event macro 17 0
+gosub gumpwait
+set %x #contposx + %catposx
+set %y #contposy + %catposy
+click %x %y ; Category
+gosub gumpwait
+set %x #contposx + %selposx
+set %y #contposy + %selposy
+click %x %y ; Selection (Potion)
+gosub gumpwait
+finditem %bottle C_ , #backpackid
+until #findcnt < 1
+gosub clear_pots
+set %amount ( %amount - %grab )
+if %amount = 0
+{
+menu delete %amount_to_make
+menu font color red
+menu font bgcolor silver
+menu text done 120 %size2 Done!
+menu set status Finished with %potion_type
+set %pot_to_make ( %pot_to_make + 1 )
+wait 5
+gosub clear_pack %resources
+set %size2 ( %size2 + 25 )
+if %amount_to_make = %finished
+gosub finished
+set %amount_to_make ( %amount_to_make + 1 )
+return
+}
+gosub grab_resources %reagent1 %reagent2
+gosub craft_potion
+return
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XX SUB TO COMBINE AND MAKE SCRIPT SMALLER X
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub if_menures_is_zero
+menu delete %amount_to_make
+menu font color red
+menu font bgcolor silver
+menu text done 120 %size2 Done!
+set %size2 ( %size2 + 25 )
+set %pot_to_make ( %pot_to_make + 1 )
+if %amount_to_make = %finished
+gosub finished
+set %amount_to_make ( %amount_to_make + 1 )
+gosub potion_init
+return
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXXXXXXXXXXX FINISHED MESSAGE XXXXXXXXXXXXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub finished
+menu set status Script is Finished!
+display ok Script has finished working!$
++All potions should now be crafted and put away.$
++$
++Thank you for using Guadah's Alchimest Assistant.$
++$
++Script is Halting$
+menu hide
+halt
+return
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXXX GUMP WAIT SUB, ENSURES GUMP IS UP XXXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub gumpwait
+set %timer #SCNT + 5
+repeat
+until #CONTNAME = generic_gump || #SCNT > %timer
+if #contname <> generic_gump
+{
+event macro 17 0
+}
+Return
+; #################################################
+; ######## PAUSE SUB ########
+; #################################################
+Sub CheckPause
+if #menubutton = pause
+{
+set #menubutton N/A
+menu delete pause
+menu font color maroon
+menu font bgcolor silver
+menu button resume 170 105 55 25 Resume
+menu set status Paused! Click "Resume" when ready.
+gosub PauseLoop
+}
+if #menubutton = quit
+{
+display ok Thank you for using Guadah's Alchemist Assistant.$
++$
++Script is Halting$
+menu hide
+halt
+}
+if #menubutton = donate
+{
+set #menuButton N/A
+execute https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jim%2efries%40yahoo%2ecom&item_name=Guadahs%20Easy%20UO%20Script&no_shipping=0&no_note=1&currency_code=USD&lc=US&bn=PP%2dBuyNowBF&charset=UTF%2d8
+}
+return
+
+Sub PauseLoop
+Pause_Loop:
+If #menubutton = resume
+{
+set #menubutton N/A
+Menu Delete Resume
+Menu Font Color Black
+menu font bgcolor silver
+Menu Button Pause 170 105 55 25 Pause
+Return
+}
+if #menuButton = quit
+{
+Display ok Thank you for using Guadah's Alchemist Assistant.$
++$
++Script is Halting$
+Menu Hide
+Halt
+}
+if #menubutton = donate
+{
+set #menuButton N/A
+execute https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jim%2efries%40yahoo%2ecom&item_name=Guadahs%20Easy%20UO%20Script&no_shipping=0&no_note=1&currency_code=USD&lc=US&bn=PP%2dBuyNowBF&charset=UTF%2d8
+}
+Goto Pause_Loop
+Return
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+; XXX TRAILMYX'S PERSISTANT VARIABLE SUBS XXX
+; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+sub TM_GetPersistantVariable
+set #RESULT %1 , _ , #CHARID
+set #RESULT * . #RESULT
+return #RESULT
+sub TM_SetPersistantVariable
+set #RESULT %1 , _ , #CHARID
+set * . #RESULT %2
+return
+
+; FIN
