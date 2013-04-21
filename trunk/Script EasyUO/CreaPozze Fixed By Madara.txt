@@ -1,7 +1,7 @@
 ; ############################################
 ; Script Name: Guadah's Alchemist Assistant
 ; Author: Guadah
-; Version: 1.0
+; Version: 1.0.1 Fixed By Madara
 ; Client Tested with: EA 6.0.9.2 (Patch 70)
 ; EUO version tested with: 1.5 Version 142
 ; Shard OSI / FS: OSI Servers
@@ -62,7 +62,7 @@ menu shape potionbg 5 75 280 25 3 7 1 Black 7 Gray
 menu text status_title 10 80 Status:
 menu font size 8
 menu font color black
-menu check tools 210 6 74 25 #true Make Tools
+menu check tools 210 6 74 25 #false Make Tools
 ;menu check pots 210 25 70 25 #true Fill Pots
 ;menu check kegs 210 44 70 25 #false Fill Kegs
 menu font bgcolor silver
@@ -320,6 +320,8 @@ wait 10
 exevent dropc #backpackid
 wait 15
 }
+if #menures = #false
+ return
 menu set status Crafting required Tools
 set %to_make ( %2 - #findcnt ) ; Sets a number of tools to make
 set #lobjectid #findid
