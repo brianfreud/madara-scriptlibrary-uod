@@ -1,0 +1,424 @@
+;==================================
+; Script Name: lighting strike
+; Author: Felix
+; Version: 3.4
+; Client Tested with: 6.0.10
+; EUO version tested with: 1.5.143
+; Shard FS: UODreams
+; Public Release: 10/03/2009
+; Purpose: reactivating lighting strike or mixing lighting strike and primary ability
+;==================================
+ 
+;-------SETUP--------------
+set %SetupHotkey y ; hotkey to run initialisation for pixel reading
+set %SetupMod alt ; hotkey modifier to initialisation
+set %UseAbilityKey 5 ; hotkey to turn on/off mixing primary ability and lighting strike. same key with shift to turn secondary ability. same key with alt to turn off script
+set %UseMomentumStrikeKey z ; hotkey to uses momentum strike
+set %PrimAbilManaCost 18 ;mana to perform primary/secondary ability
+set %DoublePrimAbilManaCost 30 ; mana to use ability with double-cost
+set %LightManaCost 12 ; mana to perform lighting strike
+set %MomentumManaCost 16 ; mana to perfom momentum strike
+set %lIconX 394 ; X-posiotn of Ligting strike icon
+set %lIconY 678 ; Y-posiotn of Ligting strike icon
+set %pIconX 394 ; X-posiotn of Primary ability icon
+set %pIconY 627 ; Y-posiotn of Primary ability icon
+set %sIconX 444 ; X-posiotn of Secondary ability icon
+set %sIconY 627 ; Y-posiotn of Secondary ability icon
+set %mIconX 444 ; X-posiotn of Secondary ability icon
+set %mIconY 678 ; Y-posiotn of Secondary ability icon
+set %FR 60 ; stop wasting mana whan fire res < value
+ 
+;don't edit below
+set %nextturn #systime
+set %nextswitch #systime
+set %nextscan #systime
+set %abilityactivated #false
+set %somethingactivated #false
+set %abilityused3000 0
+set %scandelay 400
+set #lpc 500
+set %abilityonSecond #false
+set %momentumOn #false
+   event macro 36 0
+   wait 11
+   event macro 15 149
+   wait 11
+   event macro 15 149
+   wait 11
+ 
+repeat
+      if *LightingScriptSetup <> OK
+         gosub Setup first
+      else
+          gosub Setup
+until *LightingScriptSetup = OK
+ 
+set %abilityon #false
+set %scripton #true
+loop:
+    sleep 10
+   
+    onhotkey %UseAbilityKey alt
+              gosub ShutDown
+   
+    if %scripton = #false
+       goto loop
+       
+    onhotkey %UseAbilityKey
+              gosub switchmodePrim
+    onhotkey %UseAbilityKey shift
+              gosub switchmodeSecond
+    onhotkey %SetupHotkey %SetupMod
+             gosub Setup first
+    onhotkey %UseMomentumStrikeKey
+             gosub switchmodeMomentum
+             
+    if %momentumOn
+    {
+       gosub ReadJournalNoTwoEnemies
+       if #result
+       {
+          set %momentumOn #false
+          event ExMsg #charid 0 33 OFF momentum
+       }
+    }
+ 
+    if #systime < %nextscan || #mana < %LightManaCost
+       goto loop
+       
+    set %lighting #false
+    cmppix 1 f
+       set %lighting #true
+       
+    if ( %abilityon || %abilityonSecond ) && ( %lighting = #false || %abilityactivated )
+    {
+       set %abilty #false
+       if %abilityon
+       {
+          cmppix 2 f
+                 set %abilty #true
+       }
+       if %abilityonSecond
+       {
+          cmppix 3 f
+                 set %abilty #true
+       }
+       if %abilty = #false && %abilityactivated
+       {
+          if a notin #charstatus
+          {
+                 set %abilityused3000 #systime + 3000
+                 set %abilityactivated #false
+          }
+          else
+              set %abilityactivated #false
+       }
+    }
+   
+    if %MomentumOn
+    {
+       set %momentum #false
+       cmppix 4 f
+              set %momentum #true
+    }
+   
+    if %somethingactivated
+    {
+       set %somethingactivated #false
+       set %nextscan #systime + 100
+    }
+ 
+    if %lighting || ( %abilty && ( %abilityon || %abilityonSecond ) ) || %momentumOn && %momentum
+       goto loop
+ 
+    repeat
+       set %WaitCasting #false
+       if #targcurs = 1 || A in #charstatus
+       {
+          set %WaitCasting #true
+          while #targcurs = 1 || A in #charstatus
+          {
+                sleep 10
+          }
+          wait 3
+       }
+    until %WaitCasting = #false
+   
+    if #mana >= %LightManaCost && H notin #charstatus && #FR > %FR
+    {
+       if %lighting
+          set %needPressLighting #false
+       else
+           set %needPressLighting #true
+   
+       if ( %abilityon || %abilityonSecond ) && %abilty = #false && #mana >= %PrimAbilManaCost && ( #systime >= %abilityused3000 || #mana >= %DoublePrimAbilManaCost )
+       {
+          if %abilityon
+             event macro 35 0
+          if %abilityonSecond
+             event macro 36 0
+          set %nextscan #systime + %scandelay
+          set %abilityactivated #true
+          set %somethingactivated #true
+          set %needPressLighting #false
+       }
+       if %momentumOn && %momentum = #false && #mana >= %MomentumManaCost
+       {
+          event macro 15 150
+          set %nextscan #systime + %scandelay
+          set %somethingactivated #true
+          set %needPressLighting #false
+       }
+       if %needPressLighting
+       {
+              event macro 15 149
+              set %nextscan #systime + %scandelay
+              set %abilityactivated #false
+              set %somethingactivated #true
+       }
+    }
+goto loop
+ 
+sub switchmodePrim
+    if #systime > %nextswitch
+    {
+       set %nextswitch #systime + 300
+       if %abilityon || %abilityonSecond
+       {
+          event ExMsg #charid 0 33 OFF
+          set %abilityon #false
+       }
+       else
+       {
+           event ExMsg #charid 0 68 ON
+           set %abilityon #true
+           if #mana > %PrimAbilManaCost
+              event macro 35 0
+       }
+       if %abilityonSecond
+          set %abilityonSecond #false
+       if %momentumOn
+          set %momentumOn #false
+    }
+return
+ 
+sub switchmodeSecond
+    if #systime > %nextswitch
+    {
+       set %nextswitch #systime + 300
+       if %abilityonSecond
+       {
+          event ExMsg #charid 0 33 OFF
+          set %abilityonSecond #false
+       }
+       else
+       {
+           event ExMsg #charid 0 68 ON
+           set %abilityonSecond #true
+           if #mana > %PrimAbilManaCost
+              event macro 36 0
+       }
+       if %abilityon
+          set %abilityon #false
+       if %momentumOn
+          set %momentumOn #false
+    }
+return
+ 
+sub switchmodeMomentum
+    if #systime > %nextswitch
+    {
+       set %nextswitch #systime + 300
+       if %momentumOn
+       {
+          event ExMsg #charid 0 33 OFF momentum
+          set %momentumOn #false
+       }
+       else
+       {
+           event ExMsg #charid 0 68 ON momentum
+           set %momentumOn #true
+           set %MomJindex #jindex + 1
+           if #mana > %MomentumManaCost
+              event macro 15 150
+       }
+       if %abilityon
+          set %abilityon #false
+       if %abilityonSecond
+          set %abilityonSecond #false
+    }
+return
+ 
+ 
+sub ShutDown
+    if #systime > %nextturn
+    {
+       set %nextturn #systime + 500
+       if %scripton
+       {
+          event ExMsg #charid 0 0 Script OFF
+          set %scripton #false
+       }
+       else
+       {
+           event ExMsg #charid 0 0 Script ON
+           set %scripton #true
+       }
+       if %abilityon
+          set %abilityon #false
+       if %abilityonSecond
+          set %abilityonSecond #false
+       if %momentumOn
+          set %momentumOn #false
+    }
+return
+ 
+sub ReadJournalNoTwoEnemies
+    if #jindex >= %MomJindex
+    {
+       set %result #false
+       set %NextMomJindex #jindex
+       for %iMomJ %MomJindex %NextMomJindex
+       {
+           scanjournal %iMomJ
+           if #journal = There_are_no_valid_targets_to_attack!
+           {
+              set %result #true
+              break
+           }
+       
+       }
+       set %MomJindex %NextMomJindex + 1
+    }
+    else
+        return #false
+return %result
+ 
+sub Setup
+;pause
+    wait 10
+    if %1 = first
+    {
+       set *LightingScriptSetup OK
+       event macro 8 1
+       while #CONTNAME <> paperdoll_gump
+       {
+            sleep 10
+       }
+       event exmsg #charid 0 0 drag your lighting strike icon. it should be not active.
+       set %posing #true
+       repeat
+          while #contname <> spellicon_gump
+          {
+                sleep 10
+          }
+          contpos %lIconX %lIconY
+          wait 10
+          if #CONTPOSX = %lIconX && #CONTPOSY = %lIconY
+             set %posing #false
+       until %posing = #false
+    }
+ 
+    set %pixX %lIconX + 10
+    set %pixY %lIconY + 10
+    savePix %pixX %pixY 1
+ 
+    if %1 <> first
+    {
+       if *LightingScriptLight <> #pixcol
+          set *LightingScriptSetup Fail
+    }
+    if %1 = first
+    {
+       set *LightingScriptLight #pixcol
+       event macro 8 1
+       while #CONTNAME <> paperdoll_gump
+       {
+            sleep 10
+       }
+       event exmsg #charid 0 0 drag your prime ability icon. it should be not active.
+       set %posing #true
+       repeat
+          while #contname <> abilityicon_gump
+          {
+                sleep 10
+          }
+          contpos %pIconX %pIconY
+          wait 10
+          if #CONTPOSX = %pIconX && #CONTPOSY = %pIconY
+             set %posing #false
+       until %posing = #false
+    }
+    set %pixX %pIconX + 22
+    set %pixY %pIconY + 6
+    savePix %pixX %pixY 2
+ 
+    if %1 <> first
+    {
+       if *LightingScriptPrime <> #pixcol
+          set *LightingScriptSetup Fail
+    }
+    if %1 = first
+    {
+       set *LightingScriptPrime #pixcol
+       event macro 8 1
+       while #CONTNAME <> paperdoll_gump
+       {
+            sleep 10
+       }
+       event exmsg #charid 0 0 drag your secondary ability icon. it should be not active.
+       set %posing #true
+       repeat
+          while #contname <> abilityicon_gump
+          {
+                sleep 10
+          }
+          contpos %sIconX %sIconY
+          wait 10
+          if #CONTPOSX = %sIconX && #CONTPOSY = %sIconY
+             set %posing #false
+       until %posing = #false
+    }
+    set %pixX %sIconX + 18
+    set %pixY %sIconY + 9
+    savePix %pixX %pixY 3
+ 
+    if %1 <> first
+    {
+       if *LightingScriptSecond <> #pixcol
+          set *LightingScriptSetup Fail
+    }
+    if %1 = first
+    {
+       set *LightingScriptSecond #pixcol
+       event macro 8 1
+       while #CONTNAME <> paperdoll_gump
+       {
+            sleep 10
+       }
+       event exmsg #charid 0 0 drag your momentum strike icon. it should be not active.
+       set %posing #true
+       repeat
+          while #contname <> spellicon_gump
+          {
+                sleep 10
+          }
+          contpos %mIconX %mIconY
+          wait 10
+          if #CONTPOSX = %mIconX && #CONTPOSY = %mIconY
+             set %posing #false
+       until %posing = #false
+    }
+    set %pixX %mIconX + 18
+    set %pixY %mIconY + 9
+    savePix %pixX %pixY 4
+ 
+    if %1 <> first
+    {
+       if *LightingScriptMomentum <> #pixcol
+          set *LightingScriptSetup Fail
+    }
+    if %1 = first
+       set *LightingScriptMomentum #pixcol
+ 
+return

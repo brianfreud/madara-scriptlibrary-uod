@@ -1,0 +1,172 @@
+;==================================
+; Script Name: Felix's bonecuter
+; Author: Felix
+; Version: 2.41
+; Client Tested with: 6.0.13
+; EUO version tested with: 1.5.148
+; Shard FS: UODreams
+; Public Release: 26/05/2009
+; Purpose: cutting df's bones in doom
+;==================================
+ 
+;-------SETUP----------
+;IMPORTANT: if u have laggs increase value in next string
+set %CursDelay 200 ; maximum time (in ms ) of appearing cursor after using bladed
+set %hits 50 ; script will not cut if hp < value
+set %dist 11 ; how long to cut
+set %StopIfCursor #false ; not to cut whan target cursor appeared (may be usefull for mages)
+set %FR 0 ; stop if fire res < %FR
+;-------------------------
+;don't edit below
+ 
+set #lpc 1000
+set %bladed JDP_TSF_INF_WRH_FUO_ATF_NPO_JPH_WSF_NMH_VRH_JTF_SOH_BPH_EDP_YCP_ZCP_JDP_LDP_FDP_HDP_OPO_GMH_HNF_CNF
+set %bonetypes LNF_QNF_WNF_PNF_KNF_MNF_JNF_YNF_VNF
+set %cutagain #false
+ 
+gosub find_bladed
+ 
+loop:
+     while ( #targcurs = 1 && %StopIfCursor ) ;|| ( #hits < %hits ) || ( #fr < %FR )
+     {
+           sleep 10
+     }
+find:
+     finditem %bonetypes G_ , %dist
+     while #findkind = -1
+     {
+           finditem %bonetypes G_ , %dist
+           ;finditem JCWHUMD
+           wait 2
+     }
+     set %bone #findid
+     if #findcnt > 1
+     {
+         set %bonedist #finddist
+         for #findindex 2 #findcnt
+         {
+             if #finddist < %bonedist
+             {
+                set %bonedist #finddist
+                set %bone #findid
+             }
+         }
+     }
+     set %tries 0
+     set %ignored #false
+     while %ignored = #false && %tries < 5
+     {
+           if %DagerUsed = #false && #targcurs <> 1 && #hits > %hits && #fr >= %fr
+           {
+              while #hits < %hits || #fr < %fr
+              {
+                    sleep 10
+              }
+              if %ignored = #false
+              {
+                 set %lobjectid #lobjectid
+                 set #lobjectid %blade
+                 set !jindex #jindex + 1
+                 event macro 17 0
+                 set %DagerUsed #true
+                 set %tries %tries + 1
+                 set %DagerUseTime700 #systime + 700
+                 set %nextObjUse #systime + 500
+                 set %StopTargWait #systime + %CursDelay
+              }
+              set %cutagain #false
+              while #targcurs <> 1 && #systime < %StopTargWait && %ignored = #false && %cutagain = #false
+              {
+                 finditem %bone G_ , %dist
+                 if #findkind = -1
+                    set %ignored #true
+                 set !nextjinedxend #jindex
+                 if !jindex <= !nextjinedxend
+                 {
+                    for !ji !jindex !nextjinedxend
+                    {
+                        scanjournal !ji
+                        if target_cannot_be in #journal
+                           set %ignored #true
+                        if That_is_too_far_away. in #journal || You_see_nothing_useful_to_carve_from_the_corpse. in #journal || You_may_not_carve_this_corpse. in #journal
+                        {
+                           ignoreitem %bone
+                           set %ignored #true
+                        }
+                        if You_must_wait_to_perform_another_action. in #journal
+                        {
+                           set %nextObjUse #systime + 100
+                           set %cutagain #true
+                           set %DagerUsed #false
+                        }
+                    }
+                    set !jindex !nextjinedxend + 1
+                 }
+                 sleep 10
+              }
+           }
+           if %ignored
+              set #lobjectid %lobjectid
+           if %cutagain = #false && #hits > %hits && #fr >= %fr
+           {
+              set %ltargetkind #ltargetkind
+              set %ltargetid #ltargetid
+              set %targetagain #true
+              while %targetagain
+              {
+                    set #ltargetkind 1
+                    set #ltargetid %bone
+                    event macro 22 0
+                    set %targetagain #false
+                    if #targcurs = 1
+                       set %targetagain #true
+              }
+              set %DagerUsed #false
+              set #lobjectid %lobjectid
+              set #ltargetkind %ltargetkind
+              set #ltargetid %ltargetid
+           }
+           while #systime < %nextObjUse && %ignored = #false
+           {
+                 finditem %bone G_ , %dist
+                 if #findkind = -1
+                    set %ignored #true
+                 set !nextjinedxend #jindex
+                 if !jindex <= !nextjinedxend
+                 {
+                    for !ji !jindex !nextjinedxend
+                    {
+                        scanjournal !ji
+                        if target_cannot_be in #journal || destroy in #journal
+                           set %ignored #true
+                        if That_is_too_far_away. in #journal || You_see_nothing_useful_to_carve_from_the_corpse. in #journal || You_may_not_carve_this_corpse. in #journal
+                        {
+                           ignoreitem %bone
+                           set %ignored #true
+                        }
+                    }
+                    set !jindex !nextjinedxend + 1
+                 }
+                 sleep 10
+           }
+     }
+     if %DagerUsed || %tries >= 5
+        goto find
+goto loop
+ 
+sub find_bladed
+    set %nextmsg #systime
+    finditem %bladed C_ , #backpackid
+    while #findkind = -1
+    {
+          if #systime > %nextmsg
+          {
+             event ExMsg #charid 0 0 bladed item is needed to cut bones
+             set %nextmsg #systime + 10000
+          }
+          finditem %bladed C_ , #backpackid
+          sleep 10
+    }
+    event ExMsg #charid 0 0 ready to cut
+    set %blade #findid
+return
