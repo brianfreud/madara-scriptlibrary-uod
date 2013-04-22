@@ -1,0 +1,261 @@
+; Questo script è MOLTO artigianale, ma semplifica molto l'acquisizione delle recipe. 
+; E' tutt'altro perfetto e se qualcuno avesse voglia di cimentarsi nel migliorarlo ben venga.
+; Sfruttando l'ocr funziona solo se sullo schermo è presente la schermata di UOL. Inoltre 
+; richiede che ci sia poca lag, altrimenti vanno aumentati un po' i tempi di attesa (wait)
+; Come indicato a inizio script...
+; Andare nella zona degli elfi metal weaver e posizionarsi vicino alla forgia e all'anvil. 
+; Portare con se lingotti e qualche tongs (eventualmente un tinker tool per crearle)
+; Andare nella zona degli elfi metal weaver e posizionarsi vicino alla forgia e all'anvil. 
+; Portare con se lingotti e qualche tongs (eventualmente un tinker tool per crearle)
+; Richiede il kalocr.txt
+
+main_loop:
+set %quest_item ATF ;inserire il type degli oggetti della quest (ATF=broadsword)
+set %num 10 ;inserire il numero degli oggetti necessari per la quest
+wait 1s
+gosub crea_tool
+
+riprova:
+gosub CheckForWorldSave
+set %descrizione vuoto
+set %trovata 0
+
+
+gosub trovaQuester
+gosub get_quest
+gosub quest_Description
+gosub check_quest
+gosub consegna
+gosub complete_quest
+
+goto main loop
+
+
+
+
+sub trovaQuester
+trova_npc:
+finditem HS_IS_XU
+event property #findid
+if Metal in #property
+set %npc #findid
+else
+{
+ignoreitem #findid
+goto trova_npc
+}
+return
+
+
+sub get_quest
+set #lobjectid %npc
+event macro 17 0
+wait 5
+while #contsize <> 507_436
+{
+event macro 17 0
+wait 1s
+}
+return
+
+
+sub quest_Description
+wait 10
+if #CONTNAME = generic_gump
+{
+contpos 0 50
+wait 10
+call kalocr getMLQInfo QuestOffer 0 50
+set %descrizione %1
+event sysmessage Quest proposta: , #spc , %descrizione
+if CUTS IN %descrizione
+set %trovata 1
+else
+{
+set %trovata 0
+;event sysmessage Trovata?: , #spc , %trovata
+}
+}
+return
+
+sub check_quest
+wait 10
+if %trovata = 1
+{
+set %c_x 140 + #contposx
+set %c_y 400 + #contposy
+click %c_x %c_y
+event sysmessage Quest accettata
+}
+else
+{
+set %c_x 340 + #contposx
+set %c_y 400 + #contposy
+click %c_x %c_y
+wait 20
+;ultima modifica
+if #CONTNAME = generic_gump contpos 0 50
+set %c_x 340 + #contposx
+set %c_y 410 + #contposy
+click %c_x %c_y
+event sysmessage Quest NON accettata
+wait 10
+goto riprova
+}
+return
+
+sub consegna
+if %trovata = 1
+{
+event sysmessage Inizio toggle Item
+gosub toggle_quest_item
+}
+else
+event sysmessage Toggle Item NON necessario
+return
+
+
+sub toggle_quest_item
+set %i 0
+ignoreitem reset
+exevent popup #charid 6
+target 1s
+for %i 1 10
+{
+finditem %quest_item C_ , #backpackid
+set #ltargetid #findid
+set #ltargetkind 1
+event macro 22 0
+wait 10
+finditem #ltargetid C_ , #backpackid
+event property #findid
+ignoreitem #findid
+wait 3
+}
+key esc
+event sysmessage Toggle Item Completato
+wait 20
+return
+
+sub complete_quest
+set #lobjectid %npc
+event macro 17 0
+wait 5
+while #contsize <> 507_436
+{
+event macro 17 0
+wait 1s
+}
+set %x #contposx + 132
+set %y #contposy + 402
+click %x %y
+event sysmessage Quest completata!
+wait 2
+goto main_loop
+return
+
+sub crea_tool
+start:
+ignoreitem reset
+finditem OBG C_ , #BACKPACKID
+wait 2
+if #findkind = -1
+{
+display non hai più tongs
+halt
+}
+set #LOBJECTID #findid
+event macro 17
+wait 10
+repeat
+{
+}
+until #CONTNAME = generic_gump
+; Apri gump tinker tool
+set %x1 #CONTPOSX + 30
+set %y1 #CONTPOSY + 150
+click %x1 %y1
+wait 10
+repeat
+{
+}
+until #CONTNAME = generic_gump
+; crea broadsword
+set %x2 #contposx + 230
+set %y2 #CONTPOSY + 90
+
+finditem ATF C_ , #BACKPACKID
+set %N #findcnt
+while %N < 10
+{
+click %x2 %y2
+wait 2
+set %N %N + 1
+event sysmessage Broadsword create: , #spc , %N
+wait 2
+gosub CheckTongs ; Cambia tongs
+repeat
+{
+}
+until #CONTNAME = generic_gump
+wait 1s
+}
+; Chiudi gump
+wait 10
+click %x2 %y2 r
+;
+event sysmessage Creazione oggetti tool terminata
+return
+
+sub CheckForWorldSave
+if %SaveIndex = N/A
+set %SaveIndex #jindex
+
+set !Save #false
+set !Jstart %SaveIndex
+for !i !Jstart #jindex
+{
+scanjournal !i
+if #jcolor = 53
+{
+if THE_WORLD_WILL_SAVE_IN in #journal || WORLD_IS_SAVING in #journal
+{
+set !Save #true
+Event ExMsg #charid 3 33 SAVE Detected
+wait 40s
+set %SaveIndex #jindex
+set !i #jindex
+}
+if CLEANING in #journal
+{
+set !Save #true
+Event ExMsg #charid 3 33 CLEANING Detected
+wait 25s
+set %SaveIndex #jindex
+set !i #jindex
+}
+}
+set %SaveIndex !i
+}
+
+nameSpace Clear
+nameSpace Pop
+
+return
+
+
+
+sub CheckTongs
+set %JournalIndex #Jindex - 5
+for %i %JournalIndex #jindex
+{
+scanjournal %i
+if YOU_HAVE_WORN in #journal
+{
+event SysMessage Cambio tong...
+goto start
+}
+}
+set %JournalIndex %i - 1
+wait 2
+return
