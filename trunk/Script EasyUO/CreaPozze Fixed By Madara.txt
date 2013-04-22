@@ -30,7 +30,7 @@ set %selposx 230
 ; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ; XXXXXXXXXXXXXXX MENU DESIGN XXXXXXXXXXXXXXX
 ; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-;menu hideeuo
+menu hideeuo
 menu window title Guadah's Alchemist Assistant
 menu window color silver
 menu window size 290 %size1
