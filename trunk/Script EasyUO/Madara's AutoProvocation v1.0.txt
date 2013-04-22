@@ -1,7 +1,7 @@
 ;==================================================
 ; Name: AutoProvocation v1.0
 ; Author: Madara
-; Version: 1.0.3
+; Version: 1.0.4
 ; Shard FS: UODreams
 ; Client Tested With: 7.0.22
 ; EUO version tested with: 1.5 v.236
@@ -59,9 +59,7 @@ _main:
    {
     deletejournal
     event macro 13 22
-    while #TargCurs = 0
-    {
-    }
+    target 2s
     event macro 22
     set #LTargetId %LTarget
     set #LTargetKind 1
@@ -87,7 +85,6 @@ _main:
      }
      if Your_music_fails_to_incite_enough_anger. in #journal
      {
-      ignoreitem #FindId mob2
       set %T2 ( #scnt + %wait )
       _loop2:
       onhotkey %KeyStopProvo
@@ -100,7 +97,8 @@ _main:
       goto _main
      }
      if You_must_wait_a_few_moments_to_use_another_skill. in #journal ||
-      + You_can't_incite_that! in #journal
+      + The_creatures_you_are_trying_to_provoke_are_too_far_away_from_each_
+       +other_for_your_music_to_have_an_effect. in #journal
      {
       set %T3 ( #scnt + 2 )
       _loop3:
@@ -110,6 +108,21 @@ _main:
        goto _exit3
       goto _loop3
       _exit3:
+      set %Time ( #scnt + 3 )
+      goto _main
+     }
+     if You_can't_tell_someone_to_attack_themselves! in #journal ||
+      + You_can't_incite_that! in #journal
+     {
+      ignoreitem #FindId mob2
+      set %T4 ( #scnt + 2 )
+      _loop4:
+      onhotkey %KeyStopProvo
+       goto _hotkey
+      if #scnt >= %T4
+       goto _exit4
+      goto _loop4
+      _exit4:
       set %Time ( #scnt + 3 )
       goto _main
      }
