@@ -172,12 +172,12 @@ set %x ( #contposx + 26 )
 set %y ( #contposy + 110 )
 click %x %y
 wait %lag
-set %x ( #contposx + 382 ) ; 382
-set %y ( #contposy + 288 ) ; 272
+set %x ( #contposx + 382 )
+set %y ( #contposy + 272 )
 click %x %y
 wait %lag
-set %x ( #contposx + 382 ) ; 382
-set %y ( #contposy + 288 ) ; 272
+set %x ( #contposx + 382 )
+set %y ( #contposy + 272 )
 click %x %y
 wait %lag
 set %x ( #contposx + 233 )
