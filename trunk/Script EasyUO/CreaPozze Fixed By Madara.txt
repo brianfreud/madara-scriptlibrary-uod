@@ -521,8 +521,8 @@ if #menuRes = 6 ; Greater Conflagration
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 150
-   set %selposy 150
+   set %catposy 250
+   set %selposy 90
    menu getnum %amount_to_make
    set %amount #menures
    if #menures = 0
@@ -545,8 +545,8 @@ if #menuRes = 7 ; Greater Confusion Blast
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 150
-   set %selposy 190
+   set %catposy 250
+   set %selposy 130
    menu getnum %amount_to_make
    set %amount #menures
    if #menures = 0
@@ -569,8 +569,8 @@ if #menuRes = 8 ; Greater Cure
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 90
-   set %selposy 210
+   set %catposy 210
+   set %selposy 110
    menu getnum %amount_to_make
    set %amount #menures
    if #menures = 0
@@ -593,8 +593,8 @@ if #menuRes = 2 ; Darkglow
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 130
-   set %selposy 170
+   set %catposy 270
+   set %selposy 110
    menu getnum %amount_to_make
    set %amount #menures
    if #menures = 0
@@ -617,7 +617,7 @@ if #menuRes = 10 ; Greater Explosion
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 150
+   set %catposy 230
    set %selposy 110
    menu getnum %amount_to_make
    set %amount #menures
@@ -685,8 +685,8 @@ if #menuRes = 9 ; Greater Heal
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 90
-   set %selposy 150
+   set %catposy 150
+   set %selposy 110
    menu getnum %amount_to_make
    set %amount #menures
    if #menures = 0
@@ -713,8 +713,8 @@ if #menuRes = 13 ; Invisibility
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 110
-   set %selposy 170
+   set %catposy 270
+   set %selposy 70
    menu getnum %amount_to_make
    set %amount #menures
    if #menures = 0
@@ -781,8 +781,8 @@ if #menuRes = 15 ; Night Sight
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 110
-   set %selposy 110
+   set %catposy 130
+   set %selposy 70
    menu getnum %amount_to_make
    set %amount #menures
    if #menures = 0
@@ -805,8 +805,8 @@ if #menuRes = 17 ; Parasitic
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 130
-   set %selposy 150
+   set %catposy 270
+   set %selposy 90
    menu getnum %amount_to_make
    set %amount #menures
    if #menures = 0
@@ -829,7 +829,7 @@ if #menuRes = 16 ; Normal Poison
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 130
+   set %catposy 190
    set %selposy 90
    menu getnum %amount_to_make
    set %amount #menures
@@ -853,7 +853,7 @@ if #menuRes = 11 ; Greater Poison
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 130
+   set %catposy 190
    set %selposy 110
    menu getnum %amount_to_make
    set %amount #menures
@@ -877,7 +877,7 @@ if #menuRes = 3 ; Deadly Poison
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 130
+   set %catposy 190
    set %selposy 130
    menu getnum %amount_to_make
    set %amount #menures
@@ -973,8 +973,8 @@ if #menuRes = 12 ; Greater Strength
    set %required_tool_needed 1
    set %required_tool_catposy 130
    set %required_tool_selposy 90
-   set %catposy 110
-   set %selposy 150
+   set %catposy 170
+   set %selposy 90
    menu getnum %amount_to_make
    set %amount #menures
    if #menures = 0
@@ -1005,7 +1005,7 @@ if #findstack < %minimum_required_resource1
    exevent dropc #backpackid
     wait 15
    }
- 
+
 ; Finds and grabs Resource #2
 if %2 = N/A
    return
@@ -1026,7 +1026,7 @@ if #findstack < %minimum_required_resource2
    exevent dropc #backpackid
     wait 15
    }
-   
+
  ; Finds and grabs Resource #3
 if %3 = N/A
    return
@@ -1122,8 +1122,8 @@ set %makefirst #TRUE
      }
    else ; Make Last
      {
-     set %x #contposx + 280
-     set %y #contposy + 455
+     set %x #contposx + 282
+     set %y #contposy + 410
      click %x %y ; Category
        gosub gumpwait
      }
