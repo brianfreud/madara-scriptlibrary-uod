@@ -1323,7 +1323,7 @@ return
 ; XXXX GUMP WAIT SUB, ENSURES GUMP IS UP XXXX
 ; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 sub gumpwait
-set %timer #SCNT + 20
+set %timer #SCNT + 35
 repeat
  gosub save
 until #CONTNAME = generic_gump || #SCNT > %timer
