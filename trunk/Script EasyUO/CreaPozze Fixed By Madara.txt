@@ -1,11 +1,11 @@
 ; ############################################
 ; Script Name: Guadah's Alchemist Assistant
 ; Author: Guadah, Fixed By Madara
-; Version: 1.3.5
+; Version: 1.3.6
 ; Client Tested with: 7.0.22
 ; EUO version tested with: 1.5 V 236
-; Revision Date: 23/04/2013
-; Public Release: 7-11-2008
+; Revision Date: 25/04/2013
+; Public Release: 07/11/2008
 ; Purpose: To Craft Potions
 ; Special Thanks:
 ; * Trailmyx Persistant Variable Sub, advice & support - www.scriptuo.com
@@ -28,7 +28,7 @@ set %resources WUF_ENK_TLK_XWS_YWS_YZF_KZF_KUF_RZF_MZF_JUF_WZF_SZF_JZF_TZF_YZF_A
 set %finished_items ZUF_AVF_NUF_UUF_XUF_YUF_TUF_OUF_AFZ
 set %catposx 30
 set %selposx 230
-set #lpc 5
+set #lpc 10
 ; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ; XXXXXXXXXXXXXXX MENU DESIGN XXXXXXXXXXXXXXX
 ; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -1175,7 +1175,7 @@ set #lpc 1000
   scanjournal 1
   if World_save in #journal && #jcolor = 53
    {
-   set #lpc 5
+   set #lpc 10
    return
    }
   if saving in #journal && #jcolor = 53
@@ -1185,7 +1185,7 @@ set #lpc 1000
     {
     if World_save in #sysmsg
      {
-     set #lpc 5
+     set #lpc 10
      return
      }
     }
@@ -1197,17 +1197,17 @@ set #lpc 1000
     {
     if Cleaned in #sysmsg
      {
-     set #lpc 5
+     set #lpc 10
      return
      }
     }
    }
   if Cleaned in #journal && #jcolor = 53
    {
-   set #lpc 5
+   set #lpc 10
    return
    }
- set #lpc 5
+ set #lpc 10
 return
 ; ###########################################################################
 ; ##########     Checks for resources and refills if needed   ###############

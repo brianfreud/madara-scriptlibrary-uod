@@ -1,13 +1,13 @@
 ;==================================================
 ; Name: Madara's PetHealer 2.5
 ; Author: Madara
-; Version: 2.5.2
+; Version: 2.5.5
 ; Shard FS: UODreams
 ; Client Tested With: 7.0.15 - 7.0.21 - 7.0.22
 ; EUO version tested with: 1.5 v.236
 ; Public Release: 06/03/2013
-; Last Revision: 20/04/2013
-; Credits: Boydon(Bone-Cutter)
+; Last Revision: 25/04/2013
+; Credits: Boydon, Kal In Ex
 ;==================================================
 ; COSA FA LO SCRIPT?
 ; - Se la vita del Pet scende sotto una certa Percentuale(%) di HP cura in loop usando le bende.
@@ -69,7 +69,8 @@ set %slow_lpc 500
 set %fast_lpc 1000
 set #menubutton N/A
 set %Bende ZLF
-set %bonetypes LNF_QNF_WNF_PNF_KNF_MNF_JNF_YNF_VNF
+set %bonetypes LNF_QNF_WNF_PNF_KNF_MNF_JNF_YNF_VNF_
+              +GUF_JJK_MJK_
 set %bladed FUO_ATF_NPO_JPH_WSF_NMH_VRH_JTF_SOH_BPH_
            +EDP_YCP_ZCP_JDP_LDP_FDP_HDP_OPO_GMH_HNF_
            +CNF_
@@ -321,13 +322,26 @@ if #menubutton = RESET
 if #menubutton = BARD
 {
  if *Bardo = 2 && %FBardo = #true
+ {
   menu set Bard Disco: Disattiva
+  set %FBardo #false
+  set #menubutton N/A
+  goto _exitbard
+ }
  if *Bardo = 3 && %FBardo = #true
+ {
   menu set Bard Provo: Disattiva
+  set %FBardo #false
+  set #menubutton N/A
+  goto _exitbard
+ }
  if *Bardo = 2 && %FBardo = #false
  {
   ignoreitem reset mob
   menu set Bard Disco: Attiva
+  set %FBardo #true
+  set #menubutton N/A
+  gosub Bardo
  }
  if *Bardo = 3 && %FBardo = #false
  {
@@ -345,17 +359,12 @@ if #menubutton = BARD
   set #LTargetKind 1
   ignoreitem %LTarget mob
   wait 1s
- }
- if %FBardo = #false
- {
-  ;ignoreitem reset mob
   set %FBardo #true
+  set #menubutton N/A
+  gosub Bardo
  }
- else
-  set %FBardo #false
- set #menubutton N/A
- gosub Bardo
 }
+_exitbard:
 if #menubutton = PAUSA
 {
  set #menubutton N/A
@@ -483,6 +492,8 @@ if %hotkey2 = #true
 }
 if %Doom = #true
  gosub BoneCut
+if %FBardo = #true
+ gosub Bardo
 finditem %Pet G_
 if %hits > %Benda && %life = blue || #finddist > 2
 {
@@ -519,6 +530,8 @@ if #finddist <= 2
   if %life = red || %life = yellow || %life = green
    goto exit1
   loop_s2:
+  if %FBardo = #true
+   gosub Bardo
   if %Doom = #true
    gosub BoneCut
   if %Metodo = #true
@@ -555,6 +568,8 @@ if #finddist <= 2
    }
   }
  exit1:
+ if %FBardo = #true
+   gosub Bardo
  if %Doom = #true
   gosub BoneCut
  if %life = yellow && %Bleed = #true
@@ -616,6 +631,8 @@ if #finddist <= 2
    if %life = red || %life = yellow || %life = green
     goto exit2
    loop_s3:
+   if %FBardo = #true
+    gosub Bardo
    if %Doom = #true
     gosub BoneCut
    while #CharGhost = YES
@@ -655,6 +672,8 @@ if #finddist <= 2
     }
    }
   exit2:
+  if %FBardo = #true
+   gosub Bardo
   if %Doom = #true
    gosub BoneCut
   gosub GetHitBarLife %GumpX %GumpY
@@ -680,6 +699,8 @@ if #finddist <= 2
       set #targcurs 0
     until #targcurs = 0
    }
+   if %FBardo = #true
+    gosub Bardo
    if %Doom = #true
     gosub BoneCut
    menu set Azioni Benda
@@ -713,6 +734,8 @@ if #finddist <= 2
    }
   }
   bende_finite:
+  if %FBardo = #true
+   gosub Bardo
   if %Doom = #true
    gosub BoneCut
   gosub save_clean
@@ -741,6 +764,8 @@ if #finddist <= 2
       set #targcurs 0
     until #targcurs = 0
    }
+   if %FBardo = #true
+    gosub Bardo
    if %Doom = #true
     gosub BoneCut
    menu set Azioni Greater Heal
@@ -770,6 +795,8 @@ if #finddist <= 2
    }
   }
   gosub save_clean
+  if %FBardo = #true
+   gosub Bardo
   if %Doom = #true
    gosub BoneCut
   if %hits <= %Heal && %life <> red && %life <> yellow && %life <> green && #mana > 10 && %Spell = #true && %Skill = Chiva
@@ -797,6 +824,8 @@ if #finddist <= 2
       set #targcurs 0
     until #targcurs = 0
    }
+   if %FBardo = #true
+    gosub Bardo
    if %Doom = #true
     gosub BoneCut
    menu set Azioni Obsu Vulni
@@ -830,6 +859,8 @@ if #finddist <= 2
    if %life = red || %life = yellow || %life = green
     goto exit3
    loop_s4:
+   if %FBardo = #true
+    gosub Bardo
    if %Doom = #true
     gosub BoneCut
    while #CharGhost = YES
@@ -870,6 +901,8 @@ if #finddist <= 2
     }
    }
   exit3:
+  if %FBardo = #true
+   gosub Bardo
   if %Doom = #true
    gosub BoneCut
   gosub GetHitBarLife %GumpX %GumpY
@@ -904,6 +937,8 @@ if #finddist <= 2
       set #targcurs 0
     until #targcurs = 0
    }
+   if %FBardo = #true
+    gosub Bardo
    if %Doom = #true
     gosub BoneCut
    if %CureB = 1 ; loop enter arch cure
@@ -959,6 +994,8 @@ if #finddist <= 2
    }
   }
   gosub save_clean
+  if %FBardo = #true
+   gosub Bardo
   if %Doom = #true
    gosub BoneCut
   if %life = green && %Cure = #true && #mana > 11 && %Spell = #true && %Skill = Chiva && %Lap = 0
@@ -987,6 +1024,8 @@ if #finddist <= 2
       set #targcurs 0
     until #targcurs = 0
    }
+   if %FBardo = #true
+    gosub Bardo
    if %Doom = #true
     gosub BoneCut
    menu set Azioni Expor Flamus
@@ -1035,6 +1074,8 @@ if #finddist <= 2
    {
     menu set Bard Attendi...
    }
+   if %FBardo = #true
+    gosub Bardo
    if %Doom = #true
     gosub BoneCut
    gosub save_clean
@@ -1173,6 +1214,8 @@ if %Doom = #true
 return
 
 sub Bardo
+for %i 0 5
+{
 if *Bardo = 2 && %FBardo = #true
 {
  if #scnt >= %TimeBardoD
@@ -1290,6 +1333,7 @@ if *Bardo = 3 && %FBardo = #true
   }
  }
 }
+}
 return
 
 sub hotkey1
@@ -1329,7 +1373,7 @@ sub GetPet
 return #ltargetid
 
 sub BoneCut ; By Boydon
-for %l 1 10
+for %l 1 7
 {
  finditem %bonetypes G_2
  if #findkind <> -1
@@ -1656,32 +1700,32 @@ menu text Azioni 45 122 N/A
 
 menu Font Style b
 menu font color White
-menu Font Size 12
+menu Font Size 9
 menu button Start 5 180 153 25 Metti In Pausa
 menu button Reset 161 180 132 25 IMPOSTAZIONI
 menu Font Style b
 menu font color Yellow
-menu Font Size 12
+menu Font Size 9
 menu button Curse 161 155 132 20 Remove Curse
 menu Font Style b
-menu Font Size 12
+menu Font Size 9
 menu font color White
 menu button Status 161 115 132 35 S T A T U S
 menu Font Style b
-menu Font Size 12
+menu Font Size 9
 menu font color Yellow
 menu button Doom 167 5 125 20 DOOM
 if *Bardo = 2
 {
  menu Font Style b
- menu Font Size 12
+ menu Font Size 9
  menu font color Yellow
  menu button Bard 5 155 153 20 Disco: Disattiva
 }
 if *Bardo = 3
 {
  menu Font Style b
- menu Font Size 12
+ menu Font Size 9
  menu font color Yellow
  menu button Bard 5 155 153 20 Provo: Disattiva
 }
