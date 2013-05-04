@@ -1,0 +1,35 @@
+// Author: Gramoz
+// Purpose: Train necromancy from 0 to 120 with boat on infinite lane
+// Instructions: Dress a suite 100% lrc (meditable), take a boat and go to infinite lane than raise the anchor, on SETUP write your preferences then start this macro
+//
+// Descrizione: Allena necromancy da 0 a 120 con la barca su rotta infinita
+// Istruzioni: Indossate un'armatura 100% lrc (meditabile), prendete una barca ed andate sulla rotta infinita e togliete l'ancora (raise anchor), nel SETUP scrivete le vostre preferenze (al posto di XX inserite raggiunto quanto mana deve fermarsi per rigenerare, al posto di YY scrivete quanti millisecondi aspettare per la rigenerazione del mana)
+// Consigli: Con questa macro vi salirà anche meditation, quindi nel caso non vogliate farla salire bloccatela
+//
+// SETUP:
+if "mana" <= XX "self" // <-- instead XX write the amount of mana to start regenerating it
+ useskill "meditation"
+ pause YY // <-- instead YY write how to wait the mana regeneration (milliseconds)
+//
+elseif skill "necromancy" == 120
+ for 3
+  sysmsg "120 NECROMANCY!" 70
+  pause 500
+ endfor
+ stop
+elseif skill "necromancy" > 100
+ msg "forward"
+ cast "vampiric embrace"
+elseif skill "necromancy" > 70
+ msg "forward"
+ cast "lich form"
+elseif skill "necromancy" > 60
+ msg "forward"
+ cast "wither"
+elseif skill "necromancy" > 40
+ msg "forward"
+ cast "horrific beast"
+else
+ msg "forward"
+ cast "curse weapon"
+endif
