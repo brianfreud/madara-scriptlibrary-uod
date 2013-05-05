@@ -1,0 +1,101 @@
+;==================================================
+; Name: AutoLightningStrike
+; Author: Madara
+; Version: 1.0.0
+; Shard FS: UODreams
+; Client Tested With: 7.0.22
+; EUO version tested with: 1.5 v.236
+; Public Release: 05/04/2013
+; Last Revision: 05/04/2013
+;==================================================
+set %wait 2 ; velocità inserimento lightstrike
+;==================================================
+InitEvents
+set #lpc 100
+set #SysMsgCol 2050
+if *FirstLight = N/A
+ set *FirstLight #true
+chooseskill Bush
+if #skill < 500
+{
+ display ok Devi avere almeno 50 Bushido per usare il Lightning Strike.
+ halt
+}
+
+_Main:
+ gosub FirstLight
+ gosub LightStrike
+ gosub Reset
+goto _Main
+
+sub FirstLight
+while #CharGhost = YES
+{
+}
+if *FirstLight = #true
+{
+ event SysMessage Clicca due volte su "Lightning Strike Icon" e mentre mantieni il mouse sopra la Spell premi F
+ repeat
+  onhotkey F
+   set %sys 1
+ until %sys = 1
+ savePix #CursorX #CursorY 1
+ set *PixelX #CursorX
+ set *PixelY #CursorY
+ set *PixCol #PixCol
+ event SysMessage Clicca due volte sulla "Primary Ability Icon" e mentre mantieni il mouse sopra la Spell premi F
+ wait 20
+ repeat
+  onhotkey F
+   set %sys 2
+ until %sys = 2
+ savePix #CursorX #CursorY 2
+ set *PixelX2 #CursorX
+ set *PixelY2 #CursorY
+ set *PixCol2 #PixCol
+ event SysMessage Clicca due volte su "Secondary Ability Icon" e mentre mantieni il mouse sopra la Spell premi F
+ wait 20
+ repeat
+  onhotkey F
+   set %sys 3
+ until %sys = 3
+ savePix #CursorX #CursorY 3
+ set *PixelX3 #CursorX
+ set *PixelY3 #CursorY
+ set *PixCol3 #PixCol
+ set *FirstLight #false
+ wait 20
+ event SysMessage OK! SETUP COMPLETATO!
+}
+return
+
+sub LightStrike
+if #mana > 4
+{
+ savePix *PixelX *PixelY 1
+ if #PixCol <> *PixCol
+ {
+  savePix *PixelX2 *PixelY2 2
+  if #PixCol <> *PixCol2
+  {
+   savePix *PixelX3 *PixelY3 3
+   if #PixCol <> *PixCol3
+   {
+    event macro 15 149
+    wait %wait
+   }
+  }
+ }
+}
+return
+
+sub Reset
+if #contname = OptionsGump
+{
+ event SysMessage RESET IMPOSTAZIONI...
+ event macro 9
+ wait 3s
+ event macro 9
+ set *FirstLight #true
+}
+return
