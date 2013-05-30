@@ -1,6 +1,6 @@
 ;==================================================
 ; Author: Madara
-; Version: 1.0.0
+; Version: 1.0.3
 ; Shard FS: UODreams
 ; Client Tested With: 7.0.15 - 7.0.21 - 7.0.22
 ; EUO version tested with: 1.5 v.236
@@ -29,7 +29,6 @@ set %Chars YMAC
 set %WrongLogin QEMB
 set %ServerError QEMB
 set %Disconnect QEMB
-set %Game OHF
 set %Logout SXUC
 ;==================== END SETUP ===================
 InitEvents
@@ -105,11 +104,14 @@ if #contkind = %ServerError
 
 if #contkind = %Disconnect
 {
- click 399 320
- wait 30
+ wait 10
+ set %x ( #contposx + 104 )
+ set %y ( #contposy + 124 )
+ click %x %y
+ wait 10
 }
 
-if #contkind = %Game
+if #contkind <> OHF && #contkind <> KBRC && #contkind <> GXTC && #contkind <> ECKC
 {
  event Macro 8 1
  wait 30
@@ -132,7 +134,7 @@ if #time = %Restart
  {
  }
  wait 10
- set %x ( #contposx + 119 )
+ set %x ( #contposx + 125 )
  set %y ( #contposy + 84 )
  click %x %y
  wait 10
