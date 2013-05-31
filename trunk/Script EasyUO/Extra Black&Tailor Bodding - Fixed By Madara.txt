@@ -1,7 +1,7 @@
 ;========================================
 ; Nome Script: Extra Black&Tailor Bodding
 ; Autore: TheGod
-; Versione: 7.0.2.0
+; Versione: 7.0.2.2
 ; Client Version: 7.0.22.0
 ; Versione EasyUO: 1.5 v.236
 ; Data ultima modifica: 17/02/2013
@@ -43,31 +43,34 @@
 ; - Il fil AssistUO o Client deve trovarsi all'interno della cartella di easyuo
 ; - Al momento il blocco_conn funziona solo con AssistUO v1.0.7 RC7 Build 2
 ;==============================================================================================================================
-; Edit By Madara
-;############# INIZIO IMPOSTAZIONI #################
+; CLIENT - Ancora in fase di test(Se non lo usate lasciare N/A)
+set %blocco_conn #false ; riapre il client al blocco connecting - #true/#false
+set %client N/A ; scegliete con che usare il client ("AssistUO" oppure "Client")
+;===================================================
+; METODO BANCA - Se non lo usate lasciare N/A
 set %bank_cont_t N/A ; ID Container tailor dentro banca
 set %bank_cont_b N/A ; ID Container black dentro la banca
-; CLIENT
-set %blocco_conn #true ; riapre il client al blocco connecting - #true/#false
-set %client AssistUO ; scegliete con che usare il client ("AssistUO" oppure "Client")
-; RAIL
+;===================================================
+; METODO RAIL - Se non lo usate lasciare N/A
 set %t_container NEAYJMD ; ID Container Tailor dentro casa
 set %b_container KJLKOMD ; ID Container Black dentro casa
 set %rail_luna rail_luna.txt ; Nome RAIL da casa a luna bank
 set %rail_casa rail_casa.txt ; Nome RAIL da luna a casa bank
 set %rail_return N/A ; RAIL di ritorno in caso di connection_lost (potete lasciarla vuota)
-; RUNE
+;===================================================
+; METODO RUNE - Bisogna avere 1 solo Runebook nel backpack(Se non lo usate lasciare N/A)
 set %runa_luna 2 ; Posizione runa per luna bank
 set %runa_casa 1 ; Posizione runa per casa
-;############## FINE IMPOSTAZIONI ##################
-
-
-;###################################################
-;############ NON MODIFICARE QUI SOTTO #############
-;#################################### LPC
+;===================================================
+;===================================================
+;===================================================
+; FINE IMPOSTAZIONI - NON MODIFICARE QUI SOTTO
+;===================================================
+;===================================================
+;===================================================
 set %normal_lpc 10
 set %fast_lpc 50000
-;################## GUMP INFO
+;===================================================
 set %connection_lost QEMB
 set %quit_gump YesNo_gump
 set %bod_gump STM
@@ -77,7 +80,7 @@ set %shard WNGD
 set %choose_character Login_gump
 set %paperdoll paperdoll_gump
 set %backpack OHF
-;############################### COORDINATES INFO
+;===================================================
 set %username_x 530
 set %username_y 360
 set %password_x 530
@@ -109,11 +112,11 @@ set %medium_bx2 978
 set %medium_by2 516
 set %bod_black_x 978
 set %bod_black_y 513
-;#################### USING VENDOR
+;===================================================
 set %npc HS_IS
 set %distance 6
 set %option 4
-;############## MENU INFO
+;===================================================
 set %bod_tailor 0
 set %bod_black 0
 set %routine 0
@@ -125,7 +128,7 @@ set %last_m_b 00
 set %last_s_b 00
 set %connect_time 0
 set %need_menu *menu
-;################### VARIOUS
+;===================================================
 set %num_pg N/A
 set %RuneBook ZBN
 set %book DYM
@@ -134,7 +137,7 @@ set %t_color 1155
 set %b_color 1102
 set %wait 10
 set %loop_time 0
-;################### INITEVENTS
+;===================================================
 deletejournal
 set #lpc %normal_lpc
 gosub create_menu
