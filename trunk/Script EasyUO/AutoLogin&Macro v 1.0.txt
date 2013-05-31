@@ -1,11 +1,11 @@
 ;==================================================
 ; Author: Madara
-; Version: 1.0.3
+; Version: 1.0.4
 ; Shard FS: UODreams
 ; Client Tested With: 7.0.15 - 7.0.21 - 7.0.22
 ; EUO version tested with: 1.5 v.236
 ; Public Release: 17/04/2013
-; Last Revision: 17/04/2013
+; Last Revision: 31/05/2013
 ;====================== SETUP =====================
 set %Player 1 ; Numero del pg con cui rientrare
 set %Restart 065000 ; Restart server 6:50
@@ -111,8 +111,9 @@ if #contkind = %Disconnect
  wait 10
 }
 
-if #contkind <> OHF && #contkind <> KBRC && #contkind <> GXTC && #contkind <> ECKC
+if #contkind = OHF || #contkind = KBRC || #contkind = GXTC || #contkind = ECKC
 {
+ wait 10
  event Macro 8 1
  wait 30
  if %AvviaMacro <> N/A
