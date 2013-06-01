@@ -1,0 +1,200 @@
+; =======================
+; Vash Troboh 4.2
+; =======================
+;
+; Qui sotto devi settare i vari tasti.
+; Ci sono varie sub disponibili.
+; Nota Bene: in questa nuova versione di Troboh il riconoscimento dei
+; tasti potrebbe essere più lento, teneteli premuti un po' più a lungo,
+; senza esagerare chiaramente.
+;
+; - goSub Targetta: questa va usata se il vostro nemico attuale non è settato come last target;
+;   usandola potrete settarlo come last target di client e razor. Se il target è già fuori,
+;   lo targetta direttamente.
+;
+; - gosub Ritargetta: questa va usata quando il nemico va fuori schermo e non vedete più la vita;
+;   usandola vedrete nuovamente la sua barra della vita.
+;
+; - goSub Dai_Shared normale: sharate il vostro nemico subito in ally e in automap.
+;
+; - goSub Dai_Shared bolas: sharate il vostro nemico con un leggero ritardo.
+;   molto utile se messo sullo stesso tasto delle bolas, per sbolare e sharare insieme.
+;
+; - goSub Attacca_Shared: attaccate un nemico sharato in ally o automap.
+;   se usato con precast, gli dropperà la magia addosso. Altrimenti prima attacca e poi targetta.
+
+set #lpc 30
+set %lastJournal #jindex
+set %stopRequest #false
+_mainloop:
+
+
+onhotkey V ALT
+    goSub Dai_Shared normale
+onhotkey U
+    goSub Attacca_Shared
+onhotkey f5
+    goSub Dai_Shared bolas
+
+if %stopRequest
+{
+    set %lastJournal #jindex
+    set %stopRequest #false
+}
+
+_jcheck:
+if #jindex > %lastJournal
+{
+    set %lastJournal %lastJournal + 1
+    scanjournal %lastJournal
+    if #jcolor = 83 || #jcolor = 63 || #jcolor = 89 ; (map,guild,ally)
+    {
+        if Bersaglio in #journal
+        {
+            set %journal #journal
+            goSub GetBersaglio
+        }
+    }
+    goto _jcheck
+}
+
+goto _mainloop
+
+
+
+Sub Targetta
+
+  if #enemyid = N/A
+  {
+      event sysmessage Nessun nemico.
+      return
+  }
+
+  set #ltargetid #enemyid
+  set #ltargetkind 1
+  if #targcurs = 0
+  {
+      set #targcurs 1
+      wait 1
+  }
+  event macro 22 0 ; last target
+  wait 10
+
+return
+
+
+
+Sub Ritargetta
+
+  if #enemyid = N/A
+  {
+      event sysmessage Nessun nemico
+      return
+  }
+
+  set %retarget #enemyid
+  event macro 6 0
+  wait 10
+  event macro 6 0
+  wait 10
+  set #ltargetkind 1
+  set #ltargetid %retarget
+  wait 1
+  event macro 27 0 ; attack last
+  wait 10
+
+return
+
+
+
+Sub Attacca_Shared
+
+  if %nometarget = N/A
+  {
+      event sysmessage Nessun bersaglio.
+      return
+  }
+
+  set #ltargetkind 1
+  set #ltargetid %nometarget
+  event macro 27 0
+  wait 1
+
+  if #targcurs = 0
+  {
+      set #targcurs 1
+      wait 1
+  }
+
+  event macro 22 0
+  wait 10
+
+return
+
+
+
+Sub Dai_Shared
+
+  if #enemyid = N/A
+  {
+      event SysMessage Nessun nemico da sharare.
+      return
+  }
+
+  set %share #enemyid
+
+  if bolas in %1
+      wait 1s
+
+  set #lpc 100
+  msg $
+  wait 1
+  msg | Bersaglio %share $
+  goSub GetName %share
+  msg | Attaccate #result $
+  wait 12
+  msg -- Attaccate #result $
+  set #lpc 30
+
+  wait 10
+  set %stopRequest #true
+
+return
+
+
+
+Sub GetName
+
+  event property %1
+  str Del #property 1 1
+  set %enemystring #strRes
+  str Pos %enemystring $
+  set %char1 #strRes
+  str Len %enemystring
+  set %char2 #strRes
+  str Del %enemystring %char1 %char2
+
+return #strRes
+
+
+
+Sub GetBersaglio
+
+  set #lpc 100
+  set %string %journal
+  str Pos %string glio
+  set #strRes #strRes + 4
+  str del %string 1 #strRes
+  set %target #strRes
+  str Len %target
+  set %lungo #strRes + 1
+  str Del %target %lungo 1
+  set %nometarget #strRes
+  event ExMsg %nometarget 0 333 >>KILL ME<<
+  wait 1
+  event sysmessage Target acquisito!
+  set #lpc 30
+
+return
+
+
