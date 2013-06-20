@@ -1,7 +1,7 @@
 ;================================== 
 ; Script Name: FAST OCR to get text information from UO gumps 
 ; Author: Kal In Ex 
-; Version: 5.11
+; Version: 5.1
 ; Client Tested with: 5.0.2 (Patch 13)
 ; EUO version tested with: 1.5.74
 ; Shard OSI / FS: OSI 
