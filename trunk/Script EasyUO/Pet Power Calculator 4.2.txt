@@ -1,12 +1,22 @@
 ;==================================================
 ; Name: Pet Power Calculator 4.2
 ; Author: Cerveza
-; Version: 4.2.0
-; Client: 7.0.15 - 7.0.20 - 7.0.22
-; Shard: UODreams.com
-; Ultima Modifica: 17/03/2013 EUO 1.5 v.236
-; Revision 4.2: By Madara and Larhalt de Shack
-; Credits: UOCraft.com and UOGuide.com
+; Revision: 4.0 By Madara & Larhalt de Shack
+; Shard FS: UODreams
+; Client Tested With: 7.0.15 - 7.0.21 - 7.0.22
+; EUO version tested with: 1.5 v.236
+; Public Release: 13/03/2013
+; Last Revision: 17/03/2013
+;==================================================
+; COSA FA LO SCRIPT?
+; - Calcola le statistiche, le resistenze e gli hp
+;   del Pet selezionato, riportando il tutto su una
+;   scala da 1 a 5(Stelle).
+; - E' possibile mettere a confronto due Pet mettendo
+;   la spunta su "Compare".
+; - E' possibile sapere da subito quante Stelle
+;   avrà il vostro Pet con le Stat al massimo,
+;   basta mettere la spunta su "Stat Max".
 ;==================================================
 set %ver 4.2 ; Version
 ;==================================================
@@ -20,8 +30,8 @@ set %Reptalon GN
 set %Rune_Beetle CH
 set %White_Wyrm OJ_TE
 ;==================================================
-set %kal_gumpX -99
-set %kal_gumpY -59
+set %kal_gumpX 10
+set %kal_gumpY 10
 ;==================================================
 set %heal_poison Poisoning
 ;==================================================
@@ -35,12 +45,16 @@ set %Compare #false
 set %Return #false
 set %SMax1 #false
 set %SMax2 #false
+set #sysmsgcol 2050
 menu clear
 gosub showEUOMenu1
 menu Show 421 270
 menu HideEUO
 ;********** Main Loop **********
 SUO:
+event sysmessage Inizializzazione Completata.
+event sysmessage Scegli cosa fare.
+SUO2:
 set %tame #false
 menu get Compare
 set %Compare #menures
@@ -122,7 +136,7 @@ if %Compare = #true && %menu1 = #true && %menu2 = #false
 ;}
 while #CharGhost = YES
   wait 0
-Goto SUO
+Goto SUO2
 ;********** Subs **********
 sub lore
   loop_lore:
@@ -131,21 +145,19 @@ sub lore
   while #targcurs = 1
     wait 0
   set %Pet #ltargetid
-  for %f 0 1
+  set %gump_time_loop ( #scnt + 3 )
+  while #contsize <> 400_381
   {
-   if #contsize = 400_381 && #contname = generic_gump
+   if #scnt >= %gump_time_loop
    {
-    set #contposx %kal_gumpX
-    set #contposy %kal_gumpY
-    wait 1
-   }
-   wait 1s
-  }
-  if #contsize <> 400_381 && #contname <> generic_gump
-  {
-   set #menubutton N/A
+    set #menubutton N/A
     goto suo
+   }
   }
+  ;set #contposx %kal_gumpX
+  ;set #contposy %kal_gumpY
+  set %kal_gumpX #contposx
+  set %kal_gumpY #contposy
   finditem #ltargetid *
   gosub pet_type_info
   if %currentpettype = 2
@@ -244,63 +256,7 @@ sub ocr
 return
 
 sub calculations
-  ;percent stat
-  ;gosub divide %sel_stat_hitpoints %max_stat_hitpoints 2
-  ;gosub multiply #result 100
-  ;set %per_stat_hitpoints %min_stat_hitpoints
-  ;gosub divide %sel_stat_strength %max_stat_strength 2
-  ;gosub multiply #result 100
-  ;set %per_stat_strength %min_stat_strength
-  ;gosub divide %sel_stat_dexterity %max_stat_dexterity 2
-  ;gosub multiply #result 100
-  ;set %per_stat_dexterity %min_stat_dexterity
-  ;gosub divide %sel_stat_intelligence %max_stat_intelligence 2
-  ;gosub multiply #result 100
-  ;set %per_stat_intelligence %min_stat_intelligence
-  
-  ;percent ress
-  ;gosub divide %sel_resist_physical %max_resist_physical 2
-  ;gosub multiply #result 100
-  ;set %per_resist_physical %min_resist_physical
-  ;gosub divide %sel_resist_fire %max_resist_fire 2
-  ;gosub multiply #result 100
-  ;set %per_resist_fire %min_resist_fire
-  ;gosub divide %sel_resist_cold %max_resist_cold 2
-  ;gosub multiply #result 100
-  ;set %per_resist_cold %min_resist_cold
-  ;gosub divide %sel_resist_poison %max_resist_poison 2
-  ;gosub multiply #result 100
-  ;set %per_resist_poison %min_resist_poison
-  ;gosub divide %sel_resist_energy %max_resist_energy 2
-  ;gosub multiply #result 100
-  ;set %per_resist_energy %min_resist_energy
-  
-  ;percent skills
-  ;gosub divide %sel_skill_wrestling %max_skill_wrestling 2
-  ;gosub multiply #result 100
-  ;set %per_skill_wrestling #RESULT
-  ;gosub divide %sel_skill_tactics %max_skill_tactics 2
-  ;gosub multiply #result 100
-  ;set %per_skill_tactics #RESULT
-  ;gosub divide %sel_skill_resistance %max_skill_resistance 2
-  ;gosub multiply #result 100
-  ;set %per_skill_resistance #RESULT
-  ;gosub divide %sel_skill_anatomy %max_skill_anatomy 2
-  ;gosub multiply #result 100
-  ;set %per_skill_anatomy #RESULT
-  ;gosub divide %sel_skill_poisoning %max_skill_poisoning 2
-  ;gosub multiply #result 100
-  ;set %per_skill_poisoning #RESULT
-  ;gosub divide %sel_skill_magery %max_skill_magery 2
-  ;gosub multiply #result 100
-  ;set %per_skill_magery #RESULT
-  ;gosub divide %sel_skill_eval %max_skill_eval 2
-  ;gosub multiply #result 100
-  ;set %per_skill_eval #RESULT
-  ;gosub divide %sel_skill_meditation %max_skill_meditation 2
-  ;gosub multiply #result 100
-  ;set %per_skill_meditation #RESULT
-  
+
   ;=========================== pet sel
 
   if %tame = #false
@@ -571,6 +527,7 @@ sub showEUOMenu1
   menu Font Color Silver
   menu Font Size 27
   menu Font Style b
+  menu Font Name MS Sans Serif
   menu Text EUOLabel335 223 15 * , #spc , * , #spc , * , #spc , * , #spc , *
   if %stars <> N/A
   {
