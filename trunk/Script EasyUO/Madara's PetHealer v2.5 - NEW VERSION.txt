@@ -1,12 +1,12 @@
 ;==================================================
 ; Name: Madara's PetHealer 2.5
 ; Author: Madara
-; Version: 2.5.5
+; Version: 2.5.8
 ; Shard FS: UODreams
 ; Client Tested With: 7.0.15 - 7.0.21 - 7.0.22
 ; EUO version tested with: 1.5 v.236
 ; Public Release: 06/03/2013
-; Last Revision: 25/04/2013
+; Last Revision: 20/06/2013
 ; Credits: Boydon, Kal In Ex
 ;==================================================
 ; COSA FA LO SCRIPT?
@@ -434,7 +434,7 @@ if #menubutton = DOOM
 }
 if %HPL1 = #true
 {
- if %HPL2 = 6 ; loop show hp
+ if %HPL2 = 1 ; loop show hp
  {
   set %HPL #true
   set %HPL1 #false
@@ -495,16 +495,33 @@ if %Doom = #true
 if %FBardo = #true
  gosub Bardo
 finditem %Pet G_
-if %hits > %Benda && %life = blue || #finddist > 2
+if %Benda > %Heal
 {
- menu set Azioni StandBy
- set %HPL #true
- set %HPL1 #false
- set %Bleed #true
- set %BleedA #false
- set %CureB 0
- set %Lap 0
- set %CureC 1
+ if %hits > %Benda && %life = blue || #finddist > 2
+ {
+  menu set Azioni StandBy
+  set %HPL #true
+  set %HPL1 #false
+  set %Bleed #true
+  set %BleedA #false
+  set %CureB 0
+  set %Lap 0
+  set %CureC 1
+ }
+}
+if %Heal > %Benda
+{
+ if %hits > %Heal && %life = blue || #finddist > 2
+ {
+  menu set Azioni StandBy
+  set %HPL #true
+  set %HPL1 #false
+  set %Bleed #true
+  set %BleedA #false
+  set %CureB 0
+  set %Lap 0
+  set %CureC 1
+ }
 }
 if #finddist <= 2
 {
@@ -515,12 +532,25 @@ if #finddist <= 2
  menu set Life %life
  if %HPL = #true
  {
-  if %hits <= %Heal && %HP = #true
-   event exmsg #findid 0 38 #result , %
-  else
+  if %Benda > %Heal
+  {
+   if %hits <= %Heal && %HP = #true
+    event exmsg #findid 0 38 #result , %
+   else
+   {
+    if %hits <= %Benda && %HP = #true
+     event exmsg #findid 0 73 #result , %
+   }
+  }
+  if %Heal > %Benda
   {
    if %hits <= %Benda && %HP = #true
-    event exmsg #findid 0 73 #result , %
+    event exmsg #findid 0 38 #result , %
+   else
+   {
+    if %hits <= %Heal && %HP = #true
+     event exmsg #findid 0 73 #result , %
+   }
   }
   set %HPL1 #true
   set %HPL2 0
@@ -593,7 +623,7 @@ if #finddist <= 2
  finditem %Bende C_ , #backpackid
  set %BendaT #findstack
  menu set BendaT %BendaT
- if %hits <= %Benda || %life = green
+ if %hits <= %Benda || %hits <= %Heal || %life = green
  {
   finditem %Bende C_ , #backpackid
   set %BendaT #findstack
