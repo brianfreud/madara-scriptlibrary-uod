@@ -1,0 +1,17 @@
+// Author: Kraz
+// Description: load a fukiya with darts
+if not @findobject 'fukiya'
+ promptalias 'fukiya'
+endif
+while not @injournal 'You cannot add anymore fukiya darts' 'system'
+ if @findtype 0x2806 'any' 'backpack' 1
+  waitforcontext 'fukiya' 0 5000
+  waitfortarget 1000
+  target! 'found'
+ else
+  sysmsg 'Out of fukiya darts!' 25
+  break
+ endif
+endwhile
+@clearjournal
+sysmsg 'Macro execution finished.' 69

@@ -1,0 +1,31 @@
+// Author: Gramoz
+//
+// Purpose: Train Evaluating Intelligence and/or Resisting Spells from 0 to 120
+//
+// Instructions: Dress a lrc 100% suite, take a boat and go on infinite lane, then start the macro. If you don't want to raise one of these two skills, keep it blocked.
+//
+// Descrizione: Allena evaluating intelligence e resisting spells da 0 a 120 con la barca su rotta infinita
+// Istruzioni: Indossate un'armatura 100% lrc (meditabile), prendete una barca ed andate sulla rotta infinita e togliete l'ancora (raise anchor), nel SETUP scrivete le vostre preferenze (al posto di XX inserite raggiunto quanto mana deve fermarsi per rigenerare, al posto di YY scrivete quanti millisecondi aspettare per la rigenerazione del mana)
+// Consigli: Con questa macro vi salirà anche meditation, quindi nel caso non vogliate farla salire bloccatela. Se volete far salire SOLO UNA delle due skills (eva int o res spells) bloccate l'altra
+//
+// SETUP:
+if "mana" <= XX "self" // <-- instead XX write the amount of mana to start regenerating it
+ useskill "meditation"
+ pause YY // <-- instead YY write how to wait the mana regeneration (milliseconds)
+//
+elseif skill "evaluating intelligence" == 120
+ for 3
+  sysmsg "120 EVALUATING INTELLIGENCE!" 70
+  pause 500
+ endfor
+elseif skill "resisting spells" == 120
+ for 3
+  sysmsg "120 RESISTING SPELLS!" 70
+  pause 500 
+ endfor
+endif
+msg "forward"
+cast "weaken"
+waitfortarget 1000
+target! "self"
+pause 2000
