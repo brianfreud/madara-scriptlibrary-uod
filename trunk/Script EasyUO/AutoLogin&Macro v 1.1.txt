@@ -1,11 +1,11 @@
 ;==================================================
 ; Author: Madara
-; Version: 1.0.5
+; Version: 1.1.2
 ; Shard FS: UODreams
-; Client Tested With: 7.0.15 - 7.0.21 - 7.0.22
+; Client Tested With: 7.0.15 - 7.0.22
 ; EUO version tested with: 1.5 v.236
 ; Public Release: 17/04/2013
-; Last Revision: 31/05/2013
+; Last Revision: 13/03/2014
 ;====================== SETUP =====================
 set %Player 1 ; Numero del pg con cui rientrare
 set %Restart 065000 ; Restart server 6:50
@@ -23,16 +23,30 @@ set %StopMacro G
 ; settato nelle stat, lo script userà StopMacro per
 ; fermare la stat che state alzando cosi.
 ;==================== LOGIN TYPE ==================
-set %Login QKJD
-set %Server WNGD
-set %Chars YMAC
-set %WrongLogin QEMB
-set %ServerError QEMB
-set %Disconnect QEMB
-set %Logout SXUC
+if 7.0.15 in #cliver
+{
+ set %Login CJDD
+ set %Server SXAD
+ set %Chars UWUB
+ set %WrongLogin OJGB
+ set %ServerError OJGB
+ set %Disconnect OJGB
+ set %Logout EWOC
+}
+if 7.0.22 in #cliver
+{
+ set %Login QKJD
+ set %Server WNGD
+ set %Chars YMAC
+ set %WrongLogin QEMB
+ set %ServerError QEMB
+ set %Disconnect QEMB
+ set %Logout SXUC
+}
 ;==================== END SETUP ===================
 InitEvents
 set #lpc 50
+set !_logg #true
 
 _main:
  gosub Login
@@ -59,11 +73,19 @@ if #Contkind = %Chars
  }
  if %Player = 4
  {
-  click 370 258 d mc
+  click 370 260 d mc
  }
  if %Player = 5
  {
   click 370 300 d mc
+ }
+ if %Player = 6
+ {
+  click 370 340 d mc
+ }
+ if %Player = 7
+ {
+  click 370 380 d mc
  }
  wait 30
 }
@@ -105,19 +127,26 @@ if #contkind = %ServerError
 if #contkind = %Disconnect
 {
  wait 10
- set %x ( #contposx + 104 )
- set %y ( #contposy + 124 )
- click %x %y
+ msg $
  wait 10
+ if #contkind = %Disconnect
+  msg $
 }
 
-if #clilogged = 1
+if !_logg #true
 {
- wait 5s
- event Macro 8 1
- wait 30
- if %AvviaMacro <> N/A
-  key %AvviaMacro
+ if #clilogged = 1
+ {
+  set !_logg #false
+  wait 5s
+  event Macro 8 1
+  wait 30
+  if %AvviaMacro <> N/A
+  {
+   key %AvviaMacro
+   event sysmessage SCRIPT: macro avviata.
+  }
+ }
 }
 return
 
