@@ -1,0 +1,4343 @@
+namespace push
+namespace local minerScorna_base
+
+set %standalone ( %1 <> reentrant )
+
+;==================================
+; Script Name: MINERSCORNA
+; Version: 2.0
+; Author: Scorna
+; Client Tested with: 6.0.1.3
+; EUO version tested with: 1.5 v115
+; Shard OSI / FS: FS
+; Revision Date: 01/03/2008
+; Public Release: 26/11/2006
+; Purpose: Miner ingot, sands, stones and gems
+;==================================
+set %idscript MINERSCORNA
+set %versionscript 2.0
+
+set %agMountBeetle #false
+set %usaBank #false
+;==================================
+; <Changelog>
+; version 2.0
+; Il mana necaessario per fare il recall adesso è 20 o il massimo raggiungibile.
+; In caso di 'Runa Bloccata' riprova con la solita runa.
+; Aggiunto il 'Multi-Filone'.
+; Stravolto il metodo per cercare i filoni.
+; Fix al rilevamento 'zona guard'
+; version 1.314
+; Risolto bug sovrappeso. <b>tnx Antonio.gl</b>
+; version 1.313
+; Aggiunto l' opzione 'Smelt Materiali Preziosi'.
+; Aggiunto il Modifer al peso per gli umani.
+; Controllo gargoyle pickaxe.
+; Cambiati gli ultimi Event in Exevent.
+; version 1.312
+; La prima volta che si usa il tinker tool verrà impostato l'iron come Materiale.
+; Corretto PickAxe in Shovel nella scritta status.
+; I Gump verranno chiusi solo se lo script cerca di sbloccarsi.
+; I Gump non vengono più spostati.
+; version 1.311
+; Corretto la posizione del Wait Mana.
+; Corretto il range delle casse a 2 tile.
+; version 1.31
+; Cambiato 'all come' in 'all follow me'.
+; version 1.3
+; Adesso è possibile minare anche la sabbia.
+; version 1.271
+; Aggiunti altri 2 tipi di forgia riconosciuti, uno dei quali è la forgia elfica.<b>Tnx a Sacrograal</b>
+; version 1.27
+; Aggiunta la costruzione dei tinker tools.
+; Aggiunto l'uso alternativo delle shovel
+; Adesso lo strumento per minare costruito, se si usa tinker, sarà la shovel.
+; Corretto Agaphite in Agapite.
+; version 1.26
+; Aggiunta la fuga se ferito.
+; version 1.25
+; Forse risolto un Bug, riscontrato da pochi utenti, che non permetteva di selezionare la posizione a Casa.
+; Aggiunto l'uso della skill Meditation se questa è maggiore di 0
+; Invertita la ricerca del tipo di spot: adesso lo script cercherà per primo il filone a terra.
+; version 1.24
+; Aggiunto un limite di lingotti, valido solo se si usa il Fire Beetle, per forzare il ritorno a casa.
+; version 1.23
+; Aggiunto nuove informazione all' Info Spot
+; version 1.22
+; Risolto un bug che non permetteva di minare in alcuni spot... o almeno si spera ^^
+; Aggiunto Info Spot
+; version 1.21
+; Velocizzato l'accesso alle variabili globali
+; version 1.2
+; Aggiunto gemme e statistiche.
+; version 1.1
+; Risolti alcuni bug
+; </Changelog>
+;==================================
+;Persistent Variabili Scorna Script Monitorata =========
+;*359 AutoPaused Script Scorna Alarm
+set *359 Start ;casomai fosse stato interrotto
+;Variabili Modificabili ================================
+set %ricaricarunebook 1s
+set %hidingdelay 5
+;Variabili Usate =======================================
+set %guard #false
+set %usaautopausa #false
+set %usaProtection #false ;cast protection
+set %usafuga #false ;fuggi se attaccato
+set %meditation #false ;uso ella skill meditation
+set %nrunecasaatt 1 ;runa casa attualmente in uso
+set %runecasamax  1 ;massima runa per casa
+set %runeMinermax  16 ;massima runa per miner
+set %bookMinerMax 3;totale libri miner
+set %bookMinerAtt 3 ;runebook miner attualmente in uso
+set %nruneMineratt 1 ;runa miner attualmente in uso
+set %book ;runebook da usare
+set %nruneatt ;runa da usare
+set %runemax ;max runa da usare
+set %magie 1 ;1 Magery 2 Chivarly
+set %tinkering 70 ;valore skill tinkering
+set %bookcasa N/A ;runebook con rune di casa
+set %xcasa N/A ;posizione tile a casa X
+set %ycasa N/A ;posizione tile a casa Y
+set %zcasa N/A ;posizione tile a casa Z
+set %cassacasa N/A ;ID cassa risorse
+set %zainox ;x backpack
+set %zainoy ;ybackpack
+set %timehiding #scnt + %hidingdelay ;prossimo utilizzo di hiding
+set %usahiding #false ;hiding: si o no
+set %boxpietrenormali N/A ;ID cassa Pietre
+set %boxpietredull N/A ;ID cassa Pietre
+set %boxpietreshadow N/A ;ID cassa Pietre
+set %boxpietrecopper N/A ;ID cassa Pietre
+set %boxpietrebronze N/A ;ID cassa Pietre
+set %boxpietregold N/A ;ID cassa Pietre
+set %boxpietreagaphite N/A ;ID cassa Pietre
+set %boxpietreverite N/A ;ID cassa Pietre
+set %boxpietrevalorite N/A ;ID cassa Pietre
+set %boxpietresand N/A ;ID cassa Sand
+set %boxpietretrash N/A ;ID TrashBarrel
+set %boxgemme N/A ;ID cassa Gemme
+set %debug #false
+set %usaFireBeetle #false
+set %FBID N/A
+set %usalasciaoggetto #true
+set %tastolasciaoggetto P
+set %contasabbia 0
+set %limitesand 1
+set %usasmelt #false
+set %limitesmelt 1
+set %actfilone 1
+set %idUnivoco #false
+set %runabloccata #false
+;contatori ============================================
+set %npicconate 0
+set %tiron 0
+set %tdull 0
+set %tshadow 0
+set %tcopper 0
+set %tbronze 0
+set %tgold 0
+set %tagaphite 0
+set %tverite 0
+set %tvalorite 0
+set %tot_cicli 0
+set %tot_pietrenormali 0
+set %tot_pietredull 0
+set %tot_pietreshadow 0
+set %tot_pietrecopper 0
+set %tot_pietrebronze 0
+set %tot_pietregold 0
+set %tot_pietreagaphite 0
+set %tot_pietreverite 0
+set %tot_pietrevalorite 0
+set %tot_pietrenormalitrash 0
+set %tot_pietredulltrash 0
+set %tot_pietreshadowtrash 0
+set %tot_pietrecoppertrash 0
+set %tot_pietrebronzetrash 0
+set %tot_pietregoldtrash 0
+set %tot_pietreagaphitetrash 0
+set %tot_pietreveritetrash 0
+set %tot_pietrevaloritetrash 0
+set %tot_pietresand 0
+set %tot_pietresandtrash 0
+set %tot_gemmedark 0
+set %tot_gemmefire 0
+set %tot_gemmeblue 0
+set %tot_gemmeturquoise 0
+set %tot_gemmeperfect 0
+set %tot_gemmeecru 0
+set %iron_tot 0
+set %dull_tot 0
+set %shadow_tot 0
+set %copper_tot 0
+set %bronze_tot 0
+set %gold_tot 0
+set %agaphite_tot 0
+set %verite_tot 0
+set %valorite_tot 0
+set %pickaxe_tot 0
+set %tinkertool_tot 0
+;Type ==================================================
+set %pietre BVI_TVJ
+set %prosptool GBG
+set %ore DWJ_EWJ_GWJ_TWJ
+set %forgia JBG_OUJ_CUJ_KHR_WUJ
+set %toolkit KTL
+set %lingotti ENK
+set %PickAxe QPF_TWF_WWF
+set %FBType JJ_MIK
+set %FBMType IWX
+set %Gemme UWS_TWS_GXS_ZWS_AXS_VWS;_TVJ
+set %Sand KSG
+;colori minerali =======================================
+set %soldi_tot 0
+set %iron_col 0
+set %dull_col 2419
+set %shadow_col 2406
+set %copper_col 2413
+set %bronze_col 2418
+set %gold_col 2213
+set %agaphite_col 2425
+set %verite_col 2207
+set %valorite_col 2219
+;colori barre statistiche =======================================
+set %colbr1 $555555 ;iron
+set %colbr2 $6B7B84 ;dull
+set %colbr3 $111111 ;shadow
+set %colbr4 $426B7b ;copper
+set %colbr5 $21394a ;bronze
+set %colbr6 $46C5E2 ;gold
+set %colbr7 $C490C0 ;agaphite
+set %colbr8 $397B4F ;verite
+set %colbr9 $b2AE67 ;valorite
+set %colbr10 $005555 ;sabbia
+;txt info spot =======================================
+set %tif1 IRON
+set %tif2 DULL
+set %tif3 SHAD
+set %tif4 COPR
+set %tif5 BRNZ
+set %tif6 GOLD
+set %tif7 AGAP
+set %tif8 VERT
+set %tif9 VALR
+set %tif10 SAND
+;messaggi
+set %strUsi uses , #spc , remaining: , #spc , 1 , $
+
+
+
+set %debug #true
+
+
+
+
+;=======================================================
+;=======================================================
+;                             INIZIO SCRIPT
+;=======================================================
+;=======================================================
+;inizializzazione
+quidainterrotto:
+gosub init_var
+gosub Get_Hiding
+gosub Get_LasciaOggetto
+gosub Get_AutoPausa
+gosub Get_FireBeetle
+gosub Get_Smelt
+gosub Get_Meditation
+gosub get_IDUnivoco
+gosub Crea_Menu
+gosub get_modifier_peso
+set %steptotal 24
+Menu Shape prgMenu 10 480 230 20 4 7 1 gray 7 black
+gosub setProgressBarMenu 1 %steptotal
+gosub VisualizzaStato Chiudi_Gump
+;gosub Chiudi_Gump
+gosub setProgressBarMenu 2 %steptotal
+gosub VisualizzaStato Apri_Gump
+gosub Apri_Gump
+gosub setProgressBarMenu 3 %steptotal
+gosub VisualizzaStato Check_Skill_Recall
+gosub Check_Skill_Recall
+gosub setProgressBarMenu 4 %steptotal
+gosub VisualizzaStato Check_Skill_Tinker
+gosub Check_Skill_Tinker
+gosub setProgressBarMenu 5 %steptotal
+gosub VisualizzaStato Check_Book_Casa
+gosub Check_Book_Casa
+gosub setProgressBarMenu 6 %steptotal
+gosub VisualizzaStato Check_Book_Miner
+gosub Check_Book_Miner
+gosub setProgressBarMenu 7 %steptotal
+gosub VisualizzaStato Get_Posizione_Casa
+gosub Get_Posizione_Casa
+gosub setProgressBarMenu 8 %steptotal
+gosub VisualizzaStato Get_Cassa_Casa
+gosub Get_Cassa_Casa
+gosub setProgressBarMenu 9 %steptotal
+gosub VisualizzaStato Get_Cassa_Pietre_normali
+gosub Get_Cassa_Pietre normali
+gosub setProgressBarMenu 10 %steptotal
+gosub VisualizzaStato Get_Cassa_Pietre_dull
+gosub Get_Cassa_Pietre dull
+gosub setProgressBarMenu 11 %steptotal
+gosub VisualizzaStato Get_Cassa_Pietre_shadow
+gosub Get_Cassa_Pietre shadow
+gosub setProgressBarMenu 12 %steptotal
+gosub VisualizzaStato Get_Cassa_Pietre_copper
+gosub Get_Cassa_Pietre copper
+gosub setProgressBarMenu 13 %steptotal
+gosub VisualizzaStato Get_Cassa_Pietre_bronze
+gosub Get_Cassa_Pietre bronze
+gosub setProgressBarMenu 14 %steptotal
+gosub VisualizzaStato Get_Cassa_Pietre_gold
+gosub Get_Cassa_Pietre gold
+gosub setProgressBarMenu 15 %steptotal
+gosub VisualizzaStato Get_Cassa_Pietre_agaphite
+gosub Get_Cassa_Pietre agaphite
+gosub setProgressBarMenu 16 %steptotal
+gosub VisualizzaStato Get_Cassa_Pietre_verite
+gosub Get_Cassa_Pietre verite
+gosub setProgressBarMenu 17 %steptotal
+gosub VisualizzaStato Get_Cassa_Pietre_valorite
+gosub Get_Cassa_Pietre valorite
+gosub setProgressBarMenu 18 %steptotal
+gosub VisualizzaStato Get_Cassa_Sabbia
+gosub Get_Cassa_Pietre sand
+gosub setProgressBarMenu 19 %steptotal
+gosub VisualizzaStato Get_Cassa_Pietre_trash
+gosub Get_Cassa_Pietre trash
+gosub setProgressBarMenu 20 %steptotal
+gosub VisualizzaStato Get_Cassa_Gemme
+gosub Get_Cassa_Gemme
+gosub setProgressBarMenu 21 %steptotal
+gosub VisualizzaStato Get_Statistiche
+gosub Get_Statistiche
+gosub setProgressBarMenu 22 %steptotal
+gosub VisualizzaStato Get_Fuga
+gosub Get_Sopravvivi
+gosub setProgressBarMenu 23 %steptotal
+gosub VisualizzaStato Get_LimiteSand
+gosub Get_LimiteSand
+gosub setProgressBarMenu 24 %steptotal
+gosub getGlobalVar %idscript %idscript #charid _totaletime
+set %startetime %_totaletime
+Menu delete prgMenu
+menu delete ProgressBar
+menu font bgcolor green
+Menu Font Color yellow
+Menu Button Start 10 480 230 20 Inizia
+riavvio:
+SET #menubutton N/A
+gosub Crea_Pulsanti
+gosub VisualizzaStato In_Attesa
+loopmenu:
+     if #MENUBUTTON <> N/A
+        goto buttpremuto
+
+     set !xf #charposx / 8
+     set !yf #charposy / 8
+     set !idf !xf , _ , !yf
+     if !idf <> !lidf
+     {
+       menu set txtIDFilone !idf
+       set !lidf !idf
+     }
+     wait 5
+     goto loopmenu
+buttpremuto:
+      if #menubutton = closed
+      {
+         set #menubutton N/A
+         gosub quit
+      }
+
+      if #MENUBUTTON = TestSpot
+      {
+          SET #menubutton N/A
+          gosub testa_filone 1
+          if #result > 0
+             event ExMsg #CHARID 3 90 Spot Valido! filoni #result
+          if #result < 1
+             event ExMsg #CHARID 3 25 Spot NON Valido
+      }
+      if #MENUBUTTON = butreset
+      {
+          SET #menubutton N/A
+          gosub reset_casse
+      }
+      if #MENUBUTTON = SettaPosCasa
+      {
+          SET #menubutton N/A
+          gosub Set_Posizione_Casa
+          gosub Get_Posizione_Casa
+      }
+      if #MENUBUTTON = SettaCassaCasa
+      {
+          SET #menubutton N/A
+          gosub Set_Cassa_Casa
+          gosub Get_Cassa_Casa
+
+      }
+      if #MENUBUTTON = SettaCassaGemme
+      {
+          SET #menubutton N/A
+          gosub Set_Cassa_Gemme
+          gosub Get_Cassa_Gemme
+
+      }
+      if SettaPietre in #MENUBUTTON
+      {
+          set %buttpremuto #menubutton
+          SET #menubutton N/A
+          gosub Get_Val_Pietre_Button %buttpremuto
+          set %buttpremuto #result
+          gosub Set_Cassa_Pietre %buttpremuto
+          gosub Get_Cassa_Pietre %buttpremuto
+      }
+      if Help in #MENUBUTTON
+      {
+          set %buttpremuto #menubutton
+          SET #menubutton N/A
+          gosub helpusoscript %buttpremuto
+      }
+      if #MENUBUTTON = Start
+      {
+          SET #menubutton N/A
+          menu get chkLasciaOggetto
+          set %usalasciaoggetto #menures
+          gosub putGlobalVar %idscript %idscript #charid usalasciaoggetto
+          ;set *378 %usalasciaoggetto
+          menu get edttasto
+          set %tastolasciaoggetto #menures
+          gosub putGlobalVar %idscript %idscript #charid tastolasciaoggetto
+          ;set *379 %tastolasciaoggetto
+          menu get chkHiding
+          set %usahiding #menures
+          gosub putGlobalVar %idscript %idscript #charid usahiding
+          ;set *374 %usahiding
+          menu get chkFireBeetle
+          set %usafirebeetle #menures
+          gosub putGlobalVar %idscript %idscript #charid usafirebeetle
+          menu get edtlimitelingotti
+          set %limitelingotti #menures
+          gosub putGlobalVar %idscript %idscript #charid limitelingotti
+          ;limite sand
+          menu get edtLimiteSand
+          set %cProvaNum ( ( ( #menures + 1 ) * 2 ) - 2 ) / 2
+          if  %cprovanum <> #menures
+            set %cprovanum 1
+          if  %cprovanum < 1
+            set %cprovanum 1
+          if  %cprovanum > 10
+            set %cprovanum 10
+          set %limitesand %cprovanum
+          gosub putGlobalVar %idscript %idscript #charid limitesand
+          ;smelt
+          menu get chkSmelt
+          set %usasmelt #menures
+          gosub putGlobalVar %idscript %idscript #charid usasmelt
+          menu get edtlimitesmelt
+          set %limitesmelt #menures
+          gosub putGlobalVar %idscript %idscript #charid limitesmelt
+          ;IDUnvico
+          %idUnivoco
+          menu get chkIDUnivoco
+          set %idUnivoco #menures
+          gosub putGlobalVar %idscript %idscript #charid idUnivoco
+          ;fuga
+          menu get chkFuga
+          set %usafuga #menures
+          gosub putGlobalVar %idscript %idscript #charid usafuga
+          menu get edtLimiteHP
+          set %limiteHP #menures
+          gosub putGlobalVar %idscript %idscript #charid limiteHP
+          if %magie = 1 && %magery > 50
+          {
+             menu get chkprotection
+             set %usaprotection #menures
+             gosub putGlobalVar %idscript %idscript #charid usaprotection
+          }
+          ;set *376 %usafirebeetle
+          gosub Find_FireBeetle
+          if #result = #true
+          {
+          menu get chkAutoPausa
+          set %usaautopausa #menures
+          gosub putGlobalVar %idscript %idscript #charid usaautopausa
+          ;set *375 %usaautopausa
+          gosub aspetta_mana
+          gosub validate_option
+          if #result = #true
+             goto inizio
+          }
+      }
+goto loopmenu
+set %oldposto 0
+;=======================================================
+inizio:
+gosub Crea_Menu_Avviato
+if %magie = 1 && %magery > 50 && %usaprotection = #true
+  gosub Cast_Protection
+set %scriptstart #scnt
+cicloScript:
+gosub DisplayElapsedTime
+gosub aspetta_mana
+gosub torna_a_casa
+gosub check_HP
+if #result = #false
+   gosub heal all
+gosub apri_cassa_casa
+gosub sposta_sabbia
+gosub sposta_pietre
+gosub sposta_gemme
+gosub smelta
+if #result = #false
+{
+    goto cicloscript
+}
+gosub sposta_ingot
+gosub AutoScriptScorna PAUSABOD
+if #result = #true
+{
+   goto cicloscript
+}
+gosub posa_gargoyle
+gosub Check_PickAxe
+set %pick #result
+if %pick = #false
+{
+   gosub Prendi_PickAxe
+   set %pick #result
+}
+if %pick = #false
+{
+   if %tinkering < 400
+   {
+       display OK Hai finito le Shovel e non hai Tinkering sufficiente per craftarle $ Script fermato.
+       gosub quit
+   }
+   gosub Check_ToolKit
+   set %toolsi #result
+   if %toolsi = #false
+   {
+      gosub Prendi_ToolKit
+      set %toolsi #result
+   }
+   if %toolsi = #false
+   {
+       display OK Hai finito i ToolKit $ Script Fermato
+       gosub quit
+   }
+   gosub check_iron
+   if #result = #false
+   {
+      gosub Prendi_Iron
+      set %ironsi #result
+      if %ironsi = #false
+      {
+         display OK Non hai iron a sufficienza $ Script Fermato
+         gosub quit
+      }
+   }
+}
+;se hai un tool kit prendiamo un po' di iron per fare le pick al volo
+gosub Check_ToolKit
+if #result = #true && %tinkering > 399
+{
+   gosub check_iron
+   if #result < 4
+   {
+      gosub Prendi_Iron
+   }
+}
+;se nella cassa ci sono prosp tool si prende
+gosub Check_ProspectorTool
+if  #result = #false
+{
+   finditem %prosptool  c_  , %cassacasa
+   if #findkind <> -1
+   {
+        gosub Prendi_ProspectorTool
+   }
+}
+gosub aggiorna_bar_statistiche
+nextposto:
+set %contasabbia 0
+gosub DisplayElapsedTime
+gosub vai_a_minare
+set %nposto ( %bookMinerAtt - 1 ) * 16 + %nrunemineratt
+if %oldposto <> %nposto
+{
+   set %actfilone 1
+   set %oldposto %nposto
+   gosub crea_info_spot %nposto #true
+}
+if %numfiloni . %nposto = n/a
+{
+   gosub cerca_filone %nposto
+   if %numfiloni . %nposto = -2
+    {
+      gosub crea_info_spot %nposto #false
+      set %nrunemineratt %nrunemineratt + 1
+      goto cicloscript
+    }
+    if %numfiloni . %nposto < 1
+    {
+      set %actfilone 1
+      gosub crea_info_spot %nposto #false
+      set %nrunemineratt %nrunemineratt + 1
+      goto nextposto
+    }
+    event ExMsg #charID 3 0 Trovati %numfiloni . %nposto filoni!
+    set %mat . %nposto 1
+   gosub crea_info_spot %nposto #true
+}
+nextfilone:
+set %prosp_da_usare #true
+if %actfilone > %numfiloni . %nposto
+{
+  set %actfilone 1
+  gosub crea_info_spot %nposto #false
+  set %nrunemineratt %nrunemineratt + 1
+  goto nextposto
+}
+set %nomevar filone , %nposto , _ , %actfilone
+set %NFilone % . %nomevar
+set %minaX %FiloneX . %NFilone
+set %minaY %FiloneY . %NFilone
+set %minaCave %FiloneCave . %NFilone
+set %minaTT %FiloneTilType . %NFilone
+if %prosp_da_usare = #true
+{
+    gosub usa_prospector %minaX %minaY %minaCave %minaTT
+    set %prosp_da_usare #false
+}
+rimina:
+if %usafirebeetle = #true
+{
+  gosub check_peso_FB
+  if #result = #false
+  {
+    goto cicloscript
+  }
+}
+else
+{
+  gosub check_peso
+  if #result = #false
+  {
+    goto cicloscript
+  }
+}
+gosub mina %minaX %minaY %minaCave %minaTT
+if #result = FUGA
+{
+    set %numfiloni . %nposto -2
+    gosub crea_info_spot %nposto #false
+    set %nrunemineratt %nrunemineratt + 1
+    goto cicloscript
+}
+if #result = VATTENE || #result = SBAGLIATO
+{
+    gosub crea_info_spot %nposto #false
+    set %nrunemineratt %nrunemineratt + 1
+    goto cicloscript
+}
+if #result = FINITO
+{
+    set %actfilone %actfilone + 1
+    goto nextfilone
+}
+if #result = GIUSTO
+{
+    goto rimina
+}
+gosub quit
+;======================================================
+sub Cast_Protection
+   gosub VisualizzaStato Cast_Protection
+   loopcastprot:
+   if #AR = N/A
+      gosub apri_gump
+   set !actar #AR
+   ricastprot:
+   set !jicp #JINDEX + 1
+   event macro 15 14
+   waitcastprot:
+   wait 20
+   for !jscp !jicp #JINDEX
+  {
+     scanjournal !jscp
+     if You_have_not_yet_recovered in #journal
+    {
+       wait 50
+       DELETEJOURNAL
+       goto ricastprot
+    }
+  }
+   if #ar = !actar
+      goto waitcastprot
+   if #ar > !actar
+   {
+      wait 50
+      goto loopcastprot
+   }
+return
+;=======================================================
+sub get_modifier_peso
+  finditem #charid
+  set %modweight 0
+  if #findtype in HS_IS
+    set %modweight %modweight + 40
+return
+;======================================================
+sub crea_info_spot
+   set !pposto %1
+   set !sel %2
+   set !nbookinfospot ( ( !pposto - 1 ) / 16 ) + 1
+   set !nruneinfospot !pposto - ( ( !nbookinfospot - 1 ) * 16 )
+
+   menu delete shpInfospot . !pposto
+   menu delete txtinfospot . !pposto
+   set %matsfondoinfospot %colbr1
+   if %mat . !pposto <> N/A
+   {
+      set !varsfondospot %mat . !pposto
+      set %matsfondoinfospot %colbr . !varsfondospot
+   }
+   if %numfiloni . !pposto > 0
+   {
+     set %colsfondoinfospot %matsfondoinfospot
+     set %colinkinfospot white
+     set !valtxt %mat . !pposto
+     if !valtxt = N/A
+        set !valtxt 1
+     set %txtinfospot %tif . !valtxt , #spc , %numfiloni . %nposto
+   }
+   if %numfiloni . !pposto = 0
+   {
+     set %colsfondoinfospot red
+     set %colinkinfospot yellow
+     set %txtinfospot ERR
+   }
+   if %numfiloni . !pposto = -2
+   {
+     set %colsfondoinfospot black
+     set %colinkinfospot red
+     set %txtinfospot S , #spc , O , #spc , S
+   }
+   if %numfiloni . !pposto = N/A
+   {
+     set %colsfondoinfospot black
+     set %colinkinfospot gray
+     set %txtinfospot #spc
+   }
+   menu font size 6
+   menu font style n
+   menu font color %colinkinfospot
+   menu font bgcolor %colsfondoinfospot
+   set %xis ( ( !pposto - 1 ) / 32 ) * 45 + 256
+   set %yis 25 + ( !pposto * 12 ) - ( ( !pposto - 1 ) / 32 ) * 384
+   if %yis > 220
+        set %yis %yis + 20
+   set %colbordoinfospot $333333
+   if !sel = #true
+      set %colbordoinfospot aqua
+   menu shape shpInfospot . !pposto %xis %yis 42 12 3 7 1 %colbordoinfospot 7 %colsfondoinfospot
+   set %yis %yis + 1
+   set %xis %xis + 4
+   menu text txtinfospot . !pposto %xis %yis !nruneinfospot %txtinfospot
+return
+;=======================================================
+sub heal
+ set !typeheal %1
+ gosub VisualizzaStato Heal
+ ripetiheal:
+    if #TARGCURS <> 0
+    {
+        key esc
+    }
+    wait 10
+     if #HITS = n/a
+     {
+          gosub apri_gump
+     }
+    if #HITS < #MAXHITS
+     {
+          if C in #CHARSTATUS
+          {
+             if %magie = 1
+             {
+                event macro 15 24
+              }
+             else
+             {
+                event macro 15 201
+             }
+          }
+          else
+          {
+             if %magie = 1
+             {
+                event macro 15 3
+             }
+             else
+             {
+                event macro 15 202
+             }
+          }
+          target 2s
+          event macro 23 0
+          if !typeheal = all
+          {
+            wait 20
+            goto ripetiheal
+          }
+     }
+return
+;=======================================================
+sub validate_option
+   if %usasmelt = #true
+   {
+       set %cProvaNum ( ( ( %limitesmelt + 1 ) * 2 ) - 2 ) / 2
+       if %cProvaNum <> %limitesmelt || %limitesmelt < 1
+       {
+       display OK Se usi l'opzione 'Smelt Metalli Pregiati' devi anche settare un numero.
+       return #false
+       }
+   }
+   if %usafuga = #true
+   {
+       if #MAXHITS = N/A
+          gosub apri_gump
+       if %limiteHP > #MAXHITS
+          set %limiteHP #MAXHITS
+       if %limiteHP = MAX
+       {
+          set %limiteHP #MAXHITS
+       }
+       set %cProvaNum ( ( ( %limiteHP + 1 ) * 2 ) - 2 ) / 2
+       if %cProvaNum <> %limiteHP || %limiteHP < 1
+       {
+       display OK Se usi Sopravvivi devi settare anche 'Limite HP'. $ Mettendo 'MAX' il limite sarà il massimo valore di HP.
+       return #false
+       }
+   }
+   gosub Chek_Inizio
+   if #result = #false
+   {
+      display OK Setta Posizione Casa e Cassa Risorse
+      return #false
+   }
+   gosub torna_a_casa
+   gosub VisualizzaStato Verifica_Opzioni
+
+   finditem %forgia g_2
+   if ( #findkind = -1 ) && ( %usaFirebeetle = #false )
+   {
+      display OK Nessuna Forgia trovata nell'arco di 2 tile
+      return #false
+   }
+   gosub validate_cassa %cassacasa
+   if #result = #false
+      return #false
+
+   if %boxpietrenormali = n/a
+      set %boxpietrenormali %cassacasa
+   gosub validate_cassa %boxpietrenormali
+   if #result = #false
+      return #false
+
+   if %boxpietredull = n/a
+      set %boxpietredull %cassacasa
+   gosub validate_cassa %boxpietredull
+   if #result = #false
+      return #false
+
+   if %boxpietreshadow = n/a
+      set %boxpietreshadow %cassacasa
+   gosub validate_cassa %boxpietreshadow
+   if #result = #false
+      return #false
+
+   if %boxpietrecopper = n/a
+      set %boxpietrecopper %cassacasa
+   gosub validate_cassa %boxpietrecopper
+   if #result = #false
+      return #false
+
+   if %boxpietrebronze = n/a
+      set %boxpietrebronze %cassacasa
+   gosub validate_cassa %boxpietrebronze
+   if #result = #false
+      return #false
+
+   if %boxpietregold = n/a
+      set %boxpietregold %cassacasa
+   gosub validate_cassa %boxpietregold
+   if #result = #false
+      return #false
+
+   if %boxpietreagaphite = n/a
+      set %boxpietreagaphite %cassacasa
+   gosub validate_cassa %boxpietreagaphite
+   if #result = #false
+      return #false
+
+   if %boxpietreverite = n/a
+      set %boxpietreverite %cassacasa
+   gosub validate_cassa %boxpietreverite
+   if #result = #false
+      return #false
+
+   if %boxpietrevalorite = n/a
+      set %boxpietrevalorite %cassacasa
+   gosub validate_cassa %boxpietrevalorite
+   if #result = #false
+      return #false
+
+   if %boxpietresand = n/a
+      set %boxpietresand %cassacasa
+   gosub validate_cassa %boxpietresand
+   if #result = #false
+      return #false
+
+   if %boxpietrecopper = n/a
+      set %boxpietrecopper %cassacasa
+   gosub validate_cassa %boxpietrecopper
+   if #result = #false
+      return #false
+
+   if %usafirebeetle = #true
+   {
+       set %cProvaNum ( ( ( %limitelingotti + 1 ) * 2 ) - 2 ) / 2
+       if %cProvaNum <> %limitelingotti || %limitelingotti < 1
+       {
+       display OK Se usi un Fire Beetle devi settare anche 'Limite Lingotti'.
+       return #false
+       }
+   }
+return #true
+sub validate_cassa
+    if %usaBank
+    {
+        ; @TODO Implementare check di sicurezza
+        return #true
+    }
+   set %p1 %1
+   finditem %p1 g_ , 2
+   if #findkind = -1
+   {
+    event ExMsg #CHARID 3 25 La Cassa con ID %p1 deve essere al max a due tile di distanza!
+    return #false
+   }
+return #true
+;=======================================================
+sub Set_Cassa_Pietre
+   set %p1 %1
+   set %cas
+   ignoreItem reset
+
+set #lTargetID X
+set #targCurs 1
+set #lTargetKind 1
+set %strdisp Cassa
+if %p1 = trash
+  set %strdisp Trash_Barrel
+
+event sysmessage Clicca sulla %strdisp  Devi essere alla 'Posizione a Casa' quando ci clicchi. NB:La %strdisp deve essere a portata di due tile!
+
+Ncp1:
+wait 1
+if #lTargetID = X
+{
+  if #targcurs = 0
+  {
+  return
+  }
+goto Ncp1
+}
+
+finditem #lTargetID g_ , 2
+if #findkind = -1
+{
+    event ExMsg #CHARID 3 25 Deve essere al max a due tile di distanza!
+    return
+}
+
+event property #findid
+if %p1 = trash
+{
+  set %valif1 trash
+  set %valif2 barrel
+  set %dsuc Trash , #spc , Barrel
+}
+else
+{
+  set %valif1 secure
+  set %valif2 stones
+  set %dsuc Contenitore
+}
+
+  if %valif1 in #property && %valif2 in #property
+  {
+     set %cas #findid
+     finditem %cas C_ , #backpackid
+     if #findkind = -1
+     {
+       goto mcpscp
+     }
+     else
+     {
+       event ExMsg #CHARID 3 25 Deve essere a terra! $
+       return
+     }
+  }
+  else
+  {
+     event ExMsg #CHARID 3 25 Devi selezionare un %dsuc $
+     return
+  }
+mcpscp:
+
+   set %boxsel boxpietre , %p1
+   set % . %boxsel %cas
+
+   gosub putGlobalVar %idscript %idscript #charid %boxsel
+
+return
+;=======================================================
+sub Get_Cassa_Pietre
+   set %p1 %1
+
+   set %boxsel boxpietre , %p1
+
+   gosub getGlobalVar %idscript %idscript #charid %boxsel NOLOCK
+
+   Menu set txtPietre . %p1 %boxPietre . %p1
+
+return
+;=======================================================
+sub Get_LimiteSand
+   gosub getGlobalVar %idscript %idscript #charid limitesand NOLOCK
+
+   if %limitesand = N/A
+      set %limitesand 1
+   Menu set edtlimitesand %limitesand
+return
+;=======================================================
+sub Get_Val_Pietre_Button
+   set %p1 %1
+   gosub Split %p1 settapietre
+return %strright
+; <>----divide una stringa cercando un separatore ------<>
+; %1 = text
+; %2 = separator
+; return
+; %StrLeft e %StrRight
+; <>----------------------------------------------------<>
+sub Split
+    str pos %1 %2
+    if #strres = 0
+    {
+        set %StrLeft %1
+        set %StrRight na
+    }
+    else
+    {
+        set %Temp #strres - 1
+        str left %1 %Temp
+        set %StrLeft #strres
+
+        str Len %2
+        set %Temp %Temp + #strres
+        str del %1 1 %Temp
+        set %StrRight #strres
+        str len %StrRight
+        if #strres = 0
+            set %StrRight na
+    }
+return
+;=======================================================
+sub sposta_pietre
+    gosub VisualizzaStato Sposta_Pietre
+    spostaancorapietre:
+    gosub AntiBlock
+    findItem %pietre c_  , #backpackid
+    if #findkind <> -1
+    {
+       set %colore #FINDCOL
+       set %pdsid #findid
+       set %pdsfs #findstack
+
+       if %colore = %iron_col
+       set %cisp normali
+
+       if %colore = %dull_col
+       set %cisp dull
+
+       if %colore = %shadow_col
+       set %cisp shadow
+
+       if %colore = %copper_col
+       set %cisp copper
+
+       if %colore = %bronze_col
+       set %cisp bronze
+
+       if %colore = %gold_col
+       set %cisp gold
+
+       if %colore = %agaphite_col
+       set %cisp agaphite
+
+       if %colore = %verite_col
+       set %cisp verite
+
+       if %colore = %valorite_col
+       set %cisp valorite
+
+       set %cdsp %boxpietre . %cisp
+       event property %cdsp
+       set %box_prop #property
+
+       if 125/125 in #property
+       {
+           gosub sposta_oggetto %pdsid %boxpietretrash %pdsfs 2
+           gosub Conta_pietre %cisp %pdsfs Trash
+           set %addsetmenu %cisp , Trash
+           menu set txtpt . %cisp %tot_pietre . %addsetmenu
+       }
+       else
+       {
+           gosub sposta_oggetto %pdsid %cdsp %pdsfs 2
+           gosub Conta_pietre %cisp %pdsfs Get
+           menu set txtp . %cisp %tot_pietre . %cisp
+       }
+       goto spostaancorapietre
+   }
+   wait 10
+   ignoreitem reset
+
+return
+;=======================================================
+sub sposta_sabbia
+    gosub VisualizzaStato Sposta_Sabbia
+    spostaancorasabbia:
+    gosub AntiBlock
+    findItem %sand c_  , #backpackid
+    if #findkind <> -1
+    {
+       set %colore #FINDCOL
+       set %pdsid #findid
+       set %pdsfs #findstack
+       set %cisp sand
+
+       set %cdsp %boxpietre . %cisp
+       event property %cdsp
+       set %box_prop #property
+
+       if 125/125 in #property
+       {
+           gosub sposta_oggetto %pdsid %boxpietretrash %pdsfs 2
+           gosub Conta_pietre %cisp %pdsfs Trash
+           set %addsetmenu %cisp , Trash
+           menu set txtpt . %cisp %tot_pietre . %addsetmenu
+       }
+       else
+       {
+           gosub sposta_oggetto %pdsid %cdsp %pdsfs 2
+           gosub Conta_pietre %cisp %pdsfs Get
+           menu set txtp . %cisp %tot_pietre . %cisp
+       }
+       goto spostaancorasabbia
+   }
+   wait 10
+   ignoreitem reset
+
+return
+;=======================================================
+sub sposta_gemme
+    gosub VisualizzaStato Sposta_Gemme
+    if %boxgemme = N/A
+       set %boxgemme %cassacasa
+    spostaancoragemme:
+    gosub AntiBlock
+    findItem %gemme c_  , #backpackid
+    if #findkind <> -1
+    {
+       event property #findid
+       set %tipogemma #property
+       set %pdsid #findid
+       set %pdsfs #findstack
+
+       if DARK in %tipogemma
+       set %cisp dark
+
+       if FIRE in %tipogemma
+       set %cisp fire
+
+       if BLUE in %tipogemma
+       set %cisp blue
+
+       if TURQUOISE in %tipogemma
+       set %cisp turquoise
+
+       if PERFECT in %tipogemma
+       set %cisp perfect
+
+       if ECRU in %tipogemma
+       set %cisp ecru
+
+       set %cdsp %boxgemme . %cisp
+       event property %cdsp
+       set %box_prop #property
+
+       gosub sposta_oggetto %pdsid %boxgemme %pdsfs 2
+       gosub Conta_gemme %cisp %pdsfs Get
+       menu set txtg . %cisp %tot_gemme . %cisp
+
+       goto spostaancoragemme
+   }
+   wait 10
+   ignoreitem reset
+
+return
+;=======================================================
+sub Get_Sopravvivi
+   gosub getGlobalVar %idscript %idscript #charid UsaFuga NOLOCK
+   gosub getGlobalVar %idscript %idscript #charid UsaProtection NOLOCK
+   gosub getGlobalVar %idscript %idscript #charid LimiteHP NOLOCK
+
+   if %usaFuga = n/a
+   {
+       set %usaFuga #true
+   }
+   if %UsaProtection = n/a
+   {
+       set %UsaProtection #true
+   }
+   if %LimiteHP = n/a
+   {
+       set %LimiteHP MAX
+   }
+   if %magie = 1 && %magery > 50
+   {
+   menu font bgcolor $111111
+   menu font color gray
+   set !ymenu !yfuga + 20
+   Menu Check chkProtection 130 !ymenu 105 15 %usaProtection Usa Protection
+   }
+   menu set chkFuga %usaFuga
+   menu set chkProtection %usaProtection
+   menu set edtLimiteHP %limiteHP
+return
+;=======================================================
+sub Get_Hiding
+   gosub getGlobalVar %idscript %idscript #charid UsaHiding NOLOCK
+   if %usaHiding = n/a
+   {
+       set %usaHiding #false
+   }
+return
+;=======================================================
+sub get_IDUnivoco
+   gosub getGlobalVar %idscript %idscript #charid IDUnivoco NOLOCK
+   if %IDUnivoco = n/a
+   {
+       set %IDUnivoco #false
+   }
+return
+;=======================================================
+sub Get_FireBeetle
+   gosub getGlobalVar %idscript %idscript #charid UsaFireBeetle NOLOCK
+   if %UsaFireBeetle = n/a
+   {
+       set %usaFireBeetle #false
+   }
+   gosub getGlobalVar %idscript %idscript #charid LimiteLingotti NOLOCK
+   if %LimiteLingotti = n/a
+   {
+       set %LimiteLingotti 2000
+   }
+return
+;=======================================================
+sub Get_Smelt
+   gosub getGlobalVar %idscript %idscript #charid UsaSmelt NOLOCK
+   if %UsaSmelt = n/a
+   {
+       set %UsaSmelt #false
+   }
+   gosub getGlobalVar %idscript %idscript #charid LimiteSmelt NOLOCK
+   if %LimiteSmelt = n/a
+   {
+       set %LimiteSmelt 1
+   }
+return
+;=======================================================
+sub Get_AutoPausa
+   gosub getGlobalVar %idscript %idscript #charid usaAutoPausa NOLOCK
+   if %usaAutoPausa = n/a
+   {
+       set %usaAutoPausa #false
+   }
+return
+;=======================================================
+sub Get_LasciaOggetto
+   gosub getGlobalVar %idscript %idscript #charid Usalasciaoggetto NOLOCK
+   if %Usalasciaoggetto = n/a
+   {
+       set %Usalasciaoggetto #true
+   }
+   gosub getGlobalVar %idscript %idscript #charid tastolasciaoggetto NOLOCK
+   if %tastolasciaoggetto = n/a
+   {
+       set %tastolasciaoggetto p
+   }
+return
+;=======================================================
+sub guarda_che_tipo
+   set !pj %1
+   if iron in !pj && shadow notin !pj
+      return 1
+   if dull in !pj
+      return 2
+   if shadow in !pj
+      return 3
+   if copper in !pj
+      return 4
+   if bronze in !pj
+      return 5
+   if gold in !pj
+      return 6
+   if agapite in !pj
+      return 7
+   if verite in !pj
+      return 8
+   if valorite in !pj
+      return 9
+   if sand in !pj
+      return 10
+return 1
+;=======================================================
+sub usa_Prospector
+   set %mx %1
+   set %my %2
+   set !cave %3
+   set !ttipe %4
+   gosub VisualizzaStato Usa_Prospector
+prospl:
+  gosub AntiBlock
+  findItem %prosptool c_  , #backpackid
+  if #findkind = -1
+  {
+     return
+   }
+   set #lobjectid #findid
+   event macro 17 0
+   set %error #scnt + 3
+   if #targcurs <> 1
+   {
+      wait 5
+      goto prospl
+   }
+riclickprosp:
+   if !cave = #true
+   {
+     set #ltargetx %mx
+         set #ltargety %my
+         set #LTargetZ #CHARPOSZ
+         set #LTargetKind 3
+         set #LTARGETTILE !ttipe
+   }
+
+   if !cave = #false
+   {
+      set #ltargetx %mx
+      set #ltargety %my
+      set #LTargetZ -1
+      set #LTargetKind 2
+   }
+
+   event Macro 22
+   gosub AntiBlock
+    event ExMsg #charID 3 0 Prospector Usato
+return
+;=======================================================
+sub Mina
+   set %mx %1
+   set %my %2
+   set !cave %3
+   set !ttipe %4
+   gosub VisualizzaStato Mina
+minap2:
+  findItem %pickaxe c_  , #backpackid
+  if #findkind = -1
+  {
+      gosub Crea_PickAxe
+      if #result = #false
+      {
+          return VATTENE
+      }
+      goto minap2
+   }
+   set #lobjectid #findid
+   event macro 17 0
+   set %error #scnt + 3
+   wait 2
+   wtperminare2:
+   if #targcurs = 1
+   {
+      wait 2
+      goto riclickmina2
+   }
+   if #scnt > %error
+   {
+         goto minap2
+   }
+   goto wtperminare2
+riclickmina2:
+   set %error #scnt + 30
+   set %jindex #jindex + 1
+   set %ncr 0
+
+
+   rcminaripeti2:
+   if !cave = #true
+   {
+     set #ltargetx %mx
+         set #ltargety %my
+         set #LTargetZ #CHARPOSZ
+         set #LTargetKind 3
+         set #LTARGETTILE !ttipe
+   }
+
+   if !cave = #false
+   {
+      set #ltargetx %mx
+      set #ltargety %my
+      set #LTargetZ -1
+      set #LTargetKind 2
+   }
+
+
+   event Macro 22
+   set %npicconate %npicconate + 1
+   ;event sysmessage %npicconate gocce di sudore!
+   minaloop2:
+   gosub check_HP
+   if #result = #false
+   {
+      if %guard = #true
+      {
+         msg Guards $
+         gosub heal uno
+         wait 10
+      }
+      if %guard = #false && %usafuga = #true
+      {
+         return FUGA
+      }
+   }
+    for %line #jindex %jindex
+    {
+       scanjournal %line
+       if TARGET_CANNOT in #journal || YOU_CAN'T_MINE in #journal || TARGET_CANNOT_BE_SEEN in #journal
+       {
+           deletejournal
+           return SBAGLIATO
+       }
+       if YOUR_BACKPACK_IS_FULL in #journal
+       {
+          deletejournal
+          return VATTENE
+        }
+         if THERE_IS_NO_METAL in #journal
+        {
+          deletejournal
+          return FINITO
+        }
+         if SOMEONE_HAS_GOTTEN in #journal
+        {
+          deletejournal
+          return FINITO
+        }
+        if YOU_CAREFULLY_DIG_UP in #journal
+       {
+          gosub guarda_che_tipo #journal
+          if #result > 1
+          {
+          if #result > %mat . %nposto
+          {
+             set %mat . %nposto #result
+             gosub crea_info_spot %nposto #true
+          }
+          }
+          deletejournal
+          set %contasabbia %contasabbia + 1
+          if %contasabbia < %limitesand
+            return GIUSTO
+          else
+            return FINITO
+        }
+        if YOU_DIG_SOME in #journal
+       {
+          gosub guarda_che_tipo #journal
+          if #result > 1
+          {
+          if #result > %mat . %nposto
+          {
+             set %mat . %nposto #result
+             gosub crea_info_spot %nposto #true
+          }
+          }
+          deletejournal
+           return GIUSTO
+       }
+
+        if YOU_LOOSEN_SOME in #journal || YOU_CAREFULLY_EXTRACT in #journal || YOU_DIG_FOR_A_WHILE in #journal
+       {
+          deletejournal
+           return GIUSTO
+        }
+    }
+    if #scnt < %error
+    {
+         goto minaloop2
+    }
+    return SBAGLIATO
+return
+;=======================================================
+sub trova_type_runa_singolo
+    set !ttminax %1
+    set !ttminay %2
+    set %cave #false
+    set !rock #false
+    set %tiltype n/a
+
+   tile init
+   tile cnt !ttminax !ttminay
+   for %tilekind 0 #tilecnt
+   {
+      tile get !ttminax !ttminay %tilekind
+      if CAVE_FLOOR in #tilename
+      {
+         set %cave #true
+         set %tiltype #TILETYPE
+      }
+      if ROCK in #tilename
+      {
+         set !rock #true
+      }
+   }
+   }
+
+   if %cave && !rock = #false
+   {
+      set %cave #false
+      set %tiltype n/a
+   }
+    gosub mina !ttminax !ttminay %cave %tiltype
+    if #result = FUGA
+    {
+       return -2
+    }
+    if #result = SBAGLIATO
+    {
+       return NO
+    }
+    if #result = GIUSTO || #result = VATTENE || #result = FINITO
+    {
+       return OK
+    }
+return
+;=======================================================
+sub cerca_filone
+    set !IDPosto %1
+    event ExMsg #charID 3 0 Prima volta qui. Cerco i filoni.
+    wait 10
+    set !fminx #charposx - 1
+    set !fminy #charposy - 1
+    set !fmaxx #charposx + 1
+    set !fmaxy #charposy + 1
+
+    if %numfiloni . !IDPosto = n/a
+       set %numfiloni . !IDPosto 0
+
+    for !ffy !fminy !fmaxy
+    {
+      for !ffx !fminx !fmaxx
+      {
+         set !filonex !ffx / 8
+         set !filoney !ffy / 8
+         set !IDFilone !filonex , _ , !filoney
+         if %idUnivoco = #false
+            set !IDFilone !IDPosto , _ , !IDFilone
+         if %Filone . !IDFilone = n/a
+         {
+           gosub trova_type_runa_singolo !ffx !ffy
+           set !result #result
+           if !result = -2
+           {
+              set %numfiloni . !IDPosto -2
+           }
+           if !result = OK
+           {
+             set %Filone . !IDFilone #true
+             if %Nfiloni = n/a
+               set %Nfiloni 0
+             set %Nfiloni %Nfiloni + 1
+             set %FiloneX . %NFiloni !ffx
+             set %FiloneY . %NFiloni !ffy
+             set %FiloneCave . %NFiloni %Cave
+             set %FiloneTilType . %NFiloni %tiltype
+             set %numfiloni . !IDPosto %numfiloni . !IDPosto + 1
+             set !nomevar filone , !IDPosto , _ , %numfiloni . !IDPosto
+             set % . !nomevar %Nfiloni
+         }
+         }
+      }
+    }
+
+return
+;=======================================================
+sub testa_filone
+    wait 10
+    set !fminx #charposx - 1
+    set !fminy #charposy - 1
+    set !fmaxx #charposx + 1
+    set !fmaxy #charposy + 1
+    set %numfilonitest 0
+
+    for !ffy !fminy !fmaxy
+    {
+      for !ffx !fminx !fmaxx
+      {
+         set !filonex !ffx / 8
+         set !filoney !ffy / 8
+         set !IDFilone !filonex , _ , !filoney
+         if %Test_Filone . !IDFilone = n/a
+         {
+           gosub trova_type_runa_singolo !ffx !ffy
+           if #result = -2
+           {
+              set %numfilonitest -2
+           }
+           if #result = OK
+           {
+             set !IDFilone !filonex , _ , !filoney
+             set %Test_Filone . !IDFilone #true
+             set %numfilonitest %numfilonitest + 1
+             set !TIDFilone . %numfilonitest !IDFilone
+         }
+         }
+      }
+    }
+    for !ciclo 1 %numfilonitest
+    {
+       set !var !TIDFilone . !ciclo
+       set %Test_Filone . !var n/a
+    }
+return %numfilonitest
+;=======================================================
+sub sposta_ingot
+   gosub VisualizzaStato Sposta_Lingotti
+   spostaancora:
+    findItem %lingotti c_  , #backpackid
+    if #findkind <> -1
+    {
+        set %sisid #findid
+        set %sistack #FINDSTACK
+        set %sicol #FINDCOL
+        if %sicol = 0
+        {
+           if %sistack > 40
+           {
+              if %tinkering > 399
+              {
+                 set %sistack #FINDSTACK - 40
+              }
+           }
+           else
+           {
+           ignoreitem %sisid
+           goto spostaancora
+           }
+        }
+        gosub sposta_oggetto #findid %cassacasa %sistack 2
+        gosub Conta %sicol %sistack
+        ignoreitem %sisid
+        goto spostaancora
+     }
+     wait 10
+     ignoreitem reset
+     gosub refresh_conteggio
+return
+;=======================================================
+sub Sposta_Oggetto
+   set %sogg %1
+   set %star %2
+   set %togg %3
+   set %range %4
+   if %range = n/a
+   {
+       set %range 2
+   }
+   finditem %star g_ , 2
+   if #findkind = -1
+   {
+     gosub Torna_a_Casa
+   }
+   wait 10
+   Exevent Drag %sogg %togg
+   gosub AntiBlock
+   Exevent Dropc %star
+   wait 20
+return
+;=======================================================
+sub Torna_a_Casa
+     gosub VisualizzaStato Torna_a_Casa
+
+     ; @ag inizio
+     gosub mountBeetle
+     ; @ag fine
+
+     riprovacasa:
+     if #CHARPOSX = %xcasa && #CHARPOSY = %ycasa
+     {
+        goto fattopath
+     }
+gosub AntiBlock
+     set %book %bookcasa
+     set %nruneatt %nrunecasaatt
+     set %runemax %runecasamax
+
+     gosub recall
+
+     if #result = #False
+     {
+          wait 1s
+          if %runabloccata
+          {
+          set %nrunecasaatt %nrunecasaatt + 1
+          if %nrunecasaatt > %runecasamax
+          {
+              set %nrunecasaatt  1
+           }
+           }
+           goto riprovacasa
+     }
+     if #CHARPOSX = %xcasa && #CHARPOSY = %ycasa
+     {
+        goto fattopath
+     }
+     event PathFind %xcasa %ycasa %zcasa
+     wait 1s
+     set %error #scnt + 20
+     attendipath:
+gosub AntiBlock
+     if #CHARPOSX = %xcasa && #CHARPOSY = %ycasa
+     {
+        goto fattopath
+     }
+     if #scnt > %error
+     {
+        goto riprovacasa
+     }
+     goto attendipath
+     fattopath:
+     ; @ag begin
+     gosub dismountBeetle
+     ; @ag end
+return
+;=========================================================
+sub Crea_menu_Avviato
+   set !lpc #lpc
+   set #lpc 1000
+   set %yfine 370
+   Menu Clear
+   menu Window Title Scorna Miner Script
+   menu window transparent 80
+   set %numerimaxinfospot %bookminermax * 16
+   set %xwmenu ( ( %numerimaxinfospot - 1 ) / 32 ) * 45 + 300
+
+   Menu Window size %xwmenu 440
+   Menu Window Color $000000
+   Menu Font bgcolor $000000
+
+   set %wshp %xwmenu - 257
+   menu shape shpInfospot 255 0 %wshp 440 3 7 1 $333333 7 $111111
+   Menu font color gray
+   Menu Font Style b
+   Menu font size 6
+   Menu Font Name tahoma
+   set %wshp 245 + %wshp / 2
+   menu text txt %wshp 3 INFO
+   menu text txt %wshp 13 SPOT
+
+   Menu font style n
+   Menu font size 6
+   Menu font bgcolor $331111
+   Menu font color aqua
+
+   for %finfospot 1 %bookminermax
+   {
+      set %xis ( ( %finfospot - 1 ) / 2 ) * 45 + 256
+      set %yis 25 + ( ( %finfospot - 1 ) * 212 ) - ( ( %finfospot - 1 ) / 2 ) * 424
+      menu shape shplibrospot . %finfospot %xis %yis 42 12 3 7 1 $333333 7 $331111
+     set %yis %yis + 1
+     set %xis %xis + 6
+     menu text txtlibrospot . %finfospot %xis %yis LIBRO %finfospot
+   }
+
+   for %finfospot 1 %numerimaxinfospot
+   {
+      gosub crea_info_spot %finfospot
+   }
+
+
+   Menu Font bgcolor $000000
+   Menu Font Style b
+   Menu font size 8
+   Menu Font Name tahoma
+
+   Menu Font Color Green
+   Menu Text Info 50 10 'Mino Ergo Sum' by Scorna
+   Menu Shape mnuRect1 10 275 230 80 4 7 1 gray 7 $111111
+   Menu Shape mnuRect3 5 28 240 18 3 7 1 $222222 7 $331111
+   Menu Shape mnuRect1 5 218 240 50 3 7 1 $222222 7 $111111
+   Menu Shape mnuRect2 5 46 240 150 3 7 1 $222222 7 $111111
+
+   ;Menu Shape mnuRect4 5 200 80 18 3 7 1 $222222 7 $331111
+   menu Image Create imgIta 5 195 240 23
+   menu Image Rectangle imgIta 5 5 60 23 $331111 #true
+   menu Image line imgIta 50 5 70 23 $331111 15
+   menu Image line imgIta 60 5 80 23 $222222 1
+   menu Image Rectangle imgIta 70 19 240 23 $331111 #true
+   menu Image line imgIta 0 5 60 5 $222222 1
+   menu Image line imgIta 0 5 0 23 $222222 1
+   menu Image line imgIta 75 19 240 19 $222222 1
+   menu Image line imgIta 239 23 239 23 $222222 1
+   menu Image Rectangle imgIta 0 0 240 5 $000000 #true
+
+   menu Image line imgIta 95 0 105 8 $111111 15
+   menu Image Rectangle imgIta 100 0 240 16 $111111 #true
+
+   menu Image line imgIta 0 0 89 0 $222222 1
+   menu Image line imgIta 88 0 99 14 $222222 1
+   menu Image line imgIta 99 14 240 14 $222222 1
+   menu Image line imgIta 239 0 239 14 $222222 1
+
+   Menu Font bgcolor $331111
+   Menu Font Color Aqua
+   set %ys %yfine + 15
+   Menu Text txt 10 30 Materiale
+   Menu Text txt 100 30 Lingotti
+   Menu Text txt 190 30 Pietre
+   Menu Text txt 10 202 Gemme
+   Menu Font bgcolor black
+   Menu Text txtStato 50 %ys Inizializzazione
+   Menu Text txtCicli 230 %ys %tot_cicli
+   Menu Text txt 25 268 Statistiche
+
+   Menu Font bgcolor $111111
+   Menu Text txt 115 195 Sabbia
+   Menu Font Color Gray
+   Menu Text txtpsand 180 195 %tot_pietresand
+   Menu Text txtptsand 220 195 %tot_pietresandtrash
+
+   Menu Text txt 175 47 Get
+   Menu Text txt 205 47 Trash
+   Menu Text txt 10 60 Iron
+   Menu Text txt 10 75 Dull Copper
+   Menu Text txt 10 90 Shadow Iron
+   Menu Text txt 10 105 Copper
+   Menu Text txt 10 120 Bronze
+   Menu Text txt 10 135 Gold
+   Menu Text txt 10 150 Agapite
+   Menu Text txt 10 165 Verite
+   Menu Text txt 10 180 Valorite
+
+   Menu Text txt 10 220 Dark Sapphire
+   Menu Text txt 145 235 Fire Ruby
+   Menu Text txt 10 250 Blue Diamond
+   Menu Text txt 145 220 Turquoise
+   Menu Text txt 10 235 Perfect Emerald
+   Menu Text txt 145 250 Ecru Citrine
+
+   Menu Text txtgdark 115 220 %tot_gemmedark
+   Menu Text txtgfire 225 235 %tot_gemmefire
+   Menu Text txtgblue 115 250 %tot_gemmeblue
+   Menu Text txtgturquoise 225 220 %tot_gemmeturquoise
+   Menu Text txtgperfect 115 235 %tot_gemmeperfect
+   Menu Text txtgecru 225 250 %tot_gemmeecru
+
+
+   Menu Text txtl1 115 60 %tiron
+   Menu Text txtl2 115 75 %tdull
+   Menu Text txtl3 115 90 %tshadow
+   Menu Text txtl4 115 105 %tcopper
+   Menu Text txtl5 115 120 %tbronze
+   Menu Text txtl6 115 135 %tgold
+   Menu Text txtl7 115 150 %tagaphite
+   Menu Text txtl8 115 165 %tverite
+   Menu Text txtl9 115 180 %tvalorite
+
+   Menu Text txtptnormali 220 60 %tot_pietrenormalitrash
+   Menu Text txtptdull 220 75 %tot_pietredulltrash
+   Menu Text txtptshadow 220 90 %tot_pietreshadowtrash
+   Menu Text txtptcopper 220 105 %tot_pietrecoppertrash
+   Menu Text txtptbronze 220 120 %tot_pietrebronzetrash
+   Menu Text txtptgold 220 135 %tot_pietregoldtrash
+   Menu Text txtptagaphite 220 150 %tot_pietreagaphitetrash
+   Menu Text txtptverite 220 165 %tot_pietreveritetrash
+   Menu Text txtptvalorite 220 180 %tot_pietrevaloritetrash
+
+   Menu Text txtpnormali 180 60 %tot_pietrenormali
+   Menu Text txtpdull 180 75 %tot_pietredull
+   Menu Text txtpshadow 180 90 %tot_pietreshadow
+   Menu Text txtpcopper 180 105 %tot_pietrecopper
+   Menu Text txtpbronze 180 120 %tot_pietrebronze
+   Menu Text txtpgold 180 135 %tot_pietregold
+   Menu Text txtpagaphite 180 150 %tot_pietreagaphite
+   Menu Text txtpverite 180 165 %tot_pietreverite
+   Menu Text txtpvalorite 180 180 %tot_pietrevalorite
+
+   Menu Font Color Gray
+   Menu Font bgcolor black
+
+   set %ys %yfine + 15
+   Menu Text txt 10 %ys Stato:
+   Menu Text txt 190 %ys Cicli:
+
+   if %tinkering > 399
+   {
+   Menu Text txt 10 357 Shovel create
+   Menu Text txt 10 370 Tinker Tool creati
+   Menu Font Color white
+   Menu Text txtPickAxe 120 357 %pickaxe_tot
+   Menu Text txtTinkerTool 120 370 %tinkertool_tot
+   }
+
+   Menu Font Color Red
+   set %ys %yfine + 32
+   Menu Button Start 10 %ys 230 20 Interrompi
+   set %ys %yfine + 55
+   if %usafirebeetle = #true
+   {
+     Menu Font Color gray
+     menu text txt 10 %ys Limite Lingotti
+     Menu Font Color white
+     menu text txtLimite 100 %ys %limitelingotti
+   }
+   Menu Font Color gray
+   menu text txt 140 %ys Sotto Guards
+   Menu Font Color white
+   menu text txtGuards 220 %ys NO
+
+
+   Menu font size 6
+   Menu Font Color gray
+   Menu Font bgcolor $111111
+   Menu Text txt 15 280 Iron
+   Menu Text txt 15 290 Dull
+   Menu Text txt 15 300 Shadow
+   Menu Text txt 90 280 Copper
+   Menu Text txt 90 290 Bronze
+   Menu Text txt 90 300 Gold
+   Menu Text txt 160 280 Agapite
+   Menu Text txt 160 290 Verite
+   Menu Text txt 160 300 Valorite
+   Menu Text txt 15 340 Totale:
+   Menu text txt 100 340 Total Time:
+
+   Menu Font Color white
+   Menu Text txttiron 50 280 %tiron
+   Menu Text txttdull 50 290 %tdull
+   Menu Text txttshadow 50 300 %tshadow
+   Menu Text txttcopper 120 280 %tcopper
+   Menu Text txttbronze 120 290 %tbronze
+   Menu Text txttgold 120 300 %tgold
+   Menu Text txttagaphite 200 280 %tagaphite
+   Menu Text txttverite 200 290 %tverite
+   Menu Text txttvalorite 200 300 %tvalorite
+   set %totestratti %tiron + %tdull + %tshadow + %tcopper + %tbronze + %tgold + %tagaphite + %tverite + %tvalorite
+   Menu Text txtttutti 47 340 %totestratti
+   Menu text etempo 148 340 0h 0m
+
+   Menu Button Azzera 190 337 40 15 RESET
+
+   Menu font size 16
+   Menu Font Color Red
+   Menu Text message 10 355 #spc
+
+   menu shape ProgressBarOutline 10 315 230 20 3 7 1 Gray 2 0
+   gosub aggiorna_bar_statistiche
+   menu show 670 0
+   set #lpc !lpc
+return
+;=========================================================
+sub Chek_Inizio
+    if %xcasa = N/A || %ycasa = N/A || %zcasa = N/A || %cassacasa = N/A
+    {
+          return #false
+    }
+    else
+    {
+          return #true
+    }
+return
+;=========================================================
+sub VisualizzaStato
+   set %p1 %1
+   Menu set txtStato %p1
+return
+;=======================================================
+sub Get_Posizione_Casa
+     gosub getGlobalVar %idscript %idscript #charid xcasa NOLOCK
+     gosub getGlobalVar %idscript %idscript #charid ycasa NOLOCK
+     gosub getGlobalVar %idscript %idscript #charid zcasa NOLOCK
+
+      Menu set txtPosCasa %xcasa %ycasa
+
+return
+;=======================================================
+sub Set_Posizione_Casa
+;  finditem %forgia g_ , 2
+;  if #findkind = -1
+;  {
+;       display OK Nessuna Forgia Trovata nei 2 tile Vicini
+;       return
+;  }
+  set %xcasa #CHARPOSX
+  set %ycasa #CHARPOSY
+  set %zcasa #CHARPOSZ
+  gosub putGlobalVar %idscript %idscript #charid xcasa
+  gosub putGlobalVar %idscript %idscript #charid ycasa
+  gosub putGlobalVar %idscript %idscript #charid zcasa
+
+return
+;=======================================================
+sub Get_Cassa_Casa
+      gosub getGlobalVar %idscript %idscript #charid cassacasa NOLOCK
+      Menu set txtCassaCasa %cassacasa
+
+return
+;=======================================================
+sub Get_Cassa_Gemme
+      gosub getGlobalVar %idscript %idscript #charid boxgemme NOLOCK
+      Menu set txtCassaGemme %boxgemme
+
+return
+;=======================================================
+sub Set_Cassa_Casa
+set %cas
+ignoreItem reset
+
+set #lTargetID X
+set #targCurs 1
+set #lTargetKind 1
+if %usaBank
+{
+    event sysmessage Clicca sulla Cassa. Deve trovarsi direttamente all'interno del contenitore della banca.
+}
+else
+{
+    event sysmessage Clicca sulla Cassa. Devi essere alla 'Posizione a Casa' quando ci clicchi. NB:La cassa deve essere a portata di un tile!
+}
+
+N1:
+wait 1
+
+if #lTargetID = X
+{
+if #targCurs = 0
+{
+  return
+}
+goto N1
+}
+
+if %usaBank
+{
+    ; @TODO: Implementare check di correttezza.
+    set %cassacasa #ltargetid
+    gosub putGlobalVar %idscript %idscript #charid cassacasa
+    return
+}
+
+finditem #lTargetID g_ , 1
+if #findkind = -1
+{
+    event ExMsg #CHARID 3 25 Deve essere ad un tile di distanza! $
+    return
+}
+
+event property #findid
+if SECURE in #property && STONES in #property
+{
+    set %cas #findid
+    finditem %cas C_ , #backpackid
+    if #findkind = -1
+    {
+        set %cassacasa %cas
+        gosub putGlobalVar %idscript %idscript #charid cassacasa
+    }
+    else
+    {
+        event ExMsg #CHARID 3 25 Deve essere a terra! $
+    }
+}
+else
+{
+    event ExMsg #CHARID 3 25 Devi selezionare un Contenitore $
+}
+return
+;=======================================================
+sub Set_Cassa_Gemme
+set %cas
+ignoreItem reset
+
+set #lTargetID X
+set #targCurs 1
+set #lTargetKind 1
+if %usaBank
+{
+    event sysmessage Clicca sulla Cassa. Deve trovarsi direttamente all'interno del contenitore della banca.
+}
+else
+{
+    event sysmessage Clicca sulla Cassa. Devi essere alla 'Posizione a Casa' quando ci clicchi. NB: La cassa deve essere a portata di un tile!
+}
+
+Ncg1:
+wait 1
+
+if #lTargetID = X
+{
+if #targCurs = 0
+{
+  return
+}
+goto Ncg1
+}
+
+if %usaBank
+{
+    ; @TODO: Implementare check di correttezza.
+    set %boxgemme #ltargetid
+    gosub putGlobalVar %idscript %idscript #charid boxgemme
+    return
+}
+
+finditem #lTargetID g_ , 2
+if #findkind = -1
+{
+    event ExMsg #CHARID 3 25 Deve essere ad un tile di distanza! $
+    return
+}
+
+event property #findid
+ if SECURE in #property && STONES in #property
+{
+set %cas #findid
+     finditem %cas C_ , #backpackid
+     if #findkind = -1
+    {
+     set %boxgemme %cas
+     gosub putGlobalVar %idscript %idscript #charid boxgemme
+     }
+    else
+    {
+       event ExMsg #CHARID 3 25 Deve essere a terra! $
+     }
+}
+else
+{
+ event ExMsg #CHARID 3 25 Devi selezionare un Contenitore $
+}
+return
+;=======================================================
+sub Check_Skill_Recall
+   set %magery
+   set %chiva
+   set %skillsel
+
+   chooseSkill Mager
+   set %magery #SKILL
+
+   chooseSkill Chiva
+   set %chiva #SKILL
+
+   set %magie 0
+   if %magery > ( %chiva - 1 )
+   {
+        set %skillsel %magery
+        set %magie 1
+        Menu set txtMagia Recall
+    }
+    else
+    {
+        set %skillsel %chiva
+        set %magie 2
+        Menu set txtMagia Journey
+    }
+
+    if %skillsell < 250
+    {
+        display OK Hai skill per recallarti troppo basse $ Script fermato.
+        gosub quit
+    }
+    if %skillsell < 50
+    {
+        event ExMsg #CHARID 3 25 Hai la skill per recallarti un po' bassina... cercheremo di alzarla via via^^ $
+    }
+
+return
+;=======================================================
+sub Check_Skill_Tinker
+   chooseSkill Tinke
+   set %tinkering #SKILL
+   set %tinkstr %tinkering
+   Menu set txtTinker %tinkstr
+return
+;=======================================================
+sub Check_Book_Casa
+
+cercarunebookcasa:
+    finditem ZBN C_ , #backpackid
+    if #findkind = -1
+    {
+         display OK Non c'è nessun Rune Book nominato Casa nello Zaino $ Script fermato
+         gosub quit
+    }
+
+    event property #findid
+    if CASA in #property
+    {
+       set %bookcasa #findid
+       goto trovatorunebookcasa
+    }
+    else
+    {
+       ignoreitem #findid
+    }
+goto cercarunebookcasa
+trovatorunebookcasa:
+ignoreitem reset
+
+   Menu set txtBookCasa %bookcasa
+return
+
+;=======================================================
+sub Check_Book_Miner
+   set %libri 0
+
+cercarunebookMiner:
+   finditem ZBN C_ , #backpackid
+   if #findkind = -1
+   {
+         if %libri = 0
+         {
+             display OK Non c'è nessun Rune Book nominato Miner nello Zaino $ Script fermato
+             gosub quit
+          }
+          else
+          {
+              goto trovatorunebookMiner
+          }
+    }
+
+    event property #findid
+    if MINER in #property
+    {
+       set %libri %libri + 1
+       set %bookminer . %libri #findid
+       ignoreitem #findid
+    }
+    else
+    {
+       ignoreitem #findid
+    }
+goto cercarunebookminer
+trovatorunebookminer:
+ignoreitem reset
+set %bookminerMax %libri
+   Menu set txtBookMiner %bookminerMax
+return
+;=======================================================
+sub Chiudi_Gump
+    _CLOSE_GUMPS:
+if %usalasciaoggetto = #true
+{
+key %tastolasciaoggetto
+msg $
+}
+set %error #scnt + 1
+event macro 31 0 ; CLOSES ALL GUMPS
+   loopclose:
+
+      if #contname = spellicon_gump || #contname = skillicon_gump
+      {
+      set !x #contposx + 10
+      set !y #contposy + 10
+      click !x !y r
+      wait 2
+      }
+      if #CONTNAME = BuffIcons_Gump
+      {
+      set !x #contposx + 10
+      set !y #contposy + 10
+      click !x !y r
+      wait 2
+      }
+   if #contname <> GameAreaEdgeGump
+   {
+       event macro 31 0
+       goto loopclose
+   }
+return
+;=======================================================
+sub Apri_Gump
+_OPEN_PAPERDOLL:
+set %error #scnt + 1
+event macro 8 1
+    loopa:
+   if  #contname = PAPERDOLL_GUMP
+      {
+          goto fineloopa
+      }
+
+      if #scnt > %error
+         goto _OPEN_PAPERDOLL
+      }
+    goto loopa
+    fineloopa:
+wait 10
+;contpos 650 493
+wait 10
+set %paperdollx #CONTPOSX
+set %paperdolly #CONTPOSY
+
+_OPEN_STATUS:
+set %error #scnt + 1
+event macro 8 2
+ loopb:
+   if  #contname = STATUS_GUMP
+      {
+          goto fineloopb
+      }
+
+      if #scnt > %error
+         goto _OPEN_STATUS
+      }
+    goto loopb
+    fineloopb:
+wait 10
+;contpos -24 493
+
+_OPEN_BACKPACK:
+set %error #scnt + 1
+event macro 8 7
+loopc:
+   if  #contID = #backpackid
+      {
+          goto fineloopc
+      }
+
+      if #scnt > %error
+         goto _OPEN_BACKPACK
+      }
+    goto loopc
+    fineloopc:
+wait 10
+;contpos 400 493
+set %zainox #CONTPOSX
+set %zainoy #CONTPOSY
+
+
+return
+;========================================================
+sub Crea_Menu
+   set !yincima 40
+   set !ypietre 125
+   set !ygioielli 307
+   set !ybeetle 342
+   set !yfuga 382
+   Menu Clear
+   menu Window Title Scorna Miner Script
+   menu window transparent 100
+   Menu Window size 250 520
+   Menu Window Color $000000
+
+   Menu Shape mnuRect1 2 2 246 35 4 7 1 gray 7 $002222
+
+
+   Menu font size 8
+   Menu Font Name tahoma
+
+   Menu Font bgcolor $002222
+   Menu Font Color Gray
+   Menu Text Info 10 19 Version %versionscript
+   Menu Font Style b
+   Menu Font Color Green
+   Menu Text Info 10 6 'Mino Ergo Sum' by Scorna
+
+   Menu Font bgcolor $000000
+   Menu Font Color Yellow
+   Menu Text Info1 10 !yincima Magia
+   Menu Text Info2 137 !yincima Tinkering
+   set !ymenu !yincima + 15
+   Menu Text Info3 10 !ymenu Libro Casa
+   Menu Text Info4 137 !ymenu Libri Miner
+   set !ymenu !yincima + 30
+   Menu Text Info5 10 !ymenu Posizione a Casa
+   set !ymenu !yincima + 45
+
+   Menu Font Color white
+
+   set !ymenu !ypietre + 7
+   Menu Shape mnuRect1 10 !ymenu 230 207 3 7 1 gray 7 $111111
+   Menu Text Info7 20 !ypietre Casse
+   menu font bgcolor $111111
+   Menu Font Color yellow
+   set !ymenu !ypietre + 17
+   Menu Text Info6 18 !ymenu Risorse e Lingotti
+   Menu Font Color gray
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Pietre Normali
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Pietre Dull Copper
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Pietre Shadow Iron
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Pietre Copper
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Pietre Bronze
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Pietre Gold
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Pietre Agapite
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Pietre Verite
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Pietre Valorite
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Sabbia
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Gioielli
+   set !ymenu !ymenu + 15
+   Menu Text Info7 18 !ymenu Trash
+   Menu Font Style n
+   Menu font size 6
+   set !ymenu !ypietre + 170
+   Menu Text Info7 58 !ymenu limite Spot
+
+   menu font bgcolor $000000
+   Menu Font Style b
+   Menu font size 8
+
+   set !ymenu !ybeetle + 7
+   Menu Shape mnuRect1 10 !ymenu 230 30 3 7 1 gray 7 $111111
+   Menu Font Color white
+   Menu Text Info7 40 !ybeetle Usa Fire Beetle
+   set !ymenu !ybeetle - 2
+   Menu Check chkFireBeetle 20 !ymenu 15 20 %usaFireBeetle
+   menu font bgcolor $111111
+   Menu Font Color Gray
+   set !ymenu !ybeetle + 15
+   Menu Text Info7 40 !ymenu Limite Lingotti
+   set !ymenu !ybeetle + 11
+   Menu Font Color white
+   Menu Edit edtLimiteLingotti 180 !ymenu 45 %LimiteLingotti
+   menu font bgcolor $000000
+
+   set !ymenu !yfuga + 7
+   Menu Shape mnuRect1 10 !ymenu 230 35 3 7 1 gray 7 $111111
+   Menu Font Color white
+   Menu Text Info7 40 !yfuga Sopravvivi
+   set !ymenu !yfuga - 2
+   Menu Check chkFuga 20 !ymenu 15 20 %usaFuga
+   menu font bgcolor $111111
+   Menu Font Color gray
+   set !ymenu !yfuga + 20
+   Menu Text Info7 20 !ymenu Limite HP
+   set !ymenu !yfuga + 16
+   Menu Font Color white
+   Menu Edit edtLimiteHP 75 !ymenu 35 %LimiteHP
+
+   set !ymenu !ypietre + 164
+   Menu Edit edtLimiteSand 100 !ymenu 25 %limitesand
+
+   menu font bgcolor $000000
+
+   Menu Font Color yellow
+   set !ymenu !yincima + 45
+   Menu Check chkSmelt 10 !ymenu 60 20 %usaSmelt Smelta
+   set !ymenu !yincima + 47
+   Menu Text Info6 93 !ymenu metalli pregiati per volta
+   set !ymenu !ymenu + 16
+   Menu Check chkIDUnivoco 10 !ymenu 250 20 %IDUnivoco Filoni non sovrapponibili.
+   Menu Font Color white
+   set !ymenu !yincima + 45
+   Menu Edit edtLimiteSmelt 70 !ymenu 20 %LimiteSmelt
+
+
+
+
+   Menu Font Color gray
+   Menu Check chkLasciaOggetto 30 426 200 20 %usalasciaoggetto Usa 'Lascia Oggetto' sul tasto
+   Menu Edit edttasto 220 427 15 %tastolasciaoggetto
+   Menu Check chkHiding 30 442 100 20 %usaHiding Usa Hiding
+   Menu Check chkAutoPausa 30 459 200 20 %usaautopausa Usa Auto Pausa Scorna Alarm
+
+
+   Menu Font Color white
+   Menu Text txtMagia 77 !yincima N/A
+   Menu Text txtTinker 200 !yincima N/A
+   set !ymenu !yincima + 15
+   Menu Text txtBookCasa 77 !ymenu N/A
+   Menu Text txtBookMiner 200 !ymenu N/A
+   set !ymenu !yincima + 30
+   Menu Text txtPosCasa 130 !ymenu N/A
+
+   menu font bgcolor $111111
+   set !ymenu !ypietre + 17
+   Menu Text txtCassaCasa 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtPietreNormali 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtPietreDull 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtPietreShadow 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtPietreCopper 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtPietreBronze 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtPietreGold 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtPietreAgaphite 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtPietreVerite 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtPietreValorite 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtPietreSand 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtCassaGemme 130 !ymenu N/A
+   set !ymenu !ymenu + 15
+   Menu Text txtPietreTrash 130 !ymenu N/A
+
+
+
+   Menu font size 6
+   Menu Font Color gray
+   Menu Text Info6 150 500 ID Filone
+   Menu Text Stato1 10 505 Stato:
+
+   Menu Font Color yellow
+   if %debug = #true
+       Menu Button TestSpot 195 502 45 15 Test Spot
+   Menu Font Color white
+   Menu Text txtIDFilone 150 509 N/A
+   menu font bgcolor $000000
+   Menu Font Color Aqua
+   Menu Text txtStato 35 505 Inizializzazione
+
+   Menu font size 8
+   menu show 670 0
+   if %debug = #false
+   {
+      menu HideEUO
+   }
+   menu show 670 0
+return
+;=======================================================
+sub Crea_Pulsanti
+   menu font bgcolor $006600
+   Menu Font Color White
+   Menu font size 6
+   Menu Button HelpScript 175 7 70 15 INFO/UPDATE
+   Menu font size 8
+   set !ymenu !ypietre - 4
+   Menu Button HelpPietre 228 !ymenu 15 20 ?
+   set !ymenu !yfuga
+   Menu Button HelpFuga 228 !ymenu 15 20 ?
+   Menu Button HelpAutoPausa 10 455 15 20 ?
+   Menu Button HelpLasciaOggetto 10 427 15 20 ?
+   menu font bgcolor $005555
+   set !ymenu !yincima + 29
+   Menu Button SettaPosCasa 195 !ymenu 30 15 Set
+
+   set !ymenu !ypietre + 16
+   Menu Button SettaCassaCasa 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaPietreNormali 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaPietreDull 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaPietreShadow 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaPietreCopper 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaPietreBronze 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaPietreGold 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaPietreAgaphite 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaPietreVerite 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaPietreValorite 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaPietreSand 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaCassaGemme 195 !ymenu 30 15 Set
+   set !ymenu !ymenu + 15
+   Menu Button SettaPietreTrash 195 !ymenu 30 15 Set
+
+
+
+   Menu Font bgColor gray
+   menu font color black
+   Menu font size 6
+   set !ymenu !ypietre - 1
+   Menu Button butReset 163 !ymenu 62 15 RESET CASSE
+
+   Menu Font Color Green
+   Menu font size 8
+   ;Menu Button Start 10 455 230 20 Inizia
+return
+;=========================================================
+sub AntiBlock
+   gosub AutoScriptScorna Normale
+   if %usahiding = #true
+   {
+      gosub hiding
+   }
+   set %maxpausa #scnt + 40
+   for %i 6 1
+  {
+      if #menubutton = closed
+      {
+         set #menubutton N/A
+         gosub quit
+      }
+
+      if #MENUBUTTON = Start
+      {
+          SET #menubutton N/A
+          Menu Delete Start
+          gosub crea_menu
+          goto quidainterrotto
+      }
+      if #MENUBUTTON = Azzera
+      {
+          SET #menubutton N/A
+          gosub azzera_stat
+      }
+    scanjournal %i
+    if protection in #journal
+    {
+      if You_are_now_under_the_protection in #journal && %guard = #false
+      {
+         menu set txtGuards SI
+         set %guard #true
+         DELETEJOURNAL
+      }
+      if You_have_left_the_protection in #journal && %guard = #true
+      {
+         menu set txtGuards NO
+         set %guard #false
+         DELETEJOURNAL
+      }
+    }
+    if The_world_is_saving in #journal || The_world_will_save in #journal || Cleaning_resources in #journal
+    {
+    menu shape shpsave 5 356 240 30 3 7 1 black 7 black
+    Menu font size 18
+   Menu Font Color Red
+   menu font bgcolor black
+   Menu Text save2 10 356 SAVE IN CORSO
+         aspettaskip:
+         set %displsave SAVE , #spc , IN , #spc , CORSO
+         for %i 5 1
+        {
+            scanjournal %i
+            if World_save_complete in #journal ||  Resources_cleaned in #journal
+           {
+               wait 1s
+               DELETEJOURNAL
+               Menu delete shpsave
+               Menu delete save2
+               goto fine
+           }
+
+         wait 5
+         Menu set save2 %displsave
+         set %displsave %displsave , #dot
+        }
+        if #scnt > %maxpausa
+        {
+             DELETEJOURNAL
+             Menu delete shpsave
+             Menu delete save2
+             goto fine
+         }
+        goto aspettaskip
+    }
+  }
+fine:
+return
+;======================================================
+sub hiding
+   if H notin #charstatus
+  {
+      if #scnt > %timehiding
+      {
+          event macro 13 21
+          set %timehiding #scnt + %hidingdelay
+       }
+   }
+return
+;=======================================================
+sub Recall
+   set %_runenumber %nruneatt
+   set %bookx 0
+   set %booky 0
+   set %_oldx #charposx
+   set %_oldy #charposy
+   set %_runex 138
+   set %ymagie 180
+rirecalldopofiz:
+   set %runabloccata #false
+   if %magie = 1
+   {
+   set %ymagie 145
+   }
+   set %_page 0
+   set %_side 0
+   ;pagina
+   set %_page %_runenumber + 1
+   set %_page %_page / 2
+   ;side
+    set %_num %_runenumber / 2
+    set %_num %_num * 2
+    if %_num = %_runenumber
+       set %_side 1
+    if %_side = 1
+       set %_runex 298
+
+   set  %risp #true
+
+  set %xc 0
+  set %yc 0
+
+   set %_pagexmod %_page * 34
+   set %_pagex 104
+   set %_pagex %_pagex + %_pagexmod
+   if %_page > 4
+      set %_pagex %_pagex + 31
+   recallopenagain:
+wait 5
+   set #LOBJECTID %book
+   event macro 17 0
+   wait 5
+   set %error #scnt + 2
+   gosub AntiBlock
+
+   gosub wait_gump generic_gump
+   looprecall:
+   if  #contname = generic_gump
+      {
+          goto finelooprecall
+      }
+
+      if #scnt > %error
+         goto recallopenagain
+      }
+    goto looprecall
+    finelooprecall:
+
+   set %bookx #CONTPOSX
+   set %booky #CONTPOSY
+   set %xc %bookx + %_pagex
+   set %yc %booky + 195
+   click %xc %yc
+   wait 5
+   gosub AntiBlock
+gosub wait_gump generic_gump
+   set %bookx #contposx
+   set %booky #contposy
+   set %xc %bookx + %_runex
+   set %yc %booky + %ymagie
+
+if %usafirebeetle = #true
+{
+  ;-------------------------------- BY AG ---
+  gosub mountBeetle
+  ;------------------------------------------
+}
+set !jindex #jindex
+   click %xc %yc
+   set !w4serr #scnt + 4
+   wait 50
+   wait4secondrecall:
+   if %_oldx = #charposx && %_oldy = #charposy && #scnt < !w4serr
+   {
+     wait 50
+     goto wait4secondrecall
+   }
+gosub AntiBlock
+   if %_oldx = #charposx
+   {
+      if %_oldy = #charposy
+      {
+         for %i !jindex #jindex
+         {
+            scanjournal %i
+            if THAT_LOCATION_IS_BLOCKED in #journal
+            {
+                DELETEJOURNAL
+                set %runabloccata #true
+            }
+            if ENCUMBERED_TO_MOVE in #journal
+            {
+                DELETEJOURNAL
+                gosub posa_sovrappeso
+                goto rirecalldopofiz
+            }
+         }
+         set  %risp #false
+      }
+   }
+return %risp
+
+;=======================================================
+sub posa_sovrappeso
+    ciloopps:
+      finditem %ore c_ , #BACKPACKID
+      if #findkind = -1
+      {
+           ignoreitem reset
+           return
+      }
+      if #findCol <> 0
+      {
+           ignoreitem #findid
+           goto ciloopps
+       }
+      ignoreitem reset
+      set !posatot #findstack
+      if !posatot > 5
+         set !posatot 5
+      Exevent Drag #findID !posatot
+      gosub AntiBlock
+      wait 10
+      Exevent Dropg #charposx #charposy #charposz
+      wait 10
+return
+;=======================================================
+sub setProgressBarMenu
+  set %p1 %1
+  set %p2 %2
+	set %pBarSize ( ( 229000 * %p1 ) / %p2 ) / 1000
+	menu delete ProgressBar
+
+
+
+
+	menu shape ProgressBar 11 481 %pBarSize 19 3 1 1 gray 7 gray
+return
+;========================================================
+sub Get_Meditation
+   chooseSkill medi
+   if #skill > 0
+     set %Meditation #true
+   else
+     set %Meditation #false
+return
+;========================================================
+sub aspetta_mana
+gosub VisualizzaStato Recupera_Mana
+set !usatameditation #false
+aspettaancoraaspettamana:
+     if #MANA = n/a
+     {
+          gosub Chiudi_Gump
+          gosub Apri_Gump
+     }
+     if #MANA < 20 && #MANA < #MAXMANA
+     {
+         if !usatameditation = #false && %Meditation = #true
+         {
+             event Macro 13 46
+             set !usatameditation #true
+         }
+         wait 1s
+         goto aspettaancoraaspettamana
+     }
+return
+;========================================================
+sub smelta
+    ;----------------------
+    ;- Modifica by AG -----
+    ;----------------------
+    if %usaFirebeetle
+    {
+        gosub smelta_FB
+        return
+    }
+    ;----------------------
+
+gosub VisualizzaStato Smelta
+smeltaancora:
+gosub AntiBlock
+    finditem %forgia g_ , 2
+    if #findkind = -1
+   {
+         return #false
+   }
+   set %fid #findid
+
+splitsmeltsingolo:
+    findItem %ore c_  , #backpackid
+    if #findkind <> -1
+    {
+         if %usasmelt
+         {
+         event property #findid
+         if valorite in #property || verite in #property
+         {
+             if #FINDSTACK > %limitesmelt
+             {
+                set !xd #FINDX + 5
+                set !yd #FINDY + 5
+                exevent drag #findid %limitesmelt
+                gosub antiblock
+                exevent dropc #backpackid 0 0
+                wait 10
+                goto splitsmeltsingolo
+             }
+         }
+         }
+         set #lobjectid #findid
+         event macro 17
+         TARGET 5s
+         set #LTARGETID %fid
+         set #LTARGETKIND 1
+         event macro 22 0
+         wait 1s
+         goto smeltaancora
+      }
+     wait 1s
+return
+;=========================================================
+sub VisualizzaSalvataggio
+set %p1 %1
+   Menu set txtSalvataggio %p1
+return
+;=======================================================
+sub Check_PickAxe
+gosub VisualizzaStato Check_Shovel
+gosub AntiBlock
+      wait 10
+      finditem %PickAxe c_ , #BACKPACKID
+      if #findkind <> -1
+      {
+          return #true
+      }
+      return #false
+return
+;=======================================================
+sub Prendi_PickAxe
+    gosub VisualizzaStato Prendi_Shovel
+    prendi_pickaxesg:
+    finditem %pickaxe c_ , %cassacasa
+     if #findkind <> -1
+     {
+       event property #findid
+       if gargoyle in #property
+       {
+          ignoreitem #findid
+          goto prendi_pickaxesg
+       }
+       gosub Prendi_Oggetto %pickaxe %cassacasa 1 antiblock
+     }
+     else
+     {
+        return #false
+     }
+return #result
+;=======================================================
+sub Check_ToolKit
+gosub VisualizzaStato Check_toolKit
+gosub AntiBlock
+      wait 10
+      finditem %toolkit c_ , #BACKPACKID
+      if #findkind <> -1
+      {
+          event property #findid
+          set !proptt #property
+          if %strUsi in !proptt
+          {
+             if %tinkering > 399
+             {
+                gosub crea_tinkertool
+             }
+          }
+          return #true
+      }
+      return #false
+return
+;=======================================================
+sub Check_ProspectorTool
+gosub VisualizzaStato Check_Prospector
+gosub AntiBlock
+      wait 10
+      finditem %prosptool c_ , #BACKPACKID
+      if #findkind <> -1
+      {
+          return #true
+      }
+      return #false
+return
+;=======================================================
+sub Prendi_ToolKit
+    gosub VisualizzaStato Prendi_ToolKit
+    gosub Prendi_Oggetto %toolkit %cassacasa 1 antiblock
+return #result
+;=======================================================
+sub Prendi_ProspectorTool
+    gosub VisualizzaStato Prendi_Prospector
+    gosub Prendi_Oggetto %prosptool %cassacasa 1 antiblock
+return #result
+;=======================================================
+sub Prendi_Iron
+    gosub VisualizzaStato Prendi_IRON
+piapricassa:
+gosub AntiBlock
+    set #NEXTCPOSX 100
+    set #NEXTCPOSY 100
+    finditem %cassacasa g_ , 2
+    if #findkind = -1
+    {
+         gosub Torna_a_Casa
+    }
+    set #LOBJECTID %cassacasa
+    event macro 17 0
+    wait 10
+    if #contID <> %cassacasa
+    {
+        goto piapricassa
+    }
+    contpos 100 100
+    wait 10
+piloop:
+gosub AntiBlock
+      finditem %lingotti c_ , %cassacasa
+      if #findkind = -1
+      {
+           ignoreitem reset
+           return #false
+      }
+      if #findCol <> 0
+      {
+           ignoreitem #findid
+           goto piloop
+       }
+      ignoreitem reset
+      wait 10
+piridrag:
+    gosub AntiBlock
+    if #findstack < 4
+    {
+       return #false
+    }
+    set %fspi #findstack
+    if %fspi > 40
+    {
+       set %fspi 40
+    }
+    Exevent Drag #findID %fspi
+    gosub AntiBlock
+    wait 10
+    Exevent Dropc #BACKPACKID
+    gosub check_iron
+    if #result = #false
+    {
+         gosub apri_gump
+         goto piapricassa
+    }
+    set %fspi 0 - %fspi
+    gosub conta 0 %fspi
+    return #true
+return
+;=======================================================
+sub Check_Iron
+gosub VisualizzaStato Check_Iron
+      wait 10
+ciloop:
+gosub AntiBlock
+      finditem %lingotti c_ , #BACKPACKID
+      if #findkind = -1
+      {
+           ignoreitem reset
+           return #false
+      }
+      if #findCol <> 0
+      {
+           ignoreitem #findid
+           goto ciloop
+       }
+      ignoreitem reset
+      return #FINDSTACK
+return
+;=======================================================
+sub Vai_a_Minare
+riprovaminare:
+     gosub aspetta_mana
+     gosub VisualizzaStato Vai_a_Minare
+gosub AntiBlock
+     if %nrunemineratt > %runeminermax
+     {
+        set %bookmineratt %bookmineratt + 1
+        if %bookmineratt > %bookminermax
+        {
+             set %bookmineratt 1
+             set %tot_cicli %tot_cicli + 1
+             Menu Set txtcicli %tot_cicli
+        }
+     set %nrunemineratt 1
+     }
+
+     set %nposto ( %bookMinerAtt - 1 ) * 16 + %nrunemineratt
+     if %numfiloni . %nposto = N/A || %numfiloni . %nposto > 0
+     {
+     set %book %bookminer . %bookmineratt
+     set %nruneatt %nrunemineratt
+     set %runemax %runeminermax
+     event ExMsg #charID 3 0 Libro %bookmineratt Runa %nruneatt
+     gosub recall
+     }
+     else
+     {
+       set %book %bookminer . %bookmineratt
+       set %nruneatt %nrunemineratt
+       event ExMsg #charID 3 33 Salto: Libro %bookmineratt Runa %nruneatt
+       set #result #false
+       set %runabloccata #true
+
+       wait 5
+     }
+
+     if #result = #false
+     {
+        if %runabloccata
+        {
+           set %nrunemineratt %nrunemineratt + 1
+           if %nrunemineratt > %runeminermax
+           {
+              set %bookmineratt %bookmineratt + 1
+              if %bookmineratt > %bookminermax
+              {
+                 set %bookmineratt 1
+                 set %tot_cicli %tot_cicli + 1
+                 Menu Set txtcicli %tot_cicli
+              }
+              set %nrunemineratt 1
+           }
+        }
+        goto riprovaminare
+     }
+     event ExMsg #charID 3 0 Libro %bookmineratt Runa %nruneatt
+     gosub dismountBeetle
+return
+;===================================================================
+sub check_HP
+;gosub VisualizzaStato check_peso
+rchp:
+     if #HITS = N/A
+     {
+          gosub AntiBlock
+          gosub apri_gump
+          goto rchp
+     }
+     if #HITS < %limiteHP
+     {
+           return #false
+     }
+     return #true
+return
+;===================================================================
+sub check_peso
+rcp:
+     if #WEIGHT = N/A
+     {
+          gosub AntiBlock
+          gosub apri_gump
+          goto rcp
+     }
+     set %maxw #maxweight + %modweight
+     set %maxw %maxw - 40
+     if #WEIGHT > %maxw
+     {
+           return #false
+     }
+     if *359 = BOD
+     {
+         return #false
+     }
+     return #true
+return
+;===================================================================
+sub check_peso_FB
+;gosub VisualizzaStato check_peso
+  gosub Find_FB
+rcpfb:
+     if #WEIGHT = N/A
+     {
+          gosub AntiBlock
+          gosub apri_gump
+          goto rcpfb
+     }
+     set %maxw #maxweight + %modweight
+     set %maxw %maxw - 40
+     if #WEIGHT > %maxw
+     {
+        gosub Smelta_FB
+        gosub conta_lingotti
+        set !valtxt %limitelingotti - #result
+        menu set txtLimite !valtxt
+        if #result > %limitelingotti
+          return #false
+        if #WEIGHT > ( %maxw - 100 )
+        {
+          return #false
+        }
+     }
+
+     if *359 = BOD
+     {
+         return #false
+     }
+     return #true
+return
+;=====================================================
+sub posa_gargoyle
+   rifind_gargoyle:
+     finditem %pickaxe c_ , #BACKPACKID
+     if #findkind <> -1
+     {
+       event property #findid
+       if gargoyle in #property
+       {
+          gosub sposta_oggetto #findid %cassacasa 1 2
+       }
+       ignoreitem #findid
+       goto rifind_gargoyle
+     }
+     ignoreitem reset
+return
+;=====================================================
+sub conta_lingotti
+  ;conteggio lingotti
+     set !lingotti_adesso 0
+     conta_lingotti_per_limite:
+     finditem %lingotti c_ , #BACKPACKID
+     if #findkind <> -1
+     {
+        set !lingotti_adesso !lingotti_adesso + #findstack
+        ignoreitem #findid
+        goto conta_lingotti_per_limite
+     }
+     ignoreitem reset
+return !lingotti_adesso
+;======================================================
+; dalla 1.27 adesso crea le shovel
+sub Crea_PickAxe
+if %tinkering < 400
+{
+    return #false
+}
+gosub AntiBlock
+gosub VisualizzaStato Crea_Shovel
+csriprova:
+gosub AntiBlock
+     gosub check_toolkit
+     if #result = #false
+     {
+           return #false
+     }
+     gosub check_iron
+     if #result < 4
+     {
+           return #false
+     }
+     finditem %toolkit c_  , #backpackid
+     set #LOBJECTID #findid
+     event macro 17 0
+     wait 5
+     gosub AntiBlock
+     gosub wait_gump generic_gump
+     if #result = #false
+        return #false
+
+     if %ironsettato = N/A
+     {
+        gosub ChooseMaterial iron
+        set %ironsettato SI
+     }
+
+     set %tinkx #contposx + 30
+     set %tinky #contposy + 110
+     click %tinkx %tinky
+     wait 5
+     gosub AntiBlock
+     gosub wait_gump generic_gump
+     if #result = #false
+        return #false
+     set %tinkx #contposx + 380
+     set %tinky #contposy + 270
+     click %tinkx %tinky
+     wait 5
+     gosub AntiBlock
+     gosub wait_gump generic_gump
+     if #result = #false
+        return #false
+     set %tinkx #contposx + 235
+     set %tinky #contposy + 70 ; era 190 per le pick axe
+     click %tinkx %tinky
+     gosub AntiBlock
+     wait 2s
+     ricliccatink:
+     gosub AntiBlock
+     wait 30
+     set %tinkx #contposx + 235
+     set %tinky #contposy + 110
+     click %tinkx %tinky r
+     if #CONTNAME = generic_gump
+     {
+          goto ricliccatink
+     }
+     wait 20
+     gosub check_pickaxe
+      if #result = #false
+     {
+          goto csriprova
+      }
+      set %pickaxe_tot %pickaxe_tot + 1
+      menu set txtPickAxe %pickaxe_tot
+     return #true
+return
+;======================================================
+sub Crea_TinkerTool
+if %tinkering < 400
+{
+    return #false
+}
+gosub AntiBlock
+gosub VisualizzaStato Crea_TinkerTool
+csriprovatt:
+gosub AntiBlock
+     finditem %toolkit c_ , #BACKPACKID
+      if #findkind = -1
+      {
+          return #false
+      }
+     gosub check_iron
+     if #result < 2
+     {
+           return #false
+     }
+     finditem %toolkit c_  , #backpackid
+     set #LOBJECTID #findid
+     event macro 17 0
+     wait 5
+     gosub AntiBlock
+     gosub wait_gump generic_gump
+     if #result = #false
+        return #false
+
+     if %ironsettato = N/A
+     {
+        gosub ChooseMaterial iron
+        set %ironsettato SI
+     }
+
+     set %tinkx #contposx + 30
+     set %tinky #contposy + 110
+     click %tinkx %tinky
+     wait 5
+     gosub AntiBlock
+     gosub wait_gump generic_gump
+     if #result = #false
+        return #false
+     set %tinkx #contposx + 235
+     set %tinky #contposy + 130
+     click %tinkx %tinky
+     gosub AntiBlock
+     wait 2s
+     ricliccatinktt:
+     gosub AntiBlock
+     wait 30
+     set %tinkx #contposx + 235
+     set %tinky #contposy + 110
+     click %tinkx %tinky r
+     if #CONTNAME = generic_gump
+     {
+          goto ricliccatinktt
+     }
+     wait 20
+     finditem %toolkit c_ , #BACKPACKID
+      if #findkind = -1
+      {
+          goto csriprovatt
+      }
+     set %tinkertool_tot %tinkertool_tot + 1
+      menu set txttinkertool %tinkertool_tot
+     return #true
+return
+;========================================================
+sub wait_gump
+   set !gumpdaattendere %1
+   set !errwg #scnt + 10
+   wgsubloop:
+   wait 2
+   if #CONTNAME = !gumpdaattendere
+     return #true
+   if #scnt < !errwg
+      goto wgsubloop
+return #false
+;===========================================================
+sub Conta
+   set %p1 %1
+   set %p2 %2
+   set %varstattotale N/A
+   if %p1 = %iron_col
+   {
+       set %iron_tot %iron_tot + %p2
+       set %varstattotale iron
+   }
+   if %p1 = %dull_col
+   {
+       set %dull_tot %dull_tot + %p2
+       set %varstattotale dull
+   }
+   if %p1 = %shadow_col
+   {
+       set %shadow_tot %shadow_tot + %p2
+       set %varstattotale shadow
+   }
+   if %p1 = %copper_col
+   {
+       set %copper_tot %copper_tot + %p2
+       set %varstattotale copper
+   }
+   if %p1 = %bronze_col
+   {
+       set %bronze_tot %bronze_tot + %p2
+       set %varstattotale bronze
+   }
+   if %p1 = %gold_col
+   {
+       set %gold_tot %gold_tot + %p2
+       set %varstattotale gold
+   }
+   if %p1 = %agaphite_col
+   {
+       set %agaphite_tot %agaphite_tot + %p2
+       set %varstattotale agaphite
+   }
+   if %p1 = %verite_col
+   {
+       set %verite_tot %verite_tot + %p2
+       set %varstattotale verite
+   }
+   if %p1 = %valorite_col
+   {
+       set %valorite_tot %valorite_tot + %p2
+       set %varstattotale valorite
+   }
+   set %t . %varstattotale %t . %varstattotale + %p2
+   set %varstattotale2 t , %varstattotale
+   gosub putGlobalVar %idscript %idscript #charid %varstattotale2
+   set %varstattotale3 txtt , %varstattotale
+   menu set %varstattotale3 %t . %varstattotale
+return
+;===========================================================
+sub aggiorna_bar_statistiche
+   set %totestratti %tiron + %tdull + %tshadow + %tcopper + %tbronze + %tgold + %tagaphite + %tverite + %tvalorite
+   menu set txtttutti %totestratti
+   if %totestratti < 1
+      return
+
+   set %rapbr 220000 / %totestratti
+
+   set %rapval1 ( ( %rapbr * %tiron ) / 1000 + 1 )
+   set %rapval2 ( ( %rapbr * %tdull ) / 1000 + 1 )
+   set %rapval3 ( ( %rapbr * %tshadow ) / 1000 + 1 )
+   set %rapval4 ( ( %rapbr * %tcopper ) / 1000 + 1 )
+   set %rapval5 ( ( %rapbr * %tbronze ) / 1000 + 1 )
+   set %rapval6 ( ( %rapbr * %tgold ) / 1000 + 1 )
+   set %rapval7 ( ( %rapbr * %tagaphite ) / 1000 + 1 )
+   set %rapval8 ( ( %rapbr * %tverite ) / 1000 + 1 )
+   set %rapval9 ( ( %rapbr * %tvalorite ) / 1000 + 1 )
+
+   set %xbr 220 + 11 + 9
+
+   for %cntstat 9 2
+   {
+      set %xbr %xbr - %rapval . %cntstat
+      menu delete prgbar . %cntstat
+      set %wbr %rapval . %cntstat + 1
+      menu shape prgbar . %cntstat %xbr 316 %wbr 19 3 1 1 %colbr . %cntstat 7 %colbr . %cntstat
+   }
+   set %wbr %xbr - 10
+   set %xbr 11
+   menu delete prgbar1
+   menu shape prgbar1 %xbr 316 %wbr 19 3 1 1 %colbr . %cntstat 7 %colbr . %cntstat
+return
+;===========================================================
+sub Conta_pietre
+   set %p1 %1
+   set %p2 %2
+   set %p3 %3
+
+   if %p3 = get
+   {
+   set %tot_pietre . %p1 %tot_pietre . %p1 + %p2
+   }
+   else
+   {
+   set %p1 %p1 , trash
+   set %tot_pietre . %p1 %tot_pietre . %p1 + %p2
+   }
+return
+
+;===========================================================
+sub Conta_gemme
+   set %p1 %1
+   set %p2 %2
+   set %p3 %3
+
+   set %tot_gemme . %p1 %tot_gemme . %p1 + %p2
+return
+
+;================================================================
+sub Refresh_Conteggio_pietre
+   Menu set txtp1 %tot_pietrenormali
+   Menu set txtp2 %tot_pietredull
+   Menu set txtp3 %tot_pietreshadow
+   Menu set txtp4 %tot_pietrecopper
+   Menu set txtp5 %tot_pietrebronze
+   Menu set txtp6 %tot_pietregold
+   Menu set txtp7 %tot_pietreagaphite
+   Menu set txtp8 %tot_pietreverite
+   Menu set txtp9 %tot_pietrevalorite
+   Menu set txtpt1 %tot_pietrenormalitrash
+   Menu set txtpt2 %tot_pietredulltrash
+   Menu set txtpt3 %tot_pietreshadowtrash
+   Menu set txtpt4 %tot_pietrecoppertrash
+   Menu set txtpt5 %tot_pietrebronzetrash
+   Menu set txtpt6 %tot_pietregoldtrash
+   Menu set txtpt7 %tot_pietreagaphitetrash
+   Menu set txtpt8 %tot_pietreveritetrash
+   Menu set txtpt9 %tot_pietrevaloritetrash
+return
+;================================================================
+sub Refresh_Conteggio
+    Menu set txtl1 %iron_tot
+    Menu set txtl2 %dull_tot
+    Menu set txtl3 %shadow_tot
+    Menu set txtl4 %copper_tot
+    Menu set txtl5 %bronze_tot
+    Menu set txtl6 %gold_tot
+    Menu set txtl7 %agaphite_tot
+    Menu set txtl8 %verite_tot
+    Menu set txtl9 %valorite_tot
+return
+;========================
+sub apri_cassa_casa
+accriapri:
+    if %usaBank
+    {
+        while #true
+        {
+            msg bank $
+            wait 1s
+            if #contsize = 180_240
+               break
+            wait 4s
+        }
+    }
+    else
+    {
+        finditem %cassacasa g_ , 2
+        set #NEXTCPOSX 100
+        set #NEXTCPOSY 100
+        if #findkind = -1
+        {
+             gosub Torna_a_Casa
+        }
+    }
+
+    set #LOBJECTID %cassacasa
+    event macro 17 0
+    gosub antiblock
+    wait 5
+    if #contID <> %cassacasa
+    {
+        goto accriapri
+    }
+    contpos 100 100
+return
+;====================================================
+sub AutoScriptScorna
+    if %usaautopausa = #false
+       return #false
+    set %p1 %1
+    set %valreturnass #false
+    if *359 = PAUSE && %p1 = NORMALE
+    {
+       gosub VisualizzaStato Pausa_Script
+       set *359 PAUSED
+       attendiass:
+       if *359 <> PAUSED
+       {
+           goto fineass
+       }
+       goto attendiass
+    }
+    if *359 = BOD && %p1 = PAUSABOD
+    {
+       gosub VisualizzaStato Pausa_BOD
+       set *359 PAUSEDBOD
+       attendiassbod:
+       if *359 <> PAUSEDBOD
+       {
+           gosub chiudi_gump
+           gosub apri_gump
+           gosub Check_Skill_Recall
+           set %valreturnass #true
+           goto fineass
+       }
+       goto attendiassbod
+    }
+    fineass:
+return %valreturnass
+;=====================================================
+sub HelpUsoScript
+   set %p1 %1
+   if %p1 = helppietre
+   {
+     set %strhelp Puoi , #spc , settare , #spc , un , #spc , contenitore , #spc , diverso , #spc , per , #spc , ogni , #spc , tipo , #spc , di , #spc , pietre , $
+     set %strhelp %strhelp , Settando , #spc , lo , #spc , stesso , #spc , contenitore , #spc , per , #spc , più , #spc , tipi , #spc , di , #spc , pietre , #spc , il , #spc , contenitore , #spc , sarà , #spc , condiviso , #spc , fra , #spc , quelle , $
+     set %strhelp %strhelp , NON , #spc , Settando , #spc , il , #spc , contenitore , #spc , per , #spc , un , #spc , tipo , #spc , le , #spc , pietre , #spc , di , #spc , quel , #spc , tipo , #spc , verranno , #spc , messe , #spc , nella , #spc , Cassa , #spc , Risorse , $
+     set %strhelp %strhelp , Quando , #spc , il , #spc , contenitore , #spc , sarà , #spc , pieno , #spc , le , #spc , pietre , #spc , verranno , #spc , messe , #spc , nel , #spc , contenitore , #spc , Trash , $
+     set %strhelp %strhelp , Per , #spc , non , #spc , incorrere , #spc , in , #spc , Bug , #spc , setta , #spc , Trash , #spc , con , #spc , un , #spc , Trash , #spc , Barrel
+     display ok %strhelp
+   }
+   if %p1 = helpautopausa
+   {
+     set %strhelp Permette , #spc , la , #spc , pausa , #spc , dello , #spc , script , #spc , imposta , #spc , dallo , #spc , script , #spc , 'Scorna , #spc ,  Alarm'
+     display ok %strhelp
+   }
+   if %p1 = helpscript
+   {
+     display yesno Informazioni sullo script disponibili sul Web $ Vuoi apripre la pagina Web ?
+     if #dispRes = yes
+     {
+        set %pagweb http://www.scorna.net/easyuo/euscript.asp?IDScript=
+        set %pagweb %pagweb , %idscript , &VScript=
+        set %pagweb %pagweb , %versionscript
+
+        execute %pagweb
+     }
+   }
+   if %p1 = helpfuga
+   {
+     display ok Selezionando questa opzione attivi la fuga automatica. $ Limite HP si riferisce a quanto gli HP dovrebbero scendere per attivare la fuga. $ Inserendo 'Max' il limite HP sarà il tuo valore massimo degli HP. $ Se sei mago puoi selezionare anche l'opzione Protection per castarti automaticamente Protection all'avvio dello script.$
+   }
+   if %p1 = helpgemme
+   {
+     display ok Puoi settare un contenitore dove verrano messe le gemme trovate. $ Non settando alcun contenitore le gemme eventualmente trovate verranno messe nella 'Cassa Risorse'.
+   }
+   if %p1 = helplasciaoggetto
+   {
+     display ok Può accadere che lo script si blocchi per eventuali bug.$ Lo script stesso cercherà di sbloccarsi chiudendo tutti i gump. $ A volte questo potrebbe non bastare quindi lo script cerca anche di appaggiore eventuali oggetti nella lista dei drag. $ Per poterlo fare devi però assegnare l'opzione 'Lascia quello che stai tenendo' di Razor ad un tasto specifico $ e poi selezionare quel tasto in questa casella.
+   }
+return
+;===============================================================
+sub Find_FireBeetle
+  if %usaFirebeetle = #false
+  {
+    return #true
+  }
+  ;lo cerca prima addosso
+  rifindfbm:
+  finditem %FBMType C_ , #CHARID
+  if #findkind <> -1
+  {
+    set #lobjectid #charid
+    event macro 17 0
+    wait 20
+    goto rifindfbm
+  }
+  ;in terra
+  rifindfb:
+  finditem %FBType G_1
+  if #findkind = -1
+  {
+    ;se non lo trova a terra nell'arco di 1 lo cerca nello schermo
+    finditem %FBType G_10
+    if #findkind = -1
+    {
+       ;se non lo trova a terra nell'arco di 10 interrompe
+       display ok Nessun fire Beetle trovato
+       return #false
+    }
+    else
+    {
+       msg all follow me $
+       wait 50
+       goto rifindfb
+    }
+  }
+
+  ;id
+  finditem %FBType G_1
+  if #findkind = -1
+  {
+    goto rifindfbm
+  }
+  set %FBID #findid
+  msg all follow me $
+return #true
+;===============================================================
+sub ChooseMaterial
+	if %0 < 1 || %1 = N/A
+	{
+		display ok Wrong use of Sub ChooseMaterial: some required arguments are missing!
+			+$Script will be halted.
+  gosub quit
+	}
+
+	nameSpace Push
+	nameSpace Local ChooseMaterial , #time , #random , #scnt2
+
+	set !Material #false
+
+	if %1 = iron || %1 = leather || %1 = wood
+		set !Material 1
+	if %1 = dull || %1 = spined || %1 = oak
+		set !Material 2
+	if %1 = shadow || %1 = horned || %1 = ash
+		set !Material 3
+	if %1 = copper || %1 = barbed || %1 = yew
+		set !Material 4
+	if %1 = bronze || %1 = heartwood || %1 = heart
+		set !Material 5
+	if %1 = gold || %1 = bloodwood || %1 = blood
+		set !Material 6
+	if %1 = agapite || %1 = frostwood || %1 = frost
+		set !Material 7
+	if %1 = verite
+		set !Material 8
+	if %1 = valorite
+		set !Material 9
+	if %1 = nocolor
+		set !Material 11
+
+	if ! !Material
+	{
+		display ok Unkwon material %1 ! $Script will be halted.
+  gosub quit
+	}
+
+	set !MaterialX #contposx + 30
+	set !MaterialY #contposy + 370
+	click !MaterialX !MaterialY dmc f
+ wait 5
+     gosub AntiBlock
+     gosub wait_gump generic_gump
+     if #result = #false
+        return #false
+
+	set !ColorX #contposx + 235
+	set !ColorY #contposy + 50 + 20 * !Material
+	click !ColorX !ColorY dmc f
+ wait 5
+     gosub AntiBlock
+     gosub wait_gump generic_gump
+     if #result = #false
+        return #false
+
+	nameSpace Clear
+	nameSpace Pop
+return
+;===============================================================
+sub Find_FB
+  if %usaFirebeetle = #false
+  {
+    return
+  }
+  ;in terra
+  riffb:
+  finditem %FBID G_1
+  if #findkind = -1
+  {
+    ;se non lo trova a terra nell'arco di 1 lo cerca nello schermo
+    finditem %FBID G_10
+    if #findkind = -1
+    {
+       msg all follow me $
+       event ExMsg #CHARID 3 25 Non trovo il Fire Beetle. Aspetto 4 secondi.
+       wait 4s
+       goto riffb
+       ;se non lo trova a terra nell'arco di 10 interrompe
+       ;display ok Nessun fire Beetle trovato $ Script fermato
+       ;halt
+    }
+    else
+    {
+       msg all follow me $
+       wait 50
+       goto riffb
+    }
+  }
+return
+
+;========================================================
+sub smelta_FB
+gosub VisualizzaStato Smelta_Fire_Beetle
+smeltaancorafb:
+gosub AntiBlock
+    gosub find_fb
+
+    findItem %ore c_  , #backpackid
+    if #findkind <> -1
+    {
+         set #lobjectid #findid
+         event macro 17
+         TARGET 5s
+         set #LTARGETID %FBID
+         set #LTARGETKIND 1
+         event macro 22 0
+         wait 1s
+         goto smeltaancorafb
+      }
+     wait 1s
+return
+sub reset_casse
+  set %boxpietrenormali N/A ;ID cassa Pietre
+set %boxpietredull N/A ;ID cassa Pietre
+set %boxpietreshadow N/A ;ID cassa Pietre
+set %boxpietrecopper N/A ;ID cassa Pietre
+set %boxpietrebronze N/A ;ID cassa Pietre
+set %boxpietregold N/A ;ID cassa Pietre
+set %boxpietreagaphite N/A ;ID cassa Pietre
+set %boxpietreverite N/A ;ID cassa Pietre
+set %boxpietrevalorite N/A ;ID cassa Pietre
+set %boxpietresand N/A ;ID cassa sabbia
+set %boxpietretrash N/A ;ID TrashBarrel
+set %boxgemme N/A ;ID cassa Gemme
+gosub putGlobalVar %idscript %idscript #charid boxpietrenormali
+gosub putGlobalVar %idscript %idscript #charid boxpietredull
+gosub putGlobalVar %idscript %idscript #charid boxpietreshadow
+gosub putGlobalVar %idscript %idscript #charid boxpietrecopper
+gosub putGlobalVar %idscript %idscript #charid boxpietrebronze
+gosub putGlobalVar %idscript %idscript #charid boxpietregold
+gosub putGlobalVar %idscript %idscript #charid boxpietreagaphite
+gosub putGlobalVar %idscript %idscript #charid boxpietreverite
+gosub putGlobalVar %idscript %idscript #charid boxpietrevalorite
+gosub putGlobalVar %idscript %idscript #charid boxpietresand
+gosub putGlobalVar %idscript %idscript #charid boxpietretrash
+gosub putGlobalVar %idscript %idscript #charid boxgemme
+gosub Get_Cassa_Pietre normali
+
+gosub Get_Cassa_Pietre dull
+
+gosub Get_Cassa_Pietre shadow
+
+gosub Get_Cassa_Pietre copper
+
+gosub Get_Cassa_Pietre bronze
+
+gosub Get_Cassa_Pietre gold
+
+gosub Get_Cassa_Pietre agaphite
+
+gosub Get_Cassa_Pietre verite
+
+gosub Get_Cassa_Pietre valorite
+gosub Get_Cassa_Pietre sand
+
+gosub Get_Cassa_Pietre trash
+
+gosub Get_Cassa_Gemme
+return
+sub init_var
+  set %steptotal 30
+  if  |CEO*FILESYSTEM_MODIFIED| notin * . %IDSCRIPT
+      set * . %IDSCRIPT |CEO*FILESYSTEM_MODIFIED|
+  set %esiste #false
+  gosub getGlobalVar %idscript %idscript #charid esiste
+  if #result = #false
+  {
+    Menu Clear
+    menu Window Title Scorna Miner Script
+    menu window transparent 0
+    Menu Window size 250 200
+    Menu Window Color $000000
+    Menu Font bgcolor $000000
+
+    Menu Font Style b
+    Menu Font Name tahoma
+
+    Menu font size 16
+    Menu font color Aqua
+    Menu Text txt 20 60 Inizializza Variabili
+
+    Menu font size 10
+    Menu font color gray
+    Menu Text txt 25 20 Primo avvio di:
+    Menu font color yellow
+    Menu Text txt 125 20 %idscript
+
+    Menu font size 8
+    Menu font color white
+    Menu Text txt 65 160 Attendi per favore
+    Menu font size 7
+    Menu font color gray
+    Menu Text txt 5 180 Questa Operazione sarà eseguita solo una volta
+
+    menu shape ProgressBarOutline 10 105 230 20 3 7 1 Gray 2 0
+
+
+    menu show 300 250
+    gosub fadein
+
+gosub setProgressBar 1 %steptotal
+gosub putGlobalVar %idscript %idscript #charid usalasciaoggetto
+gosub setProgressBar 2 %steptotal
+gosub putGlobalVar %idscript %idscript #charid tastolasciaoggetto
+gosub setProgressBar 3 %steptotal
+gosub putGlobalVar %idscript %idscript #charid usahiding
+gosub setProgressBar 4 %steptotal
+gosub putGlobalVar %idscript %idscript #charid usafirebeetle
+gosub setProgressBar 5 %steptotal
+gosub putGlobalVar %idscript %idscript #charid usaautopausa
+gosub setProgressBar 6 %steptotal
+gosub putGlobalVar %idscript %idscript #charid boxpietrenormali
+gosub setProgressBar 7 %steptotal
+gosub putGlobalVar %idscript %idscript #charid boxpietredull
+gosub setProgressBar 8 %steptotal
+gosub putGlobalVar %idscript %idscript #charid boxpietreshadow
+gosub setProgressBar 9 %steptotal
+gosub putGlobalVar %idscript %idscript #charid boxpietrecopper
+gosub setProgressBar 10 %steptotal
+gosub putGlobalVar %idscript %idscript #charid boxpietrebronze
+gosub setProgressBar 11 %steptotal
+gosub putGlobalVar %idscript %idscript #charid boxpietregold
+gosub setProgressBar 12 %steptotal
+gosub putGlobalVar %idscript %idscript #charid boxpietreagaphite
+gosub setProgressBar 13 %steptotal
+gosub putGlobalVar %idscript %idscript #charid boxpietreverite
+gosub setProgressBar 14 %steptotal
+gosub putGlobalVar %idscript %idscript #charid boxpietrevalorite
+gosub setProgressBar 15 %steptotal
+gosub putGlobalVar %idscript %idscript #charid boxpietretrash
+gosub setProgressBar 16 %steptotal
+gosub putGlobalVar %idscript %idscript #charid xcasa
+gosub setProgressBar 17 %steptotal
+gosub putGlobalVar %idscript %idscript #charid ycasa
+gosub setProgressBar 18 %steptotal
+gosub putGlobalVar %idscript %idscript #charid zcasa
+gosub setProgressBar 19 %steptotal
+gosub putGlobalVar %idscript %idscript #charid cassacasa
+gosub setProgressBar 20 %steptotal
+set %esiste #true
+gosub putGlobalVar %idscript %idscript #charid esiste
+gosub setProgressBar 21 %steptotal
+gosub getGlobalVar %idscript %idscript #charid _totaletime
+if ! #result
+{
+	set %_totaletime 0
+	gosub putGlobalVar %idscript %idscript #charid _totaletime
+}
+gosub setProgressBar 22 %steptotal
+gosub putGlobalVar %idscript %idscript #charid tiron
+gosub setProgressBar 23 %steptotal
+gosub putGlobalVar %idscript %idscript #charid tdull
+gosub setProgressBar 24 %steptotal
+gosub putGlobalVar %idscript %idscript #charid tshadow
+gosub setProgressBar 25 %steptotal
+gosub putGlobalVar %idscript %idscript #charid tcopper
+gosub setProgressBar 26 %steptotal
+gosub putGlobalVar %idscript %idscript #charid tbronze
+gosub setProgressBar 27 %steptotal
+gosub putGlobalVar %idscript %idscript #charid tgold
+gosub setProgressBar 28 %steptotal
+gosub putGlobalVar %idscript %idscript #charid tagaphite
+gosub setProgressBar 29 %steptotal
+gosub putGlobalVar %idscript %idscript #charid tverite
+gosub setProgressBar 30 %steptotal
+gosub putGlobalVar %idscript %idscript #charid tvalorite
+gosub fadeout
+  }
+return
+
+sub Get_Statistiche
+
+gosub getGlobalVar %idscript %idscript #charid tiron
+
+gosub getGlobalVar %idscript %idscript #charid tdull
+
+gosub getGlobalVar %idscript %idscript #charid tshadow
+
+gosub getGlobalVar %idscript %idscript #charid tcopper
+
+gosub getGlobalVar %idscript %idscript #charid tbronze
+
+gosub getGlobalVar %idscript %idscript #charid tgold
+
+gosub getGlobalVar %idscript %idscript #charid tagaphite
+
+gosub getGlobalVar %idscript %idscript #charid tverite
+
+gosub getGlobalVar %idscript %idscript #charid tvalorite
+return
+
+sub fadeout
+for %i  100 1
+{
+	wait 1
+	set %i %i - 5
+  	menu window transparent %i
+}
+menu window transparent 0
+return
+
+sub fadein
+menu window transparent 0
+menu show
+for %i  1 100
+{
+	wait 1
+	set %i %i + 5
+  	menu window transparent %i
+}
+menu window transparent 100
+return
+;*********************************************************
+sub azzera_stat
+  Menu set message Aspetta
+     set %tiron 0
+set %tdull 0
+set %tshadow 0
+set %tcopper 0
+set %tbronze 0
+set %tgold 0
+set %tagaphite 0
+set %tverite 0
+set %tvalorite 0
+menu delete prgbar1
+menu delete prgbar2
+menu delete prgbar3
+menu delete prgbar4
+menu delete prgbar5
+menu delete prgbar6
+menu delete prgbar7
+menu delete prgbar8
+menu delete prgbar9
+   gosub putGlobalVar %idscript %idscript #charid tiron
+
+gosub putGlobalVar %idscript %idscript #charid tdull
+
+gosub putGlobalVar %idscript %idscript #charid tshadow
+
+gosub putGlobalVar %idscript %idscript #charid tcopper
+l
+gosub putGlobalVar %idscript %idscript #charid tbronze
+
+gosub putGlobalVar %idscript %idscript #charid tgold
+
+gosub putGlobalVar %idscript %idscript #charid tagaphite
+
+gosub putGlobalVar %idscript %idscript #charid tverite
+
+gosub putGlobalVar %idscript %idscript #charid tvalorite
+set %scriptstart #scnt
+set %_totaletime 0
+set %startetime 0
+gosub getGlobalVar %idscript %idscript #charid _totaletime
+
+menu set txttiron 0
+menu set txttdull 0
+menu set txttshadow 0
+menu set txttcopper 0
+menu set txttbronze 0
+menu set txttgold 0
+menu set txttagaphite 0
+menu set txttverite 0
+menu set txttvalorite 0
+menu set etempo 0
+Menu set message #spc
+gosub aggiorna_bar_statistiche
+return
+;************************************************************
+sub setProgressBar
+  set %p1 %1
+  set %p2 %2
+	set %pBarSize ( ( 229000 * %p1 ) / %p2 ) / 1000
+	menu delete ProgressBar
+	menu shape ProgressBar 11 106 %pBarSize 19 3 1 1 gray 7 gray
+return
+;=======================================================
+sub Prendi_Oggetto
+    set !Oggetto %1
+    set !Contenitore %2
+    set !Quantita %3
+    set !antiblock %4
+    set !usabanca #false
+    set !bancaid N/A
+    if %0 > 5
+    {
+      set !usabanca %5
+      set !bancaid %6
+    }
+    if !usabanca = #true && !contenitore = N/A
+       set !contenitore !bancaid
+
+    set #NEXTCPOSX 100
+    set #NEXTCPOSY 100
+    set !prove 0
+    ;gosub VisualizzaStato Prendi_ToolKit
+    po_find_contenitore:
+    if !usabanca
+    {
+       if !prove > 5
+          return #false
+       ;cerca la banca
+       if #contid <> !bancaid
+       {
+          ;banca ancora chiusa
+          set !prove !prove + 1
+          msg Bank $
+          wait 50
+          gosub !antiblock
+          goto po_find_contenitore
+       }
+       ;controlla se il contenitore non è la banca
+       if !Contenitore <> !bancaid
+       {
+          ;in tal caso lo cerca nella banca
+          finditem !Contenitore c_ , !bancaid
+          if #findkind = -1
+          {
+             return #false
+          }
+       }
+    }
+    else
+    {
+       finditem !Contenitore g_ , 2
+       if #findkind = -1
+       {
+          return #false
+       }
+    }
+
+    set !prove 0
+    po_apri_contenitore:
+    if !usabanca = #true
+    {
+    if !Contenitore <> !bancaid
+    {
+       if !prove > 5
+          return #false
+       set !prove !prove + 1
+       set #LOBJECTID !Contenitore
+       event macro 17 0
+       wait 30
+       gosub !antiblock
+       if #contID <> !Contenitore
+       {
+          goto po_apri_contenitore
+       }
+    }
+    }
+    if !usabanca = #false
+    {
+    if !prove > 5
+       return #false
+    set !prove !prove + 1
+    set #LOBJECTID !Contenitore
+    event macro 17 0
+    wait 30
+    gosub !antiblock
+    if #contID <> !Contenitore
+    {
+       goto po_apri_contenitore
+    }
+    }
+    finditem !Oggetto c_  , !Contenitore
+    if #findkind = -1
+    {
+        return #false
+    }
+
+    if !Quantita > #FINDSTACK
+       set !Quantita #FINDSTACK
+
+    set !prove 0
+    po_prendi_oggetto:
+    if !prove > 5
+          return #false
+    Exevent Drag #findID !Quantita
+    gosub !antiblock
+    Exevent Dropc #BACKPACKID
+    gosub !antiblock
+    wait 30
+    finditem !Oggetto c_ , #BACKPACKID
+    if #findkind = -1
+    {
+        set !prove !prove + 1
+        goto po_prendi_oggetto
+    }
+return #true
+;************************************************************
+sub DisplayElapsedTime
+set %elaspedtime #scnt - %scriptstart
+set %totaletime %startetime  +  %elaspedtime
+set %_totaletime %totaletime
+gosub putGlobalVar %idscript %idscript #charid _totaletime
+set %ehours %totaletime / 3600
+set %emins  ( %totaletime / 60 ) - ( %ehours * 60 )
+if %lastehours <> %ehours
+{
+	set %lastehours %ehours
+}
+if %lastemins <> %emins
+{
+	set %lastemins %emins
+}
+  menu set etempo %ehours , h , #spc , %emins , m
+return
+
+;=======================================================
+;                    Global VAR
+;=======================================================
+;=======================================================
+Sub getGlobalVar
+nameSpace push
+nameSpace local #systime , _ , %4 , GET
+set !lpc #lpc
+set #lpc 1000
+set !global * . %1
+set !varName v , %4 , |
+str pos !global !varName
+set #result #strres <> 0
+if #result
+{
+   set !varNamePos #strres
+   str len !varName
+   set !delString !varNamePos + #strres - 1
+   str del !global 1 !delString
+   set !global #strres
+   str pos !global |
+   set !varNamePos #strres - 1
+   str left !global !varNamePos
+   set % . %4 #strres
+}
+else
+{
+   set % . %4 N/A
+}
+set #lpc !lpc
+nameSpace Clear
+nameSpace Pop
+return #result
+;=======================================================
+Sub putGlobalVar
+nameSpace push
+nameSpace local #systime , _ , %4 , PUT
+set !lpc #lpc
+set #lpc 1000
+set !global * . %1
+set !varName v , %4 , |
+str pos !global !varName
+if #strres = 0
+{
+   if  |CEO*FILESYSTEM_MODIFIED| notin !global
+      set !global |CEO*FILESYSTEM_MODIFIED|
+   set * . %1 !global , !varName , % . %4 , |
+   set #lpc !lpc
+   nameSpace clear
+   nameSpace pop
+   return #true
+}
+set !varNamePos #strres
+str len !varName
+set !splitString !varNamePos + #strres - 1
+str left !global !splitstring
+set !globalPart1 #strres
+str del !global 1 !splitString
+set !global #strres
+str len !global
+set !globalLen #strres
+str pos !global |
+set !splitString !globalLen - #strres + 1
+str right !global !splitstring
+set !global #strres
+set * . %1 !globalPart1 , % . %4 , !global
+set #lpc !lpc
+nameSpace clear
+nameSpace pop
+return #true
+
+
+
+;--------------------
+; ADDS BY AG
+;--------------------
+
+sub mountBeetle
+    if %agMountBeetle = #true
+    {
+        msg all follow me$
+        wait 10
+        set #lobjectid %FBID
+        event macro 17 0 ; LastObject
+        wait 10
+    }
+return
+
+sub dismountBeetle
+    if %agMountBeetle = #true
+    {
+        set #lobjectid #charid
+        event macro 17 0 ; LastObject
+        wait 10
+    }
+return
+
+sub quit
+    if %standalone
+       halt
+    while #nsname <> minerScorna_base
+    {
+        namespace clear
+        namespace pop
+    }
+    namespace clear
+    namespace pop
+    exit
+return
+

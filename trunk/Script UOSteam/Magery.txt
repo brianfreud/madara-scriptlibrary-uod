@@ -1,0 +1,56 @@
+// Author: Gramoz
+// Purpose: Train magery from 0 to 120 with boat on infinite lane
+// Instructions: Dress a suite 100% lrc (meditable), take a boat and go to infinite lane than raise the anchor, on SETUP write your preferences then start this macro
+//
+// Descrizione: Allena magery da 0 a 120 con la barca su rotta infinita
+// Istruzioni: Indossate un'armatura 100% lrc (meditabile), prendete una barca ed andate sulla rotta infinita e togliete l'ancora (raise anchor), nel SETUP scrivete le vostre preferenze (al posto di XX inserite raggiunto quanto mana deve fermarsi per rigenerare, al posto di YY scrivete quanti millisecondi aspettare per la rigenerazione del mana)
+// Consigli: Con questa macro vi salirà anche meditation, quindi nel caso non vogliate farla salire bloccatela
+//
+// SETUP:
+if "mana" <= XX "self" // <-- instead XX write the amount of mana to start regenerating it
+ useskill "meditation"
+ pause YY // <-- instead YY write how to wait the mana regeneration (milliseconds)
+//
+elseif skill "magery" == 120
+ for 3
+  sysmsg "120 MAGERY!" 70
+  pause 500
+ endfor
+ stop
+elseif skill "magery" > 90
+ msg "forward"
+ cast "earthquake"
+elseif skill "magery" > 76
+ msg "forward"
+ cast "mass dispel"
+ waitfortarget 1000
+ target! "self"
+elseif skill "magery" > 62
+ msg "forward"
+ cast "reveal"
+ waitfortarget 1000
+ target! "self"
+elseif skill "magery" > 48
+ msg "forward"
+ cast "magic reflect"
+elseif skill "magery" > 33
+ msg "forward"
+ cast "curse"
+ waitfortarget 1000
+ target! "self"
+elseif skill "magery" > 20
+ msg "forward"
+ cast "bless"
+ waitfortarget 1000
+ target! "self"
+elseif skill "magery" > 10
+ msg "forward"
+ cast "strength"
+ waitfortarget 1000
+ target! "self"
+else
+ msg "forward"
+ cast "weaken"
+ waitfortarget 1000
+ target! "self"
+endif

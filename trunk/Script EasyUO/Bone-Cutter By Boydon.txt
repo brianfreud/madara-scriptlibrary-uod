@@ -1,0 +1,73 @@
+;==================================
+; Script Name:  Bone Cutter
+; Author: Boydon
+; Version: 1.00
+; Client Tested with: 4.0.9b
+; EUO version tested with: 00A3
+; Shard OSI / FS: RunUO 1.0
+; Revision Date: 13-04-05
+; Public Release:
+; Global Variables Used: n/a
+; Purpose: Cut Unholy bones at Doom
+;==================================
+ignoreitem reset bones
+; types di tutte le blades
+set %bladed FUO_ATF_NPO_JPH_WSF_NMH_VRH_JTF_SOH_BPH_EDP_YCP_ZCP_JDP_LDP_FDP_HDP_OPO_GMH_HNF_CNF
+; types delle ossa
+set %bonetypes LNF_QNF_WNF_PNF_KNF_MNF_JNF_YNF_VNF
+
+; Cerca una blade nel backpack
+gosub find_bladed
+set %blade #result
+
+main_loop:
+finditem %bonetypes G_2
+if #findkind <> -1
+{
+	inner_loop:
+	if #targcurs = 1 ; Sto facendo qualcosaltro
+	{
+		wait 10 ; 1/2 secondo
+		goto inner_loop:
+	}
+	set #lobjectid %blade
+	event macro 17 0
+	set #ltargetkind 1
+	set #ltargetid #findid
+	target 3s
+	set %jstart #jindex ; linea corrente del journal PRIMA di targettare
+	event macro 22 0 ; Last Target
+	for %i %jstart #jindex
+	{
+		scanjournal %i
+		if You_can't_use_a_bladed_item_on_that in #journal || You_see_nothing_useful_to_carve_from_the_corpse in #journal
+		   ignoreitem #findid bones
+	}
+	wait 3
+}
+wait 1 ; diminuisce l'uso della cpu
+goto main_loop
+
+sub find_bladed
+	finditem %bladed C
+	if #findkind = -1
+	{
+  	choose:
+  	set #ltargetid XXXXXX
+  	set #targcurs 1
+  	display OK Impossibile trovare un'arma con cui tagliare$
+  							+Sceglierne una...
+		targLoop:
+		wait 1
+  	if #ltargetid = XXXXXX
+    	goto targLoop
+    finditem #ltargetid C
+    if #findkind = -1
+    {
+    	display ok Impossibile trovare l'arma selezionata$
+    						+Assicurarsi che il container nel quale è contenuta sia aperto e riprovare!
+    	goto choose
+    }
+	  return #ltargetid
+	}
+return #findid

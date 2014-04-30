@@ -1,0 +1,409 @@
+;==========================================
+; Vash Healer 4.1
+;==========================================
+;
+; IMPORTANTE:
+; -----------
+; 1- Tenere sempre zaino e status aperti.
+; 2- Attivare il Targeting System con l'apposita macro client.
+; 3- Disattivare l'auto-accoda azioni di Razor.
+; 4- Compatibile oslo con RunUO 2.0 e shard OSI-Style.
+;
+; Ecco le features dello script:
+; ------------------------------
+; 1) Avverte se le bende stanno per finire, e se finiscono
+;    è sufficiente rifornirsi, senza doverlo riavviare.
+; 2) Controlla il journal per verificare che le bende siano
+;    state correttamente applicate, altrimenti riprova.
+; 3) Mostra il tempo di bendata sulla testa del pg.
+; 4) Potete precastare magie, e finchè c'è il target fuori,
+;    lo script non benderà.
+; 5) Scarissima interferenza con i target delle spell.
+; 6) Non benda da hiddati, per non venire revelati.
+; 7) La bendata entrerà in azione subito dopo un mortal strike in modo da finire,
+;    se possibile, poco dopo la fine dell'effetto.
+; 8) Auto cure e auto refresh.
+;
+; Fate il setup qui sotto, ricordando che vero è #true e falso è #false.
+
+; SETUP
+; -----
+;Tasto Play/Pausa Script.
+set %Play F9
+set %Pausa F12
+; Settando counter a true, avrete il contatore sopra la testa del pg.
+set %counter #true
+
+; Volete il counter in decimi di secondo anzichè in secondi,
+; come nel vecchio vash healer? Mettete #true qui:
+set %oldStyle #false
+
+; Attenzione: col contatore oldstyle di rischia di crashare.
+
+; La prossima variabile indica il limite di hp al di sotto dei quali curare.
+; Mettendo 5 ad esempio, se avete 100hp, benderà solo al di sotto di 95hp.
+set %limit 5
+
+; ANTIMORTAL
+; ----------
+; Se avete problemi con l'antimortal settato a 62, mettetelo a 64.
+; Può essere utile in caso di pc vecchio, lag, ecc.
+set %antimortal 64
+
+; POZIONI
+; --------
+; Qui avete due variabili da settare #true o #false.
+; La prima farà bere in automatico allo script le pozze cure.
+; La seconda berrà in automatico pozze refresh.
+set %cure #true
+set %refresh #true
+; Se avete settato l'auto-refresh, settate al di sotto di quale
+; valore della stamina è necessario berle:
+set %stamina 30
+
+; Sconsiglio vivamente queste opzioni su pg arciere, in quanto
+; potreste bere in automatico la pozza in un momento critico,
+; e non è bello venire disarmati in momenti critici.
+
+; Adesso, a seconda che utilizziate Razor o Injection e vogliate
+; usare l'autocure o l'autorefresh, dovete farvi due macro.
+; Una macro deve togliere scudo (o arma o libro) e bere la pozza cure,
+; l'altra deve bere la pozza refresh.
+; Dopodichè scrivete il nome della macro o della sub qui:
+set %macroCure drinkCure
+set %macroRefresh drinkRefresh
+
+; Qua sotto invece metti #true se utilizzi razor,
+; altrimenti se utilizzi injection metti #false.
+
+set %razor #true
+
+; OPTIONAL
+; --------
+; Qui si può impostare i caratteri e il colore
+; del contatore. I caratteri vanno da 0 a 7, provateli.
+; I colori vanno da 0 a non so quanto. Esempio:
+; Font normale, colore grigio: font 3 color 0
+; Font grossa, colore viola: font 0 color 20
+set %font 0
+set %color 20
+; Abbiamo finito il setup.
+;==========================================
+
+;==========================================
+; Main Loop
+; ---------
+set #lpc 30
+set %mortal #false
+set #sysmsgcol 4000
+
+if %cure
+{
+    if %razor
+        set %cureCmd -Macro , #spc , %macroCure
+    else
+        set %cureCmd ,exec , #spc , %macroCure
+}
+
+if %refresh
+{
+    if %razor
+        set %refCmd -Macro , #spc , %macroRefresh
+    else
+        set %refCmd ,exec , #spc , %macroRefresh
+}
+
+set %lastStamina #scnt
+
+if %Play <> N/A && %Pausa <> N/A
+{
+ loop_pause:
+ event sysmessage Script in Pausa, per riprendere %Play
+ repeat
+ onhotkey %Play
+ {
+  event sysmessage Script Play, per mettere in pausa %Pausa
+  goto _mainloop
+ }
+ until #false
+}
+
+_mainloop:
+onhotkey %Pausa
+ goto loop_pause
+if yes in #charghost
+{
+    wait 1s
+    goto _mainloop
+}
+onhotkey %Pausa
+ goto loop_pause
+if ( ( ( #hits < ( #maxhits - %limit ) ) || C in #charstatus ) && H notin #charstatus )
+{
+     set %hasRefresh #false
+     set %hasCure #false
+     finditem NUF C_ , #backpackid
+     if #findcnt > 0
+         set %hasCure #true
+
+     finditem ZUF C_ , #backpackid
+     if #findcnt > 0
+         set %hasRefresh #true
+
+     GoSub CheckAids
+     if #result = #true
+     {
+         if #targcurs = 1
+              GoSub WaitCurs 0
+
+         set %delay ( ( 11 - ( #dex / 20 ) ) * 10 )
+
+         GoSub Apply
+         if #result = #false
+              goto _mainloop
+
+         GoSub Waitnew
+         wait 1
+     }
+}
+onhotkey %Pausa
+ goto loop_pause
+goSub CheckStamina
+sleep 10
+goto _mainloop
+;==========================================
+
+;==========================================
+; SUB WAITCURS
+; ------------
+; A questa sub si passano 1 o 2 argomenti.
+; Il primo può essere 1 o 0. Sta ad indicare
+; il valore di #targcurs desiderato.
+; Il secondo, opzionale, indica un timeout in decimi
+; di secondo. In ogni caso, per evitare che rimanga
+; all'infinito, c'è un timeout di base di 100 secondi.
+
+Sub WaitCurs
+  onhotkey %Pausa
+   goto loop_pause
+  if %0 = 2
+      set %waitTimeout #scnt2 + %2
+  else
+      set %waitTimeout #scnt2 + 1000
+  onhotkey %Pausa
+   goto loop_pause
+  while #targcurs <> %1
+  {
+      if #scnt2 > %waitTimeout
+          return #false
+
+      sleep 5
+  }
+
+  if %1 = 0
+      wait 2 ; per non far fizzare il target appena lanciato
+
+return #true
+;==========================================
+
+;==========================================
+; SUB CHECKAIDS
+; -------------
+; Controlla che ci siano bende nello zaino.
+; Avverte se ne rimangono meno di 10.
+; Mette lo script in attesa quando finiscono.
+; Setta la variabile %aids.
+
+Sub CheckAids
+  onhotkey %Pausa
+   goto loop_pause
+  finditem ZLF CA_ , #BACKPACKID
+  if #findstack = 0
+  {
+       event sysmessage No bandages found!
+       wait 3s
+       return #false
+  }
+
+  if #findstack < 10 && #findcnt < 2
+       event sysmessage ATTENZIONE! Ti rimangono solo #findstack bende!
+
+  set %aids #findid
+
+return #true
+;==========================================
+
+;==========================================
+; SUB APPLY
+; ---------
+; NOTA: serve la variabile %aids.
+; Questa sub benda il pg, facendo controlli
+; di sicurezza per verificare che le bende siano state
+; effettivamente applicate.
+
+Sub Apply
+
+  _aidloop:
+  if yes in #charghost
+      return #false
+  onhotkey %Pausa
+   goto loop_pause
+  set %startIndex #jindex
+  event macro 58
+  set %start #scnt2
+  wait 1
+  if you_begin_applying in #sysmsg
+  return #true
+
+  GoSub WaitStartMsg 3
+  if #result <> 1
+      return #false
+
+return #true
+;==========================================
+
+;==========================================
+; SUB WAITSTARTMSG
+; ----------------
+; Attende il messaggio di bendata.
+; Vuole un argomento, il timeout in decimi di secondo.
+; Restituisce 1 se benda, 0 se non è possibile bendare il pg,
+; e -1 se le bende non entrano in azione completamente.
+
+Sub WaitStartMsg
+  onhotkey %Pausa
+   goto loop_pause
+  set %sysTimeout #scnt2 + %1
+
+  _waitsysmsgloop:
+  if #jindex > %startIndex
+  {
+      set %startIndex %startIndex + 1
+      scanjournal %startIndex
+
+      if you_begin_applying in #journal
+          return 1
+
+      if that_being in #journal
+          return 0
+
+      goto _waitsysmsgloop
+  }
+
+  if #scnt2 < %sysTimeout
+  {
+      sleep 5
+      goto _waitsysmsgloop
+  }
+
+return -1
+;==========================================
+
+;==========================================
+; SUB WAITNEW
+; ----------------
+Sub WaitNew
+  onhotkey %Pausa
+   goto loop_pause
+  set %keypressed 0
+  set %end %delay + %start + 1
+  set %limitcure %end - 17
+  if %oldStyle
+    set %oldremaining 140
+  else
+    set %oldremaining 14
+  wait 2
+
+  _waitloop:
+  onhotkey %Pausa
+   goto loop_pause
+  if %counter
+  {
+      if %oldStyle
+      {
+           set %remaining %end - #scnt2
+           if %remaining < ( %oldremaining - 2 )
+           {
+               set #sysmsgcol 4000
+               event sysmessage %remaining
+               set %oldremaining %remaining
+           }
+      }
+      else
+      {
+          set %remaining ( ( %end - #scnt2 ) / 10 ) + 1
+          if %remaining <> %oldremaining
+          {
+              set #sysmsgcol 4000
+              event sysmessage %remaining
+              set %oldremaining %remaining
+          }
+      }
+  }
+  onhotkey %Pausa
+   goto loop_pause
+  if D in #charstatus && %mortal = #false
+  {
+      set %mortal #true
+      set %mortend #scnt2 + %antimortal
+
+      _mortloop:
+          if ( ( %delay + #scnt2 ) > %mortend )
+               return
+          sleep 10
+      goto _mortloop
+  }
+
+  wait 1
+  onhotkey %Pausa
+   goto loop_pause
+  if C in #charstatus && %cure = #true && %hasCure = #true && H notin #charstatus
+  {
+      if #scnt2 > %limitcure && %keypressed = 0
+      {
+           msg $
+           wait 1
+           msg %cureCmd $
+           set %keypressed 1
+      }
+  }
+
+  goSub CheckStamina
+  onhotkey %Pausa
+   goto loop_pause
+  if #scnt2 >= %end + 2 || you_finish_applying in #sysmsg || you_apply_the in #sysmsg || you_heal in #sysmsg || the_bleeding in #sysmsg || you_have_failed in #sysmsg
+  {
+      if %mortal
+           set %mortal #false
+
+      return
+  }
+
+  goto _waitloop
+
+return ; giusto per essere sicuri
+;==========================================
+
+;==========================================
+; SUB CHECKSTAMINA
+; ----------------
+Sub CheckStamina
+  onhotkey %Pausa
+   goto loop_pause
+  if %refresh = #false || %hasRefresh = #false || H in #charstatus
+      return
+  onhotkey %Pausa
+   goto loop_pause
+  if ( #stamina < %stamina )
+  {
+      if ( #scnt > ( %lastStamina + 3 ) )
+      {
+          set %lastStamina #scnt
+          msg $
+          wait 1
+          msg %refCmd $
+      }
+  }
+
+return
+;==========================================

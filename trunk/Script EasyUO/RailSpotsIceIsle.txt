@@ -1,0 +1,51 @@
+; blah.txt 
+; If_I_could_kiss_Roadkill's_butt_now_I_would! 
+; you-may-want-to-unremark-and-set-these-if-customrail 
+; set %enemytypes GE_ZD_
+; set %searchrange 15 
+; set %maxvertical 10 
+; set %petid UCKC 
+set %endspot 14 
+set %x1 3949 
+set %y1 257 
+set %z1 0 
+set %x2 3957 
+set %y2 251 
+set %z2 0 
+set %x3 3969 
+set %y3 246 
+set %z3 0 
+set %x4 3976 
+set %y4 239 
+set %z4 0 
+set %x5 3976 
+set %y5 226 
+set %z5 0 
+set %x6 3986 
+set %y6 226 
+set %z6 0 
+set %x7 3995 
+set %y7 235 
+set %z7 0 
+set %x8 4003 
+set %y8 243 
+set %z8 0 
+set %x9 3997 
+set %y9 249 
+set %z9 0 
+set %x10 3997 
+set %y10 265 
+set %z10 0 
+set %x11 3990 
+set %y11 261 
+set %z11 0 
+set %x12 3979 
+set %y12 250 
+set %z12 0 
+set %x13 3966 
+set %y13 250 
+set %z13 0 
+set %x14 3949 
+set %y14 250 
+set %z14 0 
+EXIT 

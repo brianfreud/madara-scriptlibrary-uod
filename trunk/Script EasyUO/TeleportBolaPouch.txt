@@ -1,0 +1,83 @@
+onhotkey space
+gosub telespell
+
+gote:
+set #lpc 20000
+scanjournal 1
+if begins_to_menacingly_swing_a_bola in #journal
+gosub counter
+if you_cannot_move in #journal && #hits > 75
+gosub pouch
+if You_have_been_knocked_off_of_your_mount in #journal
+gosub telespell
+if You_fall_off_of_your_mount_and_take_damage! in #journal
+gosub telespell
+
+sub telespell
+set %d 9
+set #lpc 10000
+set %ltarget #ltargetid
+set %lkind #LTARGETKIND
+event macro 15 21
+target 18
+set %x #CHARPOSX
+set %y #CHARPOSY
+set %z #CHARPOSZ
+if #CHARDIR = 0 1 ;N
+set %y %y - %d
+if #CHARDIR = 1 2 ;NE
+set %y %y - %d
+set %x %x + %d
+if #CHARDIR = 2 1 ;E
+set %x %x + %d
+if #CHARDIR = 3 2 ;SE
+set %x %x + %d
+set %y %y + %d
+if #CHARDIR = 4 1 ;S
+set %y %y + %d
+if #CHARDIR = 5 2 ;SW
+set %y %y + %d
+set %x %x - %d
+if #CHARDIR = 6 1 ;W
+set %x %x - %d
+if #CHARDIR = 7 2 ;WN
+set %x %x - %d
+set %y %y - %d
+set #ltargetx %x
+set #ltargety %y
+set #ltargetz %z
+set #ltargetkind 2
+event macro 22 0
+_telefarExit:
+set #LTARGETKIND %lkind
+set #ltargetid %ltarget
+set #lpc 1000
+return
+
+Sub pouch
+set #lpc 10000
+finditem LKF C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17 0
+set #lpc 1000
+return
+
+sub counter
+
+set %start 4
+set %meno 1
+event ExMsg #charID 3 30 Attenzione alla Bolas
+{
+set %remaining ( %start - %meno )
+event ExMsg #charID 3 31 %remaining
+wait 1s
+{
+set %remaining ( %start - %meno - 1 )
+event ExMsg #charID 3 33 %remaining
+wait 1s
+{
+set %remaining ( %start - %meno - 2 )
+event ExMsg #charID 3 32 %remaining
+
+wait 10
+return

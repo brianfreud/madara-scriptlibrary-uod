@@ -1,0 +1,5148 @@
+;-----------------------------------------------------------
+; Script Name: CEOTurboTailor
+; Author: CEO
+; Version: 2.2
+; Client Tested with: 7.0.0.4
+; EUO version tested with: 1_5_154
+; Shard OSI / FS: OSI 
+; Revision Date: 10/05/09
+; Public Release: 012704 
+; Purpose: Trains tailoring to 120 FAST. 
+;-------------------------------------------------------------
+; Instructions:
+;
+; 1. Start CEOTurboCutter
+; 2. Start CEOTurboTailor
+; 3. Identify Secure (or it'll use your bankbox automatically)
+; 4. Identify Resource container.
+;		Make sure to have cloth, leather, bone, sewing kits.
+;		Also iron ingots and tinker tools if you will be making your own kits.
+;		NOTE: ANY opened bag with resources will be used, the resource
+;				container is also used to drop cut bandages to when making
+;				oil cloths.
+; 		The script automatically learns your bank/secure/resources setup using
+;		persistant vars *524 and *525. To reset these, start the script away from the
+;		bank or out of range of your secure container.
+; 5. If you're making bone armor, be sure to be within 2 paces of a house's trash barrel OR
+;	at a bank with a trash can within 12 paces. Script automatically finds these and will use
+;	them to discard your bone armor. 
+;
+; Note: Your paperdoll MUST be visible and the backpack in the paperdoll VISIBLE with
+;		nothing blocking it's view as the script drops direct to the backpack.
+;		The resource container in your secure or bank box must also be visible with nothing
+;		block it. It can be just about any valid container type.
+;		
+initevents
+set %scriptname CEOTurboTailor
+set %version 2.2
+set %scriptstart #scnt
+set %gaintime %scriptstart
+set %initializing #true
+linespercycle 100
+;=============================================
+; User configuration section
+; Most of these defaults should be fine. Please understand 
+; what you're doing before changing.
+;=============================================
+; Set to #true to leave EUO window opened.
+set %debug #false
+if ! %debug
+	gosub initializing
+; Set to #true to enable system messages to the journal during setup
+; This is mostly for people that are having StayOnTop problems.
+set %sysmessages #false
+; Will autoset to #true if hiding is over 35. Otherwise set to #true
+; to force trying, or #false to never try. Set to #true if you're in a house. It'll always work.
+set %hideme N/A
+; set this to unhide after x number of unsuccesful attempts without a gain. Sometimes working another skill
+; will kick in a gain. To disable this, set to a high number like 9999. If you haven't gained after 9999 attempts
+; something else is wrong!
+set %unhideat 80
+; Minimum skill required to try hiding. Set lower if you want to attempt even if you
+; may fail. In tenths, defaults to 35.0.
+set %hideskillreq 350
+; Set these to your x/y cords for the EasyUO menu window
+set %menu_windowx n/a
+set %menu_windowy 20
+;Set this for the level of transparency you want for the main status display.
+set %menutransparency 87
+; Set these to your x/y cords for bank box or secure screen position.
+set %bank_securex 460
+set %bank_securey 390
+; Set these to your x/y cords for resource bag on screen position.
+set %resource_bagx 630
+set %resource_bagy 390
+; Set these to your x/y cords for the house's trash barrel. This MUST be out of the area
+; the tailoring/tinker menu comes up!
+set %trash_barrelx 0
+set %trash_barrely 0
+; Always use normal leather. 
+; 1=normal, 2=spined, 3=horned, 4=barbed.
+set %leathertype 1
+; If you'd rather make bone items near the top levels set to #true otherwise
+; it'll do studded sleeves instead of bone helmets.
+set %makebone #false
+; Minimum skill required before attempting to tinker sewing kits or 
+; tinker's tools. In tenths, defaults to 30.0
+set %tinkerskillreq 300
+; Maximum number of sewing kits to tinker at one time - Based on Weight. Min of 3. Force to your own number if you want.
+set %maxsewingkits #maxweight / 60
+;set %maxsewingkits 5
+; Set to #true if you're slow and/or having timing issues. If persistant timing
+; problems see the wait vars further down and change to higher numbers.
+set %slowconnection #false
+; These are the types for the bank dumpsters. There may be more so I've included
+; them in this section.
+set %bankgarbage IKF_BUD_HIF
+; Leave this at N/A for a more intelligent bank checking method and less chance of saying
+; "BANK BANK" at your house. If it fails to detect a bank you use, set to #true.
+set %bankfound N/A
+; Estimate costs of doing business: Change these to reflect your shard
+set %cost_of_cloth 2
+set %cost_of_leather 8
+set %cost_of_bone 10
+; set to #true if you want to select what to make and not use the skills table
+set %makeyourown #false
+; If you're on a freeshard with different menu configurations the below variables are for the
+; click points for Make Last RELATIVE to the Tailor gump's position of 50/50. 
+; You may need to adjust to your shard's menu configuration.
+; NOTE: This script was written for OSI and latest client. The Make Item feature and these
+; variables may allow you to use it, but no promises!
+set %makelast_clickx 285
+set %makelast_clicky 410
+; set this to a maximum skillcap if you want to stop at a certain point. 
+; Leave at N/A to use your real cap. In tenths, IE, GM=1000, 99.5=995, etc...
+set %maxskillcap n/a
+; Close EasyUO when the menu window is closed.
+set %exitonclose #true
+; Set this to the word in your bank's trashcan.
+; "trash" is the common one. But if it's a freeshard and something else you'll need to change
+set %trashcantext1 trash
+set %trashcantext2 garbage
+; Set this to false if your not running UOSE
+set %uose_menu #true
+; For RunUO and WorldSave avoidance
+set %_worldsavejournalindex #jindex
+; The shard type, if shardType fails for this set %eashard to either #true or #false
+gosub shardType
+set %eaShard #result
+if %eaShard
+{
+  set %tinkertoolsel 4
+  set %makelast_clicky 450
+  set %exitbutton 20
+; Position in tinkering menu to make skill tool
+  set %toolbuttonsel 7
+}
+else
+{
+  set %tinkertoolsel 3
+  set %exitbutton 18
+  set %toolbuttonsel 7
+}
+
+;
+; If you use RKCharacterSetup you can change the custom stuff on a per character basis 
+; with that method.. 
+;CALL RKCharacterSetup.txt  CEOTurboTailor
+;=============================================
+; NOTHING BELOW THIS LINE SHOULD NEED CHANGING.
+; DO SO AT YOUR OWN RISK!
+;=============================================
+set %520 520_ , #charid
+set %521 521_ , #charid
+set %522 522_ , #charid
+set %gvar %scriptname
+gosub getGlobalVar %gvar %scriptname #charid menu_windowx NOLOCK
+gosub getGlobalVar %gvar %scriptname #charid menu_windowy NOLOCK
+gosub getGlobalVar %gvar %scriptname #charid bank_securex NOLOCK
+gosub getGlobalVar %gvar %scriptname #charid bank_securey NOLOCK
+gosub getGlobalVar %gvar %scriptname #charid resource_bagx NOLOCK
+gosub getGlobalVar %gvar %scriptname #charid resource_bagy NOLOCK
+gosub getGlobalVar %gvar %scriptname #charid hideme NOLOCK
+gosub getGlobalVar %gvar %scriptname #charid beepongain NOLOCK
+gosub getGlobalVar %gvar %scriptname #charid securecontainerid NOLOCK
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+;===================== Get Training Method
+ if %eashard
+ {
+   set %train1 CEO1
+   set %train2 CEO_UOSE1
+   set %train3 Stratics1
+   set %train4 Stratics_UOSE1
+   set %totalTrainingMethods 4
+ }
+else
+ {
+   set %train1 RunUO1
+   set %train2 RunUO_UOSE1
+   set %train3 RunUO2
+   set %train4 RunUO2_scryptor
+   set %totalTrainingMethods 4
+ }
+set %ud1 %totalTrainingMethods + 1
+set %ud2 %totalTrainingMethods + 2
+set %train . %ud1 tailor1.txt
+set %train . %ud2 tailor2.txt
+gosub getGlobalVar %gvar %scriptname #charid train_method NOLOCK
+if ! #result
+{
+	set %train_method 1
+	gosub putGlobalVar %gvar %scriptname #charid train_method
+}
+;gosub setupskills
+;gosub skillchart
+;halt
+;=====================
+set %default_bankfound %bankfound
+set %gumpx 50
+set %gumpy 100
+if %slowconnection
+{
+	set %gumpwait 10
+	set %wait1 20
+	set %wait2 30
+	set %longwait 70
+}
+else
+{
+	set %gumpwait 5
+	set %wait1 10
+	set %wait2 15
+	set %longwait 40
+}
+if %sysmessages && sys notin #opts
+{
+	set %sysmessages #false
+	display ok Unable to use Event Sysmessages. You have the$flag enabled in the script, but EasyUO must also$
++be configured. See :$$Options->Configuration->Enable Event Sysmessages$$ in the EasyUO menu bar to turn it on.$$Script Halted.
+	menu hide
+	sound
+	halt
+}
+if G in #charstatus
+{
+	event macro 6 0
+	wait %wait1
+}
+set %oilcloth RTI
+set %bandaids ZLF
+set %clothtypes BUI_CUI_GUI_DUI
+set %bolttypes IAG_CAG_NAG_BAG_ZZF
+set %scissortypes KAG_JAG
+set %weighcheck #true
+set %getbolts #true
+set %skipClearMenuGump #false
+set %leathertypes JJG_MJG
+set %bonetypes GUF
+set %bonearmortypes PPH_WPH_BQH_QPH_AQH_VPH_YPH_ZPH_CQH_XPH
+set %invalidtypes IWI_XVL_ , %clothtypes , _ , %bolttypes , _
+set %lcolor1 0
+set %lcolor2 2220
+set %lcolor3 2117
+set %lcolor4 2129
+set %defaultleathertype %leathertype
+set %bagtypes CKF_LKF_ZJF_JIF_HIF_KIF_IIF_CUD_HKF_VMF_BUD_WMF_TMF_UMF_KKF_ZTD_
++ABG_CTD_AUD_SPF_JKF_OKF_OVH_KUD
+set %badcontainers CVD_OVD_EVD_QVD_BKF
+set %chesttypes JIF_HIF_IIF_KIF
+set %chest_findmod 32_19
+set %trashbarreltype BKF
+set %tinkertools JTL_GTL_KTL
+set %makelasttinker #false
+set %ironselected #false
+set %ironingots ENK
+set %sewingkittypes HAG
+set %trashcanid N/A
+set %unhidetext ?!.,'/
+; Zero Stats
+set %attempts 0
+set %unhidecount 0
+for %i 1 3
+{
+	set %attempts . %i 0
+	set %clothused . %i 0
+	set %leatherused . %i 0
+	set %boneused . %i 0
+}
+;recall saved stats
+gosub getGlobalVar %gvar %scriptname #charid attempts3 NOLOCK
+if ! #result
+{
+	set %attempts3 0
+	gosub putGlobalVar %gvar %scriptname #charid attempts3
+}
+gosub getGlobalVar %gvar %scriptname #charid clothused3 NOLOCK
+if ! #result
+{
+	set %clothused3 0
+	gosub putGlobalVar %gvar %scriptname #charid clothused3
+}
+gosub getGlobalVar %gvar %scriptname #charid leatherused3 NOLOCK
+if ! #result
+{
+	set %leatherused3 0
+	gosub putGlobalVar %gvar %scriptname #charid leatherused3
+}
+gosub getGlobalVar %gvar %scriptname #charid boneused3 NOLOCK
+if ! #result
+{
+	set %boneused3 0
+	gosub putGlobalVar %gvar %scriptname #charid boneused3
+}
+gosub getGlobalVar %gvar %scriptname #charid scripttime NOLOCK
+if ! #result
+{
+	set %scripttime 0
+	gosub putGlobalVar %gvar %scriptname #charid scripttime
+}
+set %_scripttime %scripttime
+if %maxsewingkits > 10
+	set %maxsewingkits 10
+if %maxsewingkits < 3
+	set %maxsewingkits 3
+gosub statusbarup
+gosub SetUpSkills
+set * . %521 %product . %currentitem
+set * . %520 cut
+wait %wait2
+set * . %520 pause
+gosub WaitforPause
+linespercycle 40
+menu font transparent #false
+SetupMain:
+set %adjusttimer 0
+;set %menu_windowx n/a
+if %menu_windowx = N/A
+{
+	set %menu_windowx 535
+	gosub putGlobalVar %gvar %scriptname #charid menu_windowx
+	gosub InitialSetup
+	if ! #result
+	{
+		menu hideeuo
+		Display OK You must run setup the first time this script is used!$$Script Halted.$
+		menu hide
+		halt
+	}
+	set %firstmenu #true
+	gosub initmenu
+	goto SetupCont1
+}
+set %firstmenu #true
+gosub initmenu
+gosub gmcheck
+menu font bgcolor $4488ff
+menu font color black
+menu button InitialSetup 215 31 40 20 Setup
+menu font bgcolor black
+menu font color lime
+menu font size 7
+set %timer #scnt + 5
+Setuptimer:
+wait 5
+set %timeout %timer - #scnt
+menu delete status
+menu text status 50 5 Press SETUP now to reconfigure. ( , %timeout , #spc , seconds)
+if #menubutton = initialsetup
+{
+	set %menu_windowx n/a
+	set #menubutton n/a
+	menu font size 9
+	goto SetupMain
+}
+if #scnt < %timer
+	goto Setuptimer
+menu delete InitialSetup
+menu font size 9
+gosub AutoSetup
+gosub gmcheck
+SetupCont1:
+if %makeyourown
+	gosub makeyourown
+gosub RemoveNonEssentials
+gosub MaterialsToResource %ironingots ingots
+gosub cutupbolts
+set %firstattempt #true
+set %leatherselected #false
+set %retrycount 11
+;--------------------------------------------------- Gentleman, start your scissors!
+MainLoop:
+set * . %520 cut
+;wait %gumpwait 
+if G in #charstatus
+	set #menubutton pause
+if #menubutton <> N/A
+	gosub #menubutton
+gosub DisplayElapsedTime
+gosub HideMe
+finditem %sewkitid C_ , %backpackID
+if #findkind = -1 || %retrycount > 10
+{
+	gosub CheckForResources
+	gosub FindSewingKit
+	gosub UseSewingKit
+	wait %gumpwait
+	set %retrycount 0
+}
+if #contname <> generic_gump
+{
+	set %retrycount %retrycount + 1
+	wait %gumpwait
+	menu delete status
+	menu text status 50 5 Waiting for tailoring menu , ( , %retrycount , ).
+	goto MainLoop
+}
+set %gumpx #contposx
+set %gumpy #contposy
+if  %firstattempt
+{
+	set * . %521 %product . %currentitem
+	if %leather . %currentitem <> 0 && ! %leatherselected
+	{
+		menu delete status
+		menu text status 50 5 Selecting leather type.
+		wait %gumpwait
+		gosub makefirstitem 16 %leathertype
+		if ! #result
+			goto MainLoop
+		set %leatherselected #true
+		set %firstattempt #true
+		wait %gumpwait
+		set %retrycount 11
+		goto MainLoop
+	}
+	menu delete status
+	menu text status 50 5 Making first item.
+	str len %desc . %currentitem
+	if #strres > 16
+		menu font size 8
+	menu delete making
+	menu text making 107 35 %desc . %currentitem
+	menu font size 9
+	wait %gumpwait
+	if ! %makeyourown
+	{
+		if %nextpage . %currentitem = 1
+		{
+			gosub MakeFirstItem %category . %currentitem 98
+			if ! #result
+				goto MainLoop
+			wait %wait1
+			gosub MakeFirstItem 99 %selection . %currentitem
+			if ! #result
+				goto MainLoop
+			set %firstattempt #false
+			goto MainLoop1
+		}
+		gosub MakeFirstItem %category . %currentitem %selection . %currentitem
+		if ! #result
+			goto MainLoop
+	}
+	set %firstattempt #false
+	wait %wait2
+}
+else
+{
+	menu delete status
+	menu text status 50 5 Make last.
+	set %clickx %gumpx + %makelast_clickx
+	set %clicky %gumpy + %makelast_clicky
+	click %clickx %clicky f
+}
+MainLoop1:
+set %retrycount 0
+wait %gumpwait
+if * . %522 = CUTTING-
+	wait %wait2 %wait2
+if * . %522 = CUTTING--
+	wait %longwait %longwait
+if * . %522 = CUTTING---
+{
+	menu delete status
+	menu text status 50 5 Waiting for cutter.
+	set * . %520 PAUSE
+	gosub WaitforPause
+}
+gosub CheckForResources
+if ! #result
+	goto MainLoop
+gosub DisplayResourceStats
+gosub CheckForGain
+if ( %product . %currentitem = %oilcloth ) && ( %weightcheck ) && ( #weight > #maxweight )
+{
+	gosub MaterialsToResource %bandaids bandaids
+	set %weightcheck #false
+}
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+Goto MainLoop
+halt
+
+sub CheckForResources
+gosub statusbarup
+menu delete status
+menu text status 50 5 Checking resources.
+set %return #true
+set %loopcheck 0
+cloth:
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+if %cloth . %currentitem <> 0
+{
+	gosub countresource %resource . %currentitem
+	if #result < %cloth . %currentitem
+	{
+	 	 if * . %522 <> IDLE && * . %522 <> Paused
+			goto cloth
+		set %loopcheck %loopcheck + 1
+		if %loopcheck > 5
+		{
+			display ok Hmm, there appears to be a problem getting$
++more cloth, you may be overwieght or$have too many items in your backpack.$$
++Hit OK, correct the problem and then resume script.$$Pausing.
+			gosub NeedMore Cloth
+			gosub CheckforMultipleCloths
+			menu delete status
+			menu text status 50 5 Getting more cloth.
+			set %return #false
+			set %getbolts #true
+			wait %wait1
+			set %loopcheck 0
+			goto cloth
+		}
+		if %product . %currentitem = %oilcloth
+			gosub MaterialsToResource %bandaids bandaids
+		set %weightcheck #true
+		set %amt ( %maxweight - #weight - 10 ) * 10
+		set %boltamount ( %maxweight - #weight - 10 ) / 5
+		if %amt < %cloth . %currentitem
+			set %amt  %cloth . %currentitem
+		if %boltamount < 1
+			goto cloth2
+		if %getbolts
+		{
+			menu delete status
+			menu text status 50 5 Check for bolts ( , %boltamount , ).
+			gosub GetMoreResources %bolttypes %boltamount
+			if ! #result
+			{
+				set %getbolts #false
+				goto cloth
+			}
+			wait %wait2
+			gosub cutupbolts
+			set %return #false
+			wait %wait1
+			goto cloth
+		}
+cloth2:
+		menu delete status
+		menu text status 50 5 Getting more cloth ( , %amt , ).
+		gosub GetMoreResources %resource . %currentitem %amt
+		if ! #result
+		{
+			gosub NeedMore Cloth
+			gosub CheckforMultipleCloths
+			menu delete status
+			menu text status 50 5 Getting more cloth.
+			gosub cutupbolts
+			set %return #false
+			set %getbolts #true
+			wait %wait1
+			goto cloth
+		}
+		set %return #false
+		wait %wait1
+		goto cloth
+	}
+	return %return
+}
+set %getbone #false
+leather:
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+if %bone . %currentitem = 0
+	set %leatheramt %maxweight - #weight - 10 - %used . %currentitem
+gosub countresource %resource . %currentitem
+if #result < %leather . %currentitem
+{
+	 if * . %522 <> IDLE && * . %522 <> Paused
+		goto leather
+	if %bone . %currentitem <> 0
+	{
+		gosub CalcItemAmounts
+		gosub CountBone
+		if #result >= %maxbone
+			gosub DumpBone
+	}
+	if %leatheramt < %leather . %currentitem
+		set %leatheramt %leather . %currentitem
+	menu delete status
+	menu text status 50 5 Getting more leather ( , %leatheramt , ).
+	gosub GetMoreResources %resource . %currentitem %leatheramt
+	set %getbone #true
+	if ! #result
+	{
+		gosub NeedMore Leather
+		menu delete status
+		menu text status 50 5 Getting more leather.
+		set %return #false
+		wait %wait1
+		goto leather
+	}
+	set %return #false
+	wait %wait1
+	goto leather
+}
+if %bone . %currentitem = 0
+	return %return
+bones:
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+finditem %bonetypes c_ , %backpackID
+if ( #findkind = -1 ) || ( #findkind <> -1 && #findstack < %bone . %currentitem ) || %getbone
+{
+  set %getbone #false
+	gosub CalcItemAmounts
+	gosub CountBone
+	if #result >= %maxbone
+		gosub DumpBone
+	if %boneamt < %bone . %currentitem
+		set %boneamt %bone . %currentitem
+	menu delete status
+	menu text status 50 5 Getting more bones ( , %boneamt , ).
+	gosub GetMoreResources %bonetypes %boneamt
+	if ! #result
+	{
+		gosub NeedMore Bones
+		menu delete status
+		menu text status 50 5 Getting more bones.
+		wait %wait1
+		goto bones
+	}
+	set %return #false
+	wait %wait1
+	goto bones
+}
+return %return
+
+sub CalcItemAmounts
+	set %leatherstack 0
+	set %bonestack 0
+	finditem %resource . %currentitem c_ , %backpackID
+	if #findkind <> -1
+		set %leatherstack #findstack
+	finditem %bonetypes c_ , %backpackID
+	if #findkind <> -1
+		set %bonestack #findstack
+	set %temp ( %maxweight - #weight  ) + %leatherstack + %bonestack
+	set %temp1 ( %temp ) - ( %temp / 3 )
+	set %boneamt ( ( ( %temp - %temp1 - 5 ) / 2 ) * 2 )
+	set %leatheramt ( %boneamt * 2 ) - %leatherstack
+	set %boneamt %boneamt - %bonestack
+	set %maxbone 5
+return
+
+sub GetMoreResources
+; sub to get more resources, %1 resource, %2 amount 
+set %resourcetype %1
+set %resourceamt %2
+set * . %520 PAUSE
+gosub WaitforPause
+gosub ClearMenuGump
+if %resourceamt < 1
+	set %resourceamt 1
+GMR1:
+finditem %resourcetype C
+if #findkind <> -1
+{
+	set %_findstack #findstack
+	set %_findid #findid
+ 	if #findbagid = %backpackid
+	 {
+		ignoreitem #findid backpack
+		goto GMR1
+ 	}
+	if ( #findtype in %leathertypes && #findcol <> %lcolor . %leathertype ) || ( #findtype in %ironingots  && #findcol <> 0 ) || ( #findtype in %sewingkittypes && #findcol <> 0 )
+	{
+		ignoreitem #findid wrongcolor
+		goto GMR1
+	}
+	if #findstack < %resourceamt
+		set %resourceamt #findstack
+	finditem %backpackid C_ , #charid
+	if #findkind <> -1
+	{
+		set #findmod 140_220
+		set %backpackx #findx
+		set %backpacky #findy
+		event drag %_findid
+		wait %wait2
+		if %_findstack > 1
+			msg %resourceamt  $
+		wait %wait2
+set %gmr2 0
+GMR2:
+		click %backpackx %backpacky p
+		wait %wait1
+		if #contname = drag_gump
+		{
+			set %gmr2 %gmr2 + 1
+			menu font color yellow
+			menu delete status
+			menu text status 50 5 Drop on backpack, retrying ( , %gmr2 , ).
+			sound
+			wait %wait2
+			if %gmr2 < 3
+			{
+				gosub GetPaperDollXY
+				goto GMR2
+			}
+			display ok A problem occured trying to drop to your paperdoll's$
++backpack. Make sure the backpack icon is not blocked.$
++Press OK,  then drop the resource manually, correct$the problem and resume the script.$
+			gosub pause
+			menu font color lime
+			menu delete status
+			menu text status 50 5 Checking for more resources.
+		}
+		menu font color lime
+		set * . %520 CUT
+		ignoreitem reset backpack
+		set %retrycount 11
+		return #true
+	}
+	gosub GetPaperDollXY
+	menu delete pdwarning
+	if %bone . %currentitem <> 0
+		gosub LocateTheDump
+	gosub CheckForBank
+	if ! #result
+		gosub GetSecureContainer
+	gosub GetResourceBag
+	goto GMR1
+}
+ignoreitem reset backpack
+return #false
+
+sub MaterialsToResource
+; %1 = type , %2 = name
+set %_MTRType %1
+set %_MTRName %2
+gosub ClearMenuGump
+MTR1:
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+finditem %_MTRType C_ , %backpackid
+if #findkind <> -1
+{
+	set %_MTRfindid #findid
+	set %_MTRfindstack #findstack
+	str lower %_MTRName
+	menu delete status
+	menu text status 50 5 Moving #strres , #spc , to resource.
+	finditem %resourcebagid
+	set #findmod 25_7
+	if #findtype in %chesttypes
+        		set #findmod %chest_findmod
+	if #findkind <> -1
+	{
+		event drag %_MTRfindid
+set %mtr2 0
+MTR2:
+		wait %wait2
+		if %_MTRfindstack <> 1
+			msg $
+		if #contname = stack_gump
+		{
+			set %mtr2 %mtr2 + 1
+			wait %wait2
+			if %mtr2 < 3
+				goto MTR2
+		}
+set %mtr3 0
+MTR3:
+		wait %wait1
+		click #findx #findy p
+		wait %wait1
+		if #contname = drag_gump
+		{
+			set %mtr3 %mtr3 + 1
+			menu font color yellow
+			menu delete status
+			menu text status 50 5 Retrying #strres , #spc , to resource ( , %mtr3 , ).
+			sound
+			wait %wait2
+			if %mtr3 < 3
+				goto MTR3
+			display ok A problem is occuring trying to drop #strres on to$your resource container. Make sure the container is$
++not blocked. Press OK,  drop the #strres manually,$correct the problem and resume the script.$
+			gosub pause
+		}
+		menu font color lime
+		ignoreitem %_MTRfindid mtr
+		goto MTR1
+	}
+	ignoreitem reset mtr
+	return #false
+}
+ignoreitem reset mtr
+return #true
+
+sub WaitforPause
+WaitforPause1:
+set * . %520 pause
+wait 5
+if * . %522 <> PAUSED
+	goto WaitforPause1
+wait %wait1
+return
+
+sub FindSewingKit
+FSK1:
+finditem  %sewingkittypes  C_ , %backpackID
+if #findkind <> -1
+{
+	set %sewkitid #findid
+	return
+}
+set * . %520 PAUSE
+gosub WaitforPause
+gosub GetMoreSewingKits
+set * . %520 CUT
+goto FSK1
+return ; not needed
+
+sub UseSewingKit
+set * . %520 PAUSE
+gosub WaitforPause
+set #lobjectid %sewkitid
+event macro 17 0
+wait %wait1
+set * . %520 CUT
+return
+
+sub MakeFirstItem
+set %gumpx #contposx
+set %gumpy #contposy
+; %1 = category , %2 = selection
+if %1 = 99
+	goto MFI1
+wait %gumpwait
+set %clickx %gumpx + 27
+set %clicky %gumpy + 50 + ( %1 * 20 )
+set %MF1_G 0
+MF1_GumpWait:
+wait %gumpwait
+if #contname <> generic_gump
+{
+	set %MF1_G %MF1_G + 1
+	if %MF1_G > 15
+		return #false
+	goto MF1_GumpWait
+}
+click %clickx %clicky f
+if %slowconnection
+	wait %longwait
+wait %wait2 %wait1
+wait %wait1
+if %2 = 99
+	return #true
+set %mfi 0
+MFI1:
+wait %gumpwait
+if #contname <> generic_gump
+{
+	set %mfi %mfi + 1
+	if %mfi > 15
+		return #false
+	goto MFI1
+}
+set %gumpx #contposx
+set %gumpy #contposy
+MFI2:
+if %2 = 98
+{
+	set %clickx %gumpx + 385
+	set %clicky %gumpy + 270
+	goto MFI3
+}
+;set %clicky 100 + %2 * 20
+set %clickx %gumpx + 235
+set %clicky %gumpy + 50 + ( %2 * 20 )
+MFI3:
+click %clickx %clicky f
+if %slowconnection
+	wait %longwait
+wait %wait1 %wait1
+return #true
+
+sub GetMoreSewingKits
+menu delete status
+menu text status 50 5 Getting more sewing kits.
+set %sewkits 0
+GMSK1:
+gosub GetMoreResources %sewingkittypes  1
+if #result
+{
+	set %sewkits %sewkits + 1
+	ignoreitem %sewkitid 1
+	if %sewkits >= %maxsewingkits
+	{
+		ignoreitem reset 1
+		return
+	}
+	goto GMSK1
+}
+if %sewkits = 0
+{
+	gosub TinkerSewingKits
+	if #result > 0
+	{
+		ignoreitem reset 1
+		gosub ClearMenuGump
+		wait %wait2
+		return
+	}
+	gosub ClearMenuGump
+	gosub NeedMore sewingkits
+	ignoreitem reset 1
+	return
+;	goto GMSK1
+}
+ignoreitem reset 1
+return
+
+sub TinkerSewingKits
+if %tinkerskill < %tinkerskillreq
+	return 0
+set %retrycount 11
+set %sewingkitsmade 0
+set %makelasttinker #false
+set #LOBJECTID xxx
+for %i 1 %maxsewingkits
+{
+TSK1:
+	if %runuo
+		gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+	if #menubutton = pause
+		gosub pause
+	gosub CountTinkerKits
+	if ( #result = 0 ) || ( #result = 1 && %min_uses < 10 )
+	{
+		menu delete status
+		menu text status 50 5 Getting more Tinker's tools.
+		gosub GetMoreResources %tinkertools  1
+		if ! #result
+		{
+			gosub MakeTinkerTools
+			if ! #result
+				return %sewingkitsmade
+		}
+		set %makelasttinker #false
+		goto TSK1
+	}
+	gosub MakeSewingKit
+	if #result = -1
+		return %sewingkitsmade
+	if #result = 0
+		goto TSK1
+	set %i #result
+	set %sewingkitsmade %i
+}
+wait %wait1
+return %sewingkitsmade
+
+sub MakeTinkerTools
+MTT1:
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+finditem %ironingots C_ , %backpackid
+set %backpack_ingots #findstack
+if #findkind = -1 || #findstack < 2
+{
+	set %ingotamt 2 + (  ( %maxsewingkits - %sewingkitsmade ) * 2 ) - %backpack_ingots
+	menu delete status
+	menu text status 50 5 Getting more ingots ( , %ingotamt , ).
+	gosub GetMoreResources %ironingots %ingotamt
+	if ! #result
+		return #false
+	goto MTT1
+}
+menu delete status
+menu text status 50 5 Tinkering Tinker's tools.
+finditem %tinkertoolsid
+if #findkind = -1
+	return #false
+set %makelasttinker #false
+set #LOBJECTID %tinkertoolsid
+gosub WaitforPause
+event macro 17 0
+wait %longwait
+if ! %ironselected
+	gosub selectIron
+gosub makefirstitem %tinkertoolsel 4
+wait %longwait
+gosub CountTinkerKits
+if #result < 2
+	goto MTT1
+return #true
+
+sub MakeSewingKit
+set %_temp %sewingkitsmade + 1
+menu delete status
+menu text status 50 5 Tinkering sewing kit ( , %_temp , / , %maxsewingkits , ).
+MSK1:
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+finditem %ironingots C_ , %backpackid
+set %backpack_ingots #findstack
+if #findkind = -1 || #findstack < 2
+{
+	set %ingotamt  (  ( %maxsewingkits - %sewingkitsmade ) * 2 ) - %backpack_ingots
+	menu delete status
+	menu text status 50 5 Getting more ingots ( , %ingotamt , ).
+	gosub GetMoreResources %ironingots %ingotamt
+	if ! #result
+		return -1
+	goto MSK1
+}
+set %mst2 0
+MST2:
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+set %mst2 %mst2 + 1
+if %mst2 > 5
+{
+	display ok Hmm, There appears to be a problem getting a tinker$
++menu to appear. No tinker tools? Something in the wrong place?$
++Please correct the problem. Pausing.
+	gosub pause
+	set %mst2 0
+	set %makelasttinker #false
+	set #LOBJECTID xxx
+	goto MST2
+}
+finditem %tinkertoolsid C_ , %backpackid
+if #findkind = -1
+	return 0
+gosub WaitforPause
+if #lobjectid <> %tinkertoolsid
+{
+	set #LOBJECTID %tinkertoolsid
+	event macro 17 0
+	wait %wait2
+}
+set %MST3 0
+MST3:
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+if #contname <> generic_gump
+{
+	if %mst3 > 10
+	{
+		set %makelasttinker #false
+		set #LOBJECTID xxx
+		goto MST2
+	}
+	set %mst3 %mst3 + 1
+	wait %gumpwait
+	goto MST3
+}
+wait %gumpwait
+set %gumpx #contposx
+set %gumpy #contposy
+if  %makelasttinker
+{
+	set %clickx %gumpx + %makelast_clickx
+	set %clicky %gumpy + %makelast_clicky
+	click %clickx %clicky f
+	goto MSK2
+}
+if ! %ironselected
+	gosub selectIron
+gosub makefirstitem %tinkertoolsel %toolbuttonsel
+set %makelasttinker #true
+MSK2:
+wait %gumpwait
+finditem %sewingkittypes  C_ , %backpackID
+if #findkind <> -1
+	return #findcnt
+return 0
+
+sub SelectIron
+menu delete status
+menu text status 50 5 Selecting iron ingots.
+gosub makefirstitem 16 1
+set %ironselected #true
+return
+
+sub ClearMenuGump
+if %skipClearMenuGump
+	return
+savePix 55 55 1
+set %pixcol1 #pixcol
+savePix 55 476 1
+set %pixcol2 #pixcol
+savePix 572 481 1
+set %pixcol3 #pixcol
+if %pixcol1 = 7568251 || %pixcol2 = 7568251 || %pixcol3 = 7568251
+{
+	if %pixcol1 = 7568251
+	{
+		click 55 55 f ; bring the gump forward if it's not already
+		goto CMG2
+	}
+	if %pixcol2 = 7568251
+	{
+		click 55 476 f ; bring the gump forward if it's not already
+		goto CMG2
+	}
+	if %pixcol3 = 7568251
+	{
+		click 572 481 f ; bring the gump forward if it's not already
+		goto CMG2
+	}
+}
+set %waittime #scnt + 2
+CMG1:
+if #contname <> generic_gump && %waittime > #scnt
+	goto CMG1
+if #contname <> generic_gump
+	return
+CMG2:
+gosub makefirstitem %exitbutton 99
+set %retrycount 11
+wait %wait1
+return
+
+sub GetUsesRemaining
+; %1 = #property
+set %_1 %1
+str pos %_1 :
+set %temp #strres
+str del %_1 1 %temp
+set %_1 #strres
+str pos %_1 $
+set %temp #strres
+str del %_1 %temp 999
+return #strres
+
+sub CountTinkerKits
+set %ctk 0
+set %min_uses 999
+set %tinkertoolsid n/a
+CTK1:
+finditem %tinkertools C_ , %backpackid
+if #findkind <> -1
+{
+	set %_findid #findid
+	event property %_findid
+	wait 5
+	gosub GetUsesRemaining #property
+	if #result < %min_uses
+	{
+		set %min_uses #result
+		set %tinkertoolsid %_findid
+	}
+	ignoreitem #findid ctk
+	set %ctk %ctk + 1
+	goto CTK1
+}
+ignoreitem reset ctk
+return %ctk
+
+sub NeedMore
+sound
+menu font bgcolor red
+menu font color black
+menu delete status
+str lower %1
+menu text status 50 5 Need more #strres , #dot , #spc ,  Paused.
+menu font bgcolor black
+menu font color lime
+if %sysmessages
+	event sysmessage Need more #strres , #dot , #spc ,  Paused.
+set #menubutton pause
+gosub pause
+gosub LocateTheDump
+gosub CheckForBank
+if ! #result
+	gosub GetSecureContainer
+gosub GetResourceBag
+set %retrycount 11
+return
+
+sub FindJournalMessage
+set %jc 1
+FJM1:
+scanjournal %jc
+if #journal = N/A
+	return #false
+for %_i 1 %0
+{
+ 	if % . %_i in #journal
+	{
+		deletejournal
+		return #true
+	}
+}
+set %jc %jc + 1
+goto FJM1
+
+sub resetjournal
+scanjournal 1
+deletejournal
+return
+
+sub GetBackPackID
+gosub getGlobalVar 1 COMMON #charid backpackid
+if %backpackid <> N/A
+{
+_openbackpack:
+	event macro 8 1
+	wait %wait2
+	wait %wait1
+	finditem %backpackid C_ , #charid
+	if #findkind <> -1
+	{
+		event macro 8 7
+		wait %wait2
+		wait %wait1
+		goto GBPI2
+	}
+}
+GBPI1:
+if #backpackid <> N/A && #backpackid <> YC
+{
+	set %backpackid #backpackid
+	gosub putGlobalVar 1 COMMON #charid backpackid
+	goto _openbackpack
+}
+set %adjusttimer 8
+gosub resetjournal
+wait %wait2
+event macro 8 7
+wait %wait1
+gosub FindJournalMessage must_wait
+if #result || #contname <> container_gump
+{
+	if %bpmsgon
+	{
+		menu delete status
+		menu text status 50 5 Retrying backpack open.
+	}
+	wait %longwait
+	wait %longwait
+	set %adjusttimer 8
+	goto GBPI1
+}
+set %backpackid #contid
+gosub putGlobalVar 1 COMMON #charid backpackid
+GBPI2:
+if %adjusttimer <> 0
+{
+	menu delete status
+	menu text status 50 5 Adjust your backpack now.
+	if %sysmessages
+		event SysMessage Adjust your backpack now, you have , #spc , %adjusttimer , #spc ,  seconds.
+	gosub waittimer %adjusttimer
+}
+wait %longwait
+menu delete status
+return
+
+sub countscissors
+set %scissorcount 0
+cs1:
+finditem %scissortypes C
+if #findkind <> -1
+{
+	set %scissorcount  %scissorcount + 1
+	ignoreitem #findid scissors
+	goto cs1
+}
+ignoreitem reset scissors
+return %scissorcount
+
+sub GetPaperDollXY
+gosub statusbarup
+finditem %backpackid C_ , #charid
+if #findkind <> -1
+{
+	set #findmod 140_220
+	set %backpackx #findx
+	set %backpacky #findy
+	wait %longwait
+	return
+}
+event macro 8 1
+menu delete status
+menu text status 50 5 Adjust your paperdoll now.
+gosub waittimer 5
+menu font bgcolor red
+menu font color black
+menu text pdwarning 1 20 DON'T MOVE YOUR PAPERDOLL ANYMORE!
+menu font bgcolor black
+menu font color lime
+menu delete status
+menu text status 50 5 Getting Paperdoll Info
+GPDXY1:
+if #contname <> paperdoll_gump
+{
+	gosub resetjournal
+	wait 5
+	wait %wait2
+	event macro 8 1
+	wait %wait1
+	gosub FindJournalMessage must_wait
+	if #result || #contname <> paperdoll_gump
+	{
+		menu delete status
+		menu text status 50 5 Retrying Paperdoll open.
+		wait %longwait
+		wait %longwait
+		goto GPDXY1
+	}
+}
+set %paperdollx #contposx
+set %paperdolly #contposy
+set %backpackx #contposx + 140
+set %backpacky #contposy + 220
+wait %longwait
+return
+
+sub GetResourceBag
+GRB1:
+gosub getGlobalVar %gvar %scriptname #charid resourcebagid
+if  %resourcebagid <> N/A
+{
+	menu delete status
+	menu text status 50 5 Re-opening resource container.
+	wait %shortwait
+	set %blinkmsg #true
+	goto GRB3
+}
+set %adjusttimer 8
+menu font color white
+menu delete status
+menu text status 50 5 Target your resource container now!
+set %blinkmsg #true
+set %blinktime #scnt2 + 5
+set #targcurs 1
+wait %wait1
+if %sysmessages
+	event SysMessage Target your resource container now!
+looptgt:
+wait 3
+if %blinktime < #scnt2
+{
+	set %blinktime #scnt2 + 5
+	if %blinkmsg
+	{
+		menu delete status
+		set %blinkmsg #false
+		goto GRB2
+	}
+	menu text status 50 5 Target your resource container now!
+	set %blinkmsg #true
+}
+GRB2:
+if #targcurs = 1
+     goto looptgt
+finditem #ltargetid C_ , %securecontainerid
+if #findkind = -1
+{
+	menu delete status
+	menu font color red
+	menu text status 50 5 Not in Secure/Bank Box. Try Again.
+	menu font color white
+	if %sysmessages
+		event SysMessage Not in Secure/Bank Box. Try Again.
+	wait 3s
+	display YesNo This bag doesn't appear to be in the right place.$
++Possibly a freeshard issue? If it looks ok to you$
++Press YES to use it anyway, or NO to retry.
+	if #dispres = yes
+		goto GRB2B
+	set #targcurs 1
+	wait %wait1
+	goto looptgt
+}
+GRB2B:
+if #findtype notin %bagtypes
+{
+	menu delete status
+	menu font color red
+	menu text status 50 5  Resource container type invalid ( , #findtype , ).
+	if %sysmessages
+		event SysMessage Resource container type invalid.
+	wait 3s
+	display ok The container type you have selected is a type that %scriptname , $
++does not know. A regular chest or bag bought from the provisioners is$
++recommended. Please use a different type bag.$$Unknown Type: , #spc , #findtype $$Script Paused.
+	gosub pause
+	menu delete status
+	set %blinkmsg #false
+	menu font color white
+	set #targcurs 1
+	wait %wait1
+	goto looptgt
+}
+set %resourcebagid  #ltargetid
+GRB3:
+finditem %resourcebagid C_ , %securecontainerid
+set #findmod 25_7
+if #findtype in %chesttypes
+        set #findmod %chest_findmod
+if #findkind = -1
+{
+	menu delete status
+	menu font color red
+	menu text status 50 5 Resource container not found.
+	menu font color white
+	if %sysmessages
+		event SysMessage  Resource container not found.
+	wait 3s
+	set %resourcebagid N/A
+	gosub putGlobalVar %gvar %scriptname #charid resourcebagid
+	goto GRB1
+}
+gosub putGlobalVar %gvar %scriptname #charid resourcebagid
+menu font color lime
+set #lobjectid %resourcebagid
+GRB4:
+gosub resetjournal
+wait %wait1
+nextCPos %resource_bagx %resource_bagy
+event macro 17 0
+wait %wait2
+gosub FindJournalMessage must_wait
+if #result
+{
+	menu delete status
+	menu text status 50 5 Retrying resource open.
+	if %sysmessages
+		event SysMessage Retrying resource open.
+	wait %longwait
+	wait %longwait
+	goto GRB4
+}
+if #contid = %resourcebagid
+	contpos %resource_bagx %resource_bagy
+if %adjusttimer <> 0
+{
+	menu delete status
+	menu text status 50 5 Adjust resource bag now.
+	if %sysmessages
+	event SysMessage Adjust resource bag now, you have , #spc , %adjusttimer , #spc , seconds.
+	gosub waittimer %adjusttimer
+	if #contid = %resourcebagid && ( #contposx <> %resource_bagx || #contposy <> %resource_bagy )
+	{
+		set %resource_bagx #contposx
+		set %resource_bagy #contposy
+		gosub putGlobalVar %gvar %scriptname #charid resource_bagx
+		gosub putGlobalVar %gvar %scriptname #charid resource_bagy
+	}
+}
+wait %longwait
+menu delete status
+return
+
+sub CheckForGain
+if %currentskill = #skill
+	return
+set %currentskill #skill
+menu window color red
+if %beepongain
+	sound
+menu delete status
+menu text status 50 5 Tailor Gain!
+gosub GainStats
+wait 5
+menu window color black
+if %makeyourown
+{
+	gosub gmcheck
+	return
+}
+gosub SelectItemToMake
+set %newitem #result
+set %lastcloth %cloth . %currentitem
+if %currentitem <> %newitem
+{
+	gosub skillchangedisplay
+CFG1:
+	 if * . %522 = CUTTING
+	{
+		wait 5
+		goto CFG1
+	}
+	set * . %520 PAUSE
+	gosub WaitforPause
+	set %currentitem %newitem
+	gosub RemoveNonEssentials
+	set %firstattempt #true
+	set * . %521 %product . %currentitem
+	gosub LocateTheDump
+	set %retrycount 11
+}
+gosub gmcheck
+return
+
+sub GMCheck
+if ( ( #skill = %skillcap ) || ( %maxskillcap <= #skill ) ) && ! %debug
+{
+	gosub DisplayElapsedTime
+	gosub putGlobalVar %gvar %scriptname #charid scripttime
+	set * . %520 cut
+	wait %wait1
+	set * . %520 pause
+	gosub WaitforPause
+	sound
+	if #contname = generic_gump
+		gosub ClearMenuGump
+	menu font color lime
+	menu delete making
+	menu text making 107 35 %desc30
+	sound
+	gosub statusbarup
+	set %skipClearMenuGump #false
+	gosub MaterialsToResource %leathertypes leather
+	set %skipClearMenuGump #true
+	gosub MaterialsToResource %clothtypes cloth
+	gosub MaterialsToResource %bonetypes bone
+	sound
+	gosub MaterialsToResource %bandaids bandaids
+	gosub MaterialsToResource %sewingkittypes sewingkits
+	gosub MaterialsToResource %tinkertools tinkertools
+	gosub MaterialsToResource %ironingots ingots
+	sound
+	if %bone . %currentitem <> 0
+	{
+		finditem %product . %currentitem C_ , #backpackid
+		if #findkind <> -1
+			gosub DumpBone
+	}
+	menu delete status
+	menu font color red
+	menu font bgcolor white
+	menu text status 50 5 Congratulations, skillcap reached!
+	if %maxskillcap = #skill
+	{
+		menu delete status
+		menu text status 50 5 Yahoo, maxskillcap reached!
+	}
+	sound
+	menu font style b
+	menu font align right
+	menu delete g1
+	menu text g1 100 246 #skill
+	menu font align left
+	set * . %520 done
+	menu font style n
+	menu font bgcolor black
+	menu font color lime
+	gosub DisplayElapsedTime
+	gosub recordTurboStats
+	gosub floatgain
+	halt
+}
+return
+
+sub HideMe
+if ! %hideme || H in #charstatus
+	return #true
+set %ht 0
+set %retrycount 11
+menu show
+menu delete status
+menu text status 50 5 Attempting to hide.
+set * . %520 pause
+wait %wait1
+HM1:
+event macro 13 21
+wait %wait1
+if H notin #charstatus && %ht < 5
+{
+	set %ht %ht + 1
+	menu delete status
+	menu font color yellow
+	menu text status 50 5 Hiding failed! Retrying.. ( , %ht , )
+	menu font color lime
+	wait 12s
+	goto HM1
+}
+if H notin #charstatus
+{
+	menu delete status
+	menu font color red
+	menu text status 50 5 Hiding failed, you suck at hiding.
+	menu font color lime
+	wait 12s
+	set * . %520 cut
+	return #false
+}
+menu delete status
+menu text status 50 5 Hidden, waiting 12 seconds.
+wait 12s
+set * . %520 cut
+return #true
+
+sub initmenu
+if %initializing
+	gosub fadeout
+menu clear
+menu window size 260 295
+menu window title CEOTurboTailor %version
+menu window color black
+menu font bgcolor BLACK
+menu font color red
+menu show %menu_windowx %menu_windowy
+menu font size 9
+menu text hstatus 10 5 Status:
+menu text h1 10 20 Elapsed Time:
+menu text h1 10 35 Currently Making:
+menu shape myshape1 3 53 254 1 3 7 5 blue 3 white
+menu shape myshape1 3 173 254 1 3 7 5 blue 3 white
+menu shape myshape1 3 263 254 1 3 7 5 blue 3 white
+set #menubutton N/A
+menu font size 11
+menu font color white
+menu font style ub
+menu text h1 65 55 Resource Statistics
+menu text h1 70 175 Tailoring Statistics
+menu font size 9
+menu font color fuchsia
+menu font style b
+menu font size 8
+menu text h1 90 75 This
+menu text h1 145 75 Last
+menu font style bu
+menu text h1 90 90 Gain
+menu text h1 145 90 Gain
+menu text h1 200 90 Total
+menu font size 9
+menu font color red
+menu font style b
+menu text h1 5 105 Attempts
+menu text h1 5 120 Cloth
+menu text h1 5 135 Leather
+menu text h1 5 150 Bone
+menu text h1 60 105 :
+menu text h1 60 120 :
+menu text h1 60 135 :
+menu text h1 60 150 :
+menu text h1 60 246 :
+menu text h1 5 200 Last gain at:
+menu font size 8
+menu font color fuchsia
+menu font align right
+menu text h1 100 215 Total
+menu text h1 160 215 Current
+menu text h1 220 215 Gain
+menu font style bu
+menu text h2  100 230 Skill
+menu text h2  160 230 Gains
+menu text h2  220 230  Rate
+menu font style b
+menu font align left
+menu font color red
+menu font size 9
+menu text h3 10 246 Tailoring
+menu font color lime
+menu font style n
+if %firstmenu
+	gosub GainStats
+menu font align left
+gosub DisplayElapsedTime
+menu font align right
+menu text a3 225 105 %attempts3
+menu text c3 225 120 %clothused3
+menu text l3 225 135 %leatherused3
+menu text b3 225 150 %boneused3
+menu font align left
+menu font color white
+menu font style u
+menu text h1 5 215 Skillcap
+menu text h1 7 70 Est. Cost
+menu font style n
+menu text h1 60 85 gp
+menu font align right
+gosub calctotalcosts
+menu font align left
+if %maxskillcap = N/A
+	menu text skillcap 13 230 %skillcap
+else
+	menu text skillcap 2 230 %skillcap , ( , %maxskillcap , )
+menu font color lime
+menu text making 107 35 %desc . %currentitem
+menu font bgcolor teal
+menu font color black
+menu button pause 100 270 60 20 Pause
+menu button hide 5 270 60 20 Hide
+menu button makeyourown 190 270 65 20 Make Item
+;menu button InitialSetup 215 31 40 20 Setup
+menu button resetstats 215 56 40 20 Reset
+menu button SkillChart 235 180 20 15 SC
+if %initializing
+{
+	menu show %menu_windowx %menu_windowy
+	wait 1
+	gosub fadein
+	set %initializing #false
+}
+menu show %menu_windowx %menu_windowy
+menu window transparent %menutransparency
+if ! %debug
+	menu hideeuo
+menu font bgcolor black
+menu font color lime
+set %firstmenu #false
+;halt
+return
+
+sub Initializing
+menu window transparent 100
+menu clear
+menu window size 240 170
+menu window title %scriptname %version
+set %skill_windowx ( #clixres - 240 ) / 2
+set %skill_windowy ( #cliyres - 150 ) / 2
+menu window color gray
+menu font bgcolor gray
+menu show %skill_windowx %skill_windowy
+if ! %debug
+	menu hideeuo
+gosub popuptext
+menu font color black
+menu font size 10
+menu font style b
+menu text i1 5 5 Welcome to CEOTurboTailor!
+menu font size 8
+menu font style n
+menu font color navy
+menu text h1 5 25 This script is copyright by the author under the
+menu text h1 5 40 terms of the CEO Public License (CPL) at:
+menu font color white
+menu font size 7
+menu text h1 5 60 http://www.easyuo.com/forum/viewtopic.php?p=3585
+menu font size 12
+menu font color yellow
+menu text i1 15 90 Initializing, Please wait...
+menu font size 15
+menu font color red
+menu text i1 35 115 Make sure cutter is
+menu text i1 75 140 STARTED!
+menu font bgcolor black
+menu font color lime
+gosub fadein
+wait 5s
+return
+
+sub popuptext
+for %i 1 17
+{
+	wait 1
+	menu font size %i
+	set %textposy 130 / 2 + %i / 2 - %i
+	set %textposx 260 / 2 - ( 5 * %i ) - %i / 2
+	menu delete p1
+	menu text p1 %textposx %textposy CEOTurboTailor!
+}
+wait 20
+set %a10 aaaaaa
+set %a11 bbbbbb
+set %a12 ccccccc
+set %a13 dddddd
+set %a14 eeeeee
+set %a15 ffffff
+for %i  0 15
+{
+	wait 2
+	menu font color  $ , %i , %i , %i , %i , %i , %i
+	if %i > 9
+		menu font color $ , %a . %i
+	menu text p1 %textposx %textposy CEOTurboTailor!
+}
+wait 30
+gosub fadeout
+menu delete p1
+return
+
+sub fadeout
+for %i  100 1
+{
+	wait 1
+	set %i %i - 5
+  	menu window transparent %i
+}
+menu window transparent 0
+return
+
+sub fadein
+menu window transparent 0
+menu show
+for %i  1 100
+{
+	wait 1
+	set %i %i + 5
+  	menu window transparent %i
+}
+menu window transparent 100
+return
+
+sub calctotalcosts
+menu font color yellow
+set %tcosts %clothused3 * %cost_of_cloth + %leatherused3 * %cost_of_leather + %boneused3 * %cost_of_bone
+menu delete tcost
+menu text tcost 55 85 %tcosts
+menu font color lime
+return
+
+sub ResetStats
+set #menubutton N/A
+Display YesNo Do you want to erase all statistics and start over?
+if #dispres = no
+	return
+set %_530 0
+set %attempts 0
+for %i 1 3
+{
+	set %attempts . %i 0
+	set %clothused . %i 0
+	set %leatherused . %i 0
+	set %boneused . %i 0
+	menu delete a . %i
+	menu delete c . %i
+	menu delete l . %i
+	menu delete b . %i
+}
+;reset Globals
+set %skillstart %currentskill
+gosub putGlobalVar %gvar %scriptname #charid skillstart
+set %attempts3 0
+set %clothused3 0
+set %leatherused3 0
+set %boneused3 0
+set %scripttime 0
+set %_scripttime 0
+gosub putGlobalVar %gvar %scriptname #charid attempts3
+gosub putGlobalVar %gvar %scriptname #charid clothused3
+gosub putGlobalVar %gvar %scriptname #charid leatherused3
+gosub putGlobalVar %gvar %scriptname #charid boneused3
+gosub putGlobalVar %gvar %scriptname #charid scripttime
+gosub redrawstats
+menu font align right
+gosub calctotalcosts
+menu font align left
+return
+
+
+sub floatgain
+menu delete pause
+menu delete hide
+menu delete makeyourown
+menu delete resetstats
+menu delete SkillChart
+menu font style n
+menu font bgcolor teal
+menu font color black
+menu button closed 100 270 60 20 Exit
+set #menubutton N/A
+menu font color lime
+menu font size 25
+menu font bgcolor black
+gm1:
+set %x #random % 269
+set %y #random % 295
+set %c1 #random % 255
+set %c2 #random % 255
+set %c3 #random % 255
+menu font color %c1 , %c2 , %c3
+set %c1 #random % 255
+set %c2 #random % 255
+set %c3 #random % 255
+menu font bgcolor %c1 , %c2 , %c3
+set %c1 #random % 255
+set %c2 #random % 255
+set %c3 #random % 255
+menu window color %c1 , %c2 , %c3
+set %c1 #random % 30 + 10
+menu font size %c1
+menu delete gm
+menu text gm %x %y #skill
+wait 3
+if #menubutton = closed || * . %520 = terminate
+{
+	set * . %520 terminate
+	gosub paypalpopup
+	terminate euo
+}
+goto gm1
+
+sub DisplayElapsedTime
+menu show
+set %elaspedtime #scnt - %scriptstart
+set %totaletime %_scripttime +  %elaspedtime
+set %scripttime %totaletime
+set %ehours %totaletime / 3600
+set %emins  ( %totaletime / 60 ) - ( %ehours * 60 )
+menu font color white
+if %lastehours <> %ehours
+{
+	set %lastehours %ehours
+	menu delete ehours
+	menu text ehours 95 20 %ehours , h
+}
+if %lastemins <> %emins
+{
+	set %lastemins %emins
+	menu delete emins
+	menu text emins 120 20 %emins , m
+}
+menu font color lime
+return ; remove this you want seconds display
+menu font color white
+set %esecs %totaletime % 60
+if %lastesecs <> %esecs
+{
+	set %lastesecs %esecs
+	menu delete esecs
+	menu text esecs 150 20 %esecs , s
+}
+menu font color lime
+return
+
+
+sub GainStats
+menu delete g1
+menu delete g2
+menu delete g3
+set %tailorgain #skill - %startskill
+set %time X , #time
+set %time1 #scnt
+set %rate %tailorgain * 3600 / ( #scnt - %scriptstart  )
+menu font align right
+menu text g1 100 246 #skill
+menu text g2 160 246 %tailorgain
+menu text g3 220 246 %rate
+menu font align left
+set %unhidecount 0
+set %attempts2 %attempts1
+set %attempts1 0
+set %clothused2 %clothused1
+set %clothused1 0
+set %leatherused2 %leatherused1
+set %leatherused1 0
+set %boneused2 %boneused1
+set %boneused1 0
+menu font align right
+for %i 1 2
+{
+	menu delete a . %i
+	menu delete c . %i
+	menu delete l . %i
+	menu delete b . %i
+}
+menu text a1 113 105 %attempts1
+menu text c1 113 120 %clothused1
+menu text l1 113 135 %leatherused1
+menu text b1 113 150 %boneused1
+menu text a2 168 105 %attempts2
+menu text c2 168 120 %clothused2
+menu text l2 168 135 %leatherused2
+menu text b2 168 150 %boneused2
+menu font align left
+if %startskill <> %currentskill
+{
+	gosub FormatTime %time
+	menu delete time
+	menu text time 77 200 #result
+	set %egain %time1 - %gaintime
+	set %eghours %egain / 3600
+	set %egmins  ( %egain / 60 ) - ( %eghours * 60 )
+	set %egsecs %egain % 60
+	menu delete time2
+	menu text time2 130 200 ( , %eghours , h , #spc , %egmins , m , #spc , %egsecs , s , #spc , used)
+	set %gaintime %time1
+}
+return
+
+sub DisplayResourceStats
+set %attempts1 %attempts1 + 1
+set %unhidecount %unhidecount + 1
+set %attempts3 %attempts3 + 1
+menu font align right
+menu delete a1
+menu delete a3
+menu text a1 113 105 %attempts1
+menu text a3 225 105 %attempts3
+gosub putGlobalVar %gvar %scriptname #charid attempts3
+if %cloth . %currentitem <> 0
+{
+	set %clothused1 %clothused1 + %used . %currentitem
+	set %clothused3 %clothused3 + %used . %currentitem
+	gosub putGlobalVar %gvar %scriptname #charid clothused3
+	menu delete c1
+	menu delete c3
+	menu text c1 113 120 %clothused1
+	menu text c3 225 120 %clothused3
+}
+if %leather . %currentitem <> 0
+{
+	set %leatherused1 %leatherused1 + %used . %currentitem
+	set %leatherused3 %leatherused3 + %used . %currentitem
+	gosub putGlobalVar %gvar %scriptname #charid leatherused3
+	menu delete l1
+	menu delete l3
+	menu text l1 113 135 %leatherused1
+	menu text l3 225 135 %leatherused3
+}
+if %bone . %currentitem <> 0
+{
+	set %boneused1 %boneused1 + %bone . %currentitem
+	set %boneused3 %boneused3 + %bone . %currentitem
+	gosub putGlobalVar %gvar %scriptname #charid boneused3
+	menu delete b1
+	menu delete b3
+	menu text b1 113 150 %boneused1
+	menu text b3 225 150 %boneused3
+}
+gosub calctotalcosts
+menu font align left
+if %hideme &&  H in #charstatus && %unhidecount > %unhideat
+{
+	menu delete status
+	menu text status 50 5 Unhiding due to no gains.
+	gosub WaitforPause
+	set %rnd ( #random % 5 ) + 1
+	str mid %unhidetext %rnd 1
+	event macro 3 1 #strres
+	set %unhidecount 0
+}
+return
+
+sub FormatTime
+str ins %1 : 4
+set %1 #strres
+str ins %1 : 7
+set %1 #strres
+str del %1 1 1
+set %1 #strres
+return %1
+
+sub hide
+set %hideme #true
+set #menubutton N/A
+return
+
+sub Pause
+set %elaspedtime #scnt - %scriptstart
+set %totaletime %_scripttime + %elaspedtime
+set %scripttime %totaletime
+gosub putGlobalVar %gvar %scriptname #charid scripttime
+sound
+set %firstattempt #true
+;menu window color gray
+menu font transparent #true
+menu font size 30
+menu font color red
+menu font style b
+menu text  ptext  62 120 Paused
+menu font size 9
+menu font style n
+menu font color lime
+menu font transparent #false
+if %sysmessages
+{
+	event sysmessage Paused. Press the resume button or toggle out
+	event sysmessage of warmode. If not in warmode, toggle to war/peace.
+}
+set %returnbywarmode #false
+if G in #charstatus
+{
+	menu delete status
+	menu font color yellow
+	menu text status 50 5 Paused via warmode.
+	menu font color green
+	set %returnbywarmode #true
+}
+menu delete pause
+menu font bgcolor teal
+menu font color black
+menu button resume 100 270 60 20 Resume
+gosub WaitforPause
+set #menubutton N/A
+Pause1:
+if G in #charstatus
+	set %returnbywarmode #true
+if %returnbywarmode && G notin #charstatus
+      set #menubutton resume
+wait 5
+if #menubutton = N/A
+	goto Pause1
+menu delete ptext
+if #menubutton = closed
+	gosub closed
+menu delete resume
+menu button pause 100 270 60 20 Pause
+set #menubutton N/A
+set %retrycount 11
+menu window color black
+menu font bgcolor black
+menu font color lime
+set %scriptstart #scnt
+set %gaintime %scriptstart
+set %_scripttime %scripttime
+set * . %521 %product . %currentitem
+return
+
+sub closed
+set %skipClearMenuGump #false
+gosub ClearMenuGump
+set %elaspedtime #scnt - %scriptstart
+set %totaletime %_scripttime + %elaspedtime
+set %scripttime %totaletime
+gosub putGlobalVar %gvar %scriptname #charid scripttime
+if %exitonclose && ! %debug
+{
+	set * . %520 terminate
+	terminate euo
+}
+set #menubutton N/A
+return
+
+sub AutoSetup
+if %hideme = N/A && %hideskill > %hideskillreq
+	set %hideme #true
+if %hideme = N/A
+	set %hideme #false
+menu show
+set %bpmsgon #true
+gosub GetBackPackID
+menu show
+gosub GetPaperDollXY
+menu show
+menu delete pdwarning
+gosub calcmaxweight
+if %default_bankfound = N/A
+{
+	gosub checkforbank2
+	set %bankfound #result
+}
+if %atbank || %bankfound
+	gosub CheckForBank
+menu show
+if ! #result
+	gosub GetSecureContainer
+gosub GetResourceBag
+menu show
+gosub LocateTheDump
+gosub CheckforMultipleCloths
+return
+
+sub LocateTheDump
+if %bone . %currentitem <> 0
+{
+	if ! %atbank
+		gosub FindDumpster
+
+	if %atbank
+		gosub FindTrashCan 12
+}
+return
+
+sub calcmaxweight
+set %maxweight #maxweight
+if #maxweight > 400
+	set %maxweight 400
+set %maxweight %maxweight  - ( %maxSkillTools * 2 ) - 5
+return
+
+
+sub CountBone
+set %cbh 0
+CBH1:
+finditem %product . %currentitem C_ , %backpackid
+if #findkind <> -1
+{
+	set %cbh %cbh + 1
+	ignoreitem #findid bone
+	goto CBH1
+}
+ignoreitem reset bone
+return %cbh
+
+sub DumpBone
+wait %wait2
+if  ! %atbank
+{
+	gosub FindDumpster
+	nextcpos %trash_barrelx %trash_barrely
+	set #lobjectid %trashcanid
+	wait %wait2
+	event macro 17 0
+	wait %longwait
+	contpos %trash_barrelx %trash_barrely
+	wait %wait1
+	set %trash_clickx  %trash_barrelx + 30
+	set %trash_clicky %trash_barrely + 160
+	gosub MoveBonestoTrash
+}
+if %atbank
+{
+	set %charposx #charposx
+	set %charposy #charposy
+	gosub FindTrashCan 12
+	move #findx #findy 2 4s
+	gosub FindTrashCan 2
+	nextcpos %trash_barrelx %trash_barrely
+	set #lobjectid %trashcanid
+	wait %wait2
+	event macro 17 0
+	wait %longwait
+	contpos %trash_barrelx %trash_barrely
+	wait %wait1
+	set %trash_clickx  %trash_barrelx + 90
+	set %trash_clicky %trash_barrely + 150
+	gosub MoveBonestoTrash
+	move %charposx %charposy 0 4s
+	gosub CheckForBank
+	gosub GetResourceBag
+}
+return
+
+sub MoveBonestoTrash
+set %ba1 0
+gosub resetjournal
+MBT1:
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+wait 5 10
+finditem %product . %currentitem C_ , %backpackid
+;finditem ZLF C_ , %backpackid ; testline so I don't have to really use bone...
+if #findkind <> -1
+{
+	set %ba1 %ba1 + 1
+	menu delete status
+	menu text status 50 5 Dumping bone armor ( , %ba1 , ).
+	event drag #findid
+	set %mbt2 0
+MBT2:
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+	wait %wait1
+	click %trash_clickx %trash_clicky p
+	wait %wait1
+	if #lliftedkind <> 0
+	{
+		set %mbt2 %mbt2 + 1
+		if %mbt2 > 3
+		{
+			if %mbt2 > 9
+			{
+				menu delete status
+				menu text status 50 5 Aborting dump.
+				display ok There is a problem transferring items to your trashcan.$You will need to do it manually.$Pausing script.$
+				gosub pause
+				return
+			}
+			menu delete status
+			menu text status 50 5 Dump Problems, Trying again...
+			set #lobjectid %trashcanid
+			event macro 17 0
+			contpos %trash_barrelx %trash_barrely
+			goto MBT2
+		}
+		goto MBT2
+	}
+	wait %wait1
+	set %mbt2 0
+	goto MBT1
+}
+return
+
+
+sub FindDumpster
+FD1:
+menu delete status
+menu text status 50 5 Locating dumpster.
+set %trash_clickx 0
+set %trash_clicky 0
+finditem %trashbarreltype G_2
+if #findkind <> -1
+{
+	set %trashcanid #findid
+	return #true
+}
+gosub NoDumpster
+goto FD1
+return #false
+
+
+sub NoDumpster
+sound
+menu font bgcolor red
+menu font color black
+menu delete status
+menu text status 50 5 You're not near a trash barrel!
+menu font bgcolor black
+menu font color lime
+set #menubutton pause
+gosub pause
+return
+
+sub FindTrashCan
+set %_distance %1
+FTC1:
+menu delete status
+if %bpmsgon
+	menu text status 50 5 Locating trashcan.
+set %trashx 0
+set %trashy 0
+finditem %bankgarbage G_ , %_distance
+if #findkind <> -1
+{
+	if ! %NoEventProperty
+	{
+		if #clilang <> enu && %checklang
+		{
+			menu hideeuo
+			display ok # , clilang = #CLILANG $$Your client must be in english mode in order to detect the bank trashcan. Add the following$
++line to your uo.cfg files. $$Note: The line must be added for each character's desktop file.$$
++UserLanguageCodeString=ENU$$Script_Halted.$$
+			menu hide
+			halt
+		}
+		event property #findid
+		if %trashcantext1 notin #property && %trashcantext2 notin #property
+		{
+			ignoreitem #findid badtrash
+			goto FTC1
+		}
+	}
+	if abs ( #findz - #charposz ) > 5
+	{
+		ignoreitem #findid badtrash
+		goto FTC1
+	}
+	set %trashcanid #findid
+	return #true
+}
+menu delete status
+if %bpmsgon
+	menu text status 50 5 Locating trashcan.
+goto FTC1
+return #false
+
+
+sub NoTrashCan
+sound
+menu font bgcolor red
+menu font color black
+menu delete status
+menu text status 50 5 You're not near a Bank Trash Can!
+menu font bgcolor black
+menu font color lime
+set #menubutton pause
+gosub pause
+return
+
+sub CheckforBank2
+set %housesigns GNE_INE_SNE_UNE_ONE_QNE_AOE_QJE_
++COE_WNE_YNE_IOE_KOE_EOE_GOE_SJE_UJE_OJE_AKE_
++CKE_WJE_YJE_IKE_KKE_EKE_GKE_QKE_SKE_MKE_OKE_
++YKE_ALE_UKE_WKE_GLE_ILE_CLE_ELE_OLE_QLE_KLE_
++MLE_WLE_YLE_SLE_ULE_CRE_ERE_YQE_ARE_KRE_MRE_
++GRE_IRE_LRE_HKE_XJE
+CFB12:
+finditem %housesigns
+if #findkind <> -1
+{
+	event property #findid
+	wait 5
+	if bank in #property || mint in #property
+		return #true
+	ignoreitem #findid bankcheck
+	goto CFB12
+}
+set %pc 0
+CFB22:
+finditem HS_IS
+if #findkind <> -1
+{
+	set %pc %pc + 1
+	if #findrep = 7
+	{
+		event property #findid
+		if banker in #property || minter in #property
+			return #true
+		ignoreitem #findid bankcheck
+		goto CFB22
+	}
+	ignoreitem #findid bankcheck
+	goto CFB22
+}
+if %pc > 10
+	return #true
+return #false
+
+
+sub CheckForBank
+if ! %bankfound
+	return #false
+menu delete status
+menu text status 50 5 Checking for bank.
+wait %shortwait
+set %retry #true
+CFB1:
+gosub resetjournal
+nextcpos %bank_securex %bank_securey
+gosub openBank
+wait %longwait
+gosub FindJournalMessage Bank_Container
+if #result
+{
+	set %atbank #true
+	menu delete status
+	menu text status 50 5 Looks like you're at a bank.
+	contpos %bank_securex %bank_securey
+	wait %wait1
+	set %securecontainerid N/A
+	if #contsize = 180_240
+	{
+		set %securecontainerid #contid
+		gosub putGlobalVar %gvar %scriptname #charid securecontainerid
+	}
+	if %securecontainerid = N/A
+		goto CFB1
+	if %adjusttimer <> 0
+	{
+		menu delete status
+		menu text status 50 5 Adjust your bank box now.
+		if %sysmessages
+		event SysMessage Adjust your bank box now, you have , #spc , %adjusttimer , #spc , seconds.
+		gosub waittimer %adjusttimer
+		if #contid = %securecontainerid && ( #contposx <> %bank_securex || #contposy <> %bank_securey )
+		{
+			set %bank_securex #contposx
+			set %bank_securey #contposy
+			gosub putGlobalVar %gvar %scriptname #charid bank_securex
+			gosub putGlobalVar %gvar %scriptname #charid bank_securey
+		}
+	}
+	menu delete status
+	return #true
+}
+set %atbank #false
+return #false
+
+sub Openbank
+if %runuo
+{
+	msg bank$
+	return
+}
+msg #smc , #spc , bank$
+return
+
+sub GetSecureContainer
+set %securecontainerid N/A
+gosub getGlobalVar %gvar %scriptname #charid securecontainerid
+GSC1:
+if %securecontainerid  <> N/A
+{
+	menu delete status
+	menu text status 50 5 Re-opening secure container.
+	wait %shortwait
+	set %blinkmsg #true
+	goto GSC3
+}
+set %adjusttimer 8
+menu font color white
+menu delete status
+menu text status 50 5 Target your SECURE container now!
+set %blinkmsg #true
+set %blinktime #scnt2 + 5
+set #targcurs 1
+wait %wait1
+if %sysmessages
+	event SysMessage Target your SECURE container now!
+looptgt2:
+wait 3
+if %blinktime < #scnt2
+{
+	set %blinktime #scnt2 + 5
+	if %blinkmsg
+	{
+		menu delete status
+		set %blinkmsg #false
+		goto GSC2
+	}
+	menu text status 50 5 Target your SECURE container now!
+	set %blinkmsg #true
+}
+GSC2:
+if #targcurs = 1
+     goto looptgt2
+wait %wait1
+finditem #ltargetid G_2
+if ( #findkind = -1 || #finddist > 2 ) || ( #findkind <> -1 && #findtype in %badcontainers )
+{
+	menu font color red
+	menu delete status
+	menu text status 50 5 Invalid container. Try again.
+	menu font color white
+	if %sysmessages
+		event SysMessage container. Try Again.
+	wait 3s
+display ok The container you identified is not a valid$
++container. It is two far away or an invalid type( , #findtype , ).$$
++Please use a standard wooden or metal$
++chest within 2 paces of your character.$
+	set #targcurs 1
+	wait %wait1
+	goto looptgt2
+}
+set #lobjectid #ltargetid
+event macro 17
+wait %wait2
+if  #contname <> container_gump  || #contid <> #lobjectid
+{
+	menu font color red
+	menu delete status
+	menu text status 50 5 Invalid container. Try again.
+	menu font color white
+	if %sysmessages
+		event SysMessage container. Try Again.
+	wait 3s
+display ok The object you identified with type: #findtype , #spc , does$
++not show as being a container according to$
++EasyUO's Container Info variables.$$
++Please use a standard wooden or metal$
++chest within 2 paces of your character.$
+	set #targcurs 1
+	wait %wait1
+	goto looptgt2
+}
+set %securecontainerid  #ltargetid
+GSC3:
+finditem %securecontainerid G_2
+if #findkind = -1
+{
+	menu font color red
+	menu delete status
+	menu text status 50 5 SECURE container not found.
+	menu font color white
+	if %sysmessages
+		event SysMessage SECURE container not found.
+	wait 3s
+	set %securecontainerid N/A
+	gosub putGlobalVar %gvar %scriptname #charid securecontainerid
+	set %resourcebagid N/A
+	gosub putGlobalVar %gvar %scriptname #charid resourcebagid
+	set %adjusttimer 8
+	goto GSC1
+}
+gosub putGlobalVar %gvar %scriptname #charid securecontainerid
+menu font color lime
+nextcpos %bank_securex %bank_securey
+set #lobjectid %securecontainerid
+GSC4:
+gosub resetjournal
+wait %wait2
+event macro 17 0
+wait %wait1
+gosub FindJournalMessage must_wait
+if #result
+{
+	menu delete status
+	menu text status 50 5 Retrying Secure box open.
+	if %sysmessages
+		event SysMessage Retrying Secure box open.
+	wait %wait2
+	wait %longwait
+	goto GSC4
+}
+if #contid = %securecontainerid
+	contpos %bank_securex %bank_securey
+if %adjusttimer <> 0
+{
+	menu delete status
+	menu text status 50 5 Adjust secure bag now.
+	if %sysmessages
+		event SysMessage Adjust secure bag now, you have , #spc , %adjusttimer , #spc ,  seconds.
+	gosub waittimer %adjusttimer
+	if #contid = %securecontainerid && ( #contposx <> %bank_securex || #contposy <> %bank_securey )
+	{
+		set %bank_securex #contposx
+		set %bank_securey #contposy
+		gosub putGlobalVar %gvar %scriptname #charid bank_securex
+		gosub putGlobalVar %gvar %scriptname #charid bank_securey
+	}
+}
+menu delete status
+wait %longwait
+return
+
+sub makeyourown
+MYO0:
+display yesno Using this option will allow you to make your first item and then$
++the script will Make Last until you stop it  or select the Make Item$
++button again. Do you want to continue?$$
++Yes=Make Item, No=Use Skill Chart
+if #dispres = NO
+{
+	set %retrycount 11
+	set #menubutton N/A
+	gosub SelectItemToMake
+	set %currentitem #result
+	gosub RemoveNonEssentials
+	set %firstattempt #true
+	set %makeyourown #false
+	set %leathertype %defaultleathertype
+	set * . %520 cut
+	return
+}
+set %packcloth 0
+set %packleather 0
+set %packbone 0
+set %cloth99 0
+set %leather99 0
+set %bone99 0
+gosub FindSewingKit
+gosub UseSewingKit
+set * . %520 pause
+gosub WaitforPause
+menu delete status
+menu text status 50 5 Examining backpack contents.
+MYO1:
+finditem * C_ , %backpackid
+if #findkind <> -1
+{
+	if #findtype in %clothtypes
+		set %packcloth #findstack
+	if #findtype in %leathertypes
+		set %packleather #findstack
+	if #findtype in %bonetypes
+		set %packbone #findstack
+	ignoreitem #findid backpack
+	goto MYO1
+}
+MYO2:
+menu font bgcolor blue
+menu font color white
+menu delete status
+menu text status 50 5 Make your item now.
+wait 5
+finditem * C_ , %backpackid
+if #findkind = -1
+{
+	menu font bgcolor white
+	menu font color blue
+	menu delete status
+	menu text status 50 5 Make your item now.
+	wait 5
+	goto MYO2
+}
+menu font bgcolor black
+menu font color lime
+menu delete status
+menu text status 50 5 New item detected.
+set %product99 #findtype
+event property #findid
+;what got used?
+ignoreitem reset backpack
+if %packcloth <> 0
+{
+	finditem %clothtypes C_ , %backpackid
+	if #findkind = -1
+	{
+		set %cloth99 %packcloth
+		set %resource99 %clothtypes
+		goto MYO3
+	}
+	if #findstack <> %packcloth
+	{
+		set %cloth99 %packcloth - #findstack
+		set %resource99 %clothtypes
+		goto MYO3
+	}
+}
+if %packleather <> 0
+{
+	finditem %leathertypes  C_ , %backpackid
+	if #findkind = -1
+	{
+		set %leather99 %packleather
+		set %resource99 %leathertypes
+		set %_myocolor #findcol
+		goto MYO2b
+	}
+	if #findstack <> %packleather
+	{
+		set %leather99 %packleather - #findstack
+		set %resource99 %leathertypes
+		set %_myocolor #findcol
+	}
+}
+MYO2b:
+if %packbone <> 0
+{
+	finditem %bonetypes  C_ , %backpackid
+	if #findkind = -1
+		set %bone99 %packbone
+	if #findstack <> %packbone
+		set %bone99 %packbone - #findstack
+}
+MYO3:
+; now cut it up
+if ( %product99 in %invalidtypes )
+{
+	display ok Invalid type. $$This item can not be cut up properly!
+	goto MYO0
+}
+gosub resetjournal
+set * . %521 %product99
+set * . %520 cut
+wait %longwait
+set * . %520 pause
+gosub WaitforPause
+wait %longwait
+gosub FindJournalMessage Scissors_Cannot
+if ( #result && %bone99 = 0 )
+{
+	if %product99 notin %invalidtypes
+		set %invalidtypes %invalidtypes , %product99 , _
+	display ok Invalid type. $$This item can not be cut up properly$and is not a bone type armor!
+	goto MYO0
+}
+set %used99 0
+if %packcloth <> 0
+{
+	finditem %clothtypes C_ , %backpackid
+	if #findstack <> %packcloth
+		set %used99 %packcloth - #findstack
+}
+if %packleather <> 0
+{
+	finditem %leathertypes  C_ , %backpackid
+	if #findstack <> %packcloth
+		set %used99 %packleather - #findstack
+}
+if %used99 <= 0
+{
+	display ok Hmm, something did not work right.$No resources or a negative amount were used!$Try again.
+	goto MYO0
+}
+str pos #property $
+set %temp #strres - 1
+str left #property %temp
+set %desc99 #strres
+if exceptional in %desc99
+{
+	str del %desc99 1 12
+	set %desc99 #strres
+}
+display YesNo Is this correct? $ , %desc99 $Cloth: %cloth99 $Leather: %leather99 $Bone: %bone99 $Used: %used99 $
+if #dispres = no
+	goto MYO0
+set %currentitem 99
+gosub RemoveNonEssentials
+set %makeyourown #true
+set %firstattempt #true
+set #menubutton N/A
+set %leathertype %defaultleathertype
+if %leather99 <> 0
+{
+	for %_i 1 4
+	{
+		if %lcolor . %_i = %_myocolor
+			set %leathertype %_i
+	}
+}
+set * . %520 cut
+return
+
+sub RemoveNonEssentials
+if %leather . %currentitem = 0
+	gosub MaterialsToResource %leathertypes leather
+if %cloth . %currentitem = 0
+	gosub MaterialsToResource %clothtypes cloth
+if %bone . %currentitem = 0
+	gosub MaterialsToResource %bonetypes bone
+gosub MaterialsToResource %bandaids bandaids
+if %bone . %currentitem <> 0
+{
+	gosub CountBone
+	if #result <> 0
+		gosub DumpBone
+}
+return
+
+
+sub SetUpSkills
+chooseskill hiding
+set %hideskill #skill
+chooseskill tinkering
+wait %wait1
+set %tinkerskill #skill
+chooseskill tail
+if #skillLock <> up
+{
+	menu delete status
+	menu text status 50 5 Setting Tailoring skill up.
+	display ok Your tailoring skill is down! $Pointless to run this script don't you think?$
+}
+;if #skill < 125
+;{
+;	menu delete status
+;	menu text status 50 5 Go buy some tailoring skill!
+;	menu hideeuo
+;	display ok This script requires that you go buy your tailoring$skill up to at least 12.5 or train manually.$$
+;+Please do so and restart the script, thank you.
+;	menu hide
+;	sound
+;	halt
+;}
+set %skillstart %currentskill
+gosub getGlobalVar %gvar %scriptname #charid skillstart
+if ! #result
+{
+set %skillstart #skill
+gosub putGlobalVar %gvar %scriptname #charid skillstart
+}
+wait %wait1
+gosub getGlobalVar %gvar %scriptname #charid  _startskill
+if ! #result || %_startskill = N/A
+{
+	set %_startskill #skill
+	gosub putGlobalVar %gvar %scriptname #charid  _startskill
+}
+set %startskill #skill
+set %currentskill #skill
+set %skillcap #skillcap
+gosub SetupSkillTable
+return
+
+sub SelectItemToMake
+set %itemtomake 0
+for %i 1 %totalskillsinmethod
+{
+	if %currentskill >=  %switchpoint . %i
+		set %itemtomake %i
+}
+set %itemtomake %itemtomake + 1
+return %itemtomake
+
+sub StatusBarUp
+;purpose - make sure the status bar is up on the char
+	IF #charname = N/A
+	{
+		Event Macro 8 2
+		wait %wait2
+	}
+return
+
+sub SkillChart
+set %tm %train_method
+display ok Please note: When choosing a skill table,  if you play on$
++an EA/OSI shard DO NOT select a RunUO table. These$
++tables are designed for users playing on freeshards$
++and will not work correctly on EA/OSI shards.
+SC1:
+set %y  130 + %totalskillsinmethod * 15
+menu clear
+menu window transparent 100
+menu window size 355 %y
+menu window title CEOTurboTailor %version
+menu window color black
+menu font bgcolor BLACK
+menu font color yellow
+menu show %menu_windowx %menu_windowy
+menu shape myshape1 3 62 345 1 3 7 5 blue 3 white
+menu font size 12
+menu font style bu
+menu text h1 135 5 SKill Chart
+menu font style n
+menu font size 9
+menu font color yellow
+menu text h1 5 30 Current Skill Level
+menu text h1 5 45 Skillcap
+menu text h1 110 30 :
+menu text h1 110 45 :
+if %maxskillcap <> N/A
+	menu text h1 175 45 Max Skillcap:
+menu font style u
+menu font align right
+menu text h1 150 80 C
+menu text h1 190 80 L
+menu text h1 230 80 B
+menu text h1 280 80 Low
+menu text h1 333 80 High
+menu font align left
+menu text h1 25 80 Item to Make
+menu font style n
+menu text h1 135 65 Cloth/Leather/Bone
+menu font color lime
+menu font align right
+menu text h1 145 30 %currentskill
+menu text h1 145 45 %skillcap
+if %maxskillcap <> N/A
+	menu text h1 275 45 %skillcap
+menu font align left
+menu font style ub
+menu text h1 250 10 Method
+menu font color silver
+menu font style n
+menu font bgcolor silver
+menu font color blue
+menu combo create trainmethod 195 25 150
+for %z 1 %totalTrainingMethods
+{
+	menu combo add trainmethod %z , #dot , %train . %z
+}
+menu combo add trainmethod %ud1 , #dot , User Defined tailor1.TXT
+menu combo add trainmethod %ud2 , #dot , User Defined tailor2.TXT
+menu Combo Select trainmethod %train_method
+menu font align left
+menu font color white
+for %sc 1 %totalskillsinmethod
+{
+	menu font bgcolor black
+
+	set %y 80 +  %sc * 15
+	set %temp %sc - 1
+	set %lowswitch  abs ( ( %switchpoint . %temp  ) * ( %temp > 0 ) )
+;	set %lowswitch  abs ( ( %switchpoint . %temp + 1 ) * ( %switchpoint . %temp + 1 > 0 ) )
+	set %highswitch %switchpoint . %sc - 1
+	if %highswitch > %skillcap
+		set %highswitch %skillcap
+	if %currentskill >= %lowswitch && %currentskill <= %highswitch
+	{
+		menu font bgcolor blue
+	}
+	menu text skill 10 %y %desc . %sc
+	menu font align right
+	menu text cloth 150 %y %cloth . %sc
+	menu text leather 190 %y %leather . %sc
+	menu text bone 230 %y %bone . %sc
+	menu text lowswitch  280 %y %lowswitch
+	menu text highswitch  335 %y %highswitch
+	menu font align left
+	if %switchpoint . %sc > %skillcap
+		goto sc2
+
+}
+sc2:
+set %y  100 + %totalskillsinmethod * 15
+set #menubutton N/A
+set %skilltablebase 150
+set %windowsizey %skilltablebase + ( %skillTableSize * 15 ) + 65
+set %windowsizex 345
+menu font bgcolor teal
+menu font color black
+menu button Return 120 %y 120 20 Return to Tailoring
+sc3:
+if %runuo
+	gosub CEOWorldSaveChecker save_in_1_minute world_is_saving world_save_complete 45 120
+wait 5
+if #menubutton = n/a
+{
+       	menu get trainmethod
+	if %tm <> #menures
+	{
+		set %train_method #menures
+		set %tm %train_method
+		gosub putGlobalVar %gvar %scriptname #charid train_method
+		menu font size 30
+		menu font style b
+		menu font bgcolor silver
+		menu font color black
+		set %y %windowsizey / 2 - 30
+		set %x %windowsizex / 2 - 100
+		menu text  gtext  %x %y Please Wait
+		wait 2
+		sound
+		menu font size 9
+		menu font style n
+		menu font bgcolor black
+		menu font color lime
+		set %bpmsgon #false
+		if %backpackid = n/a
+		{
+			set %adjusttimer 0
+			set %backpackid #backpackid
+		}
+		gosub ClearMenuGump
+		gosub statusbarup
+		gosub SetUpSkills
+		menu delete gtext
+		set %bpmsgon #true
+		set %firstattempt #true
+		goto SC1
+	}
+	goto SC3
+}
+if #menubutton <> return && #menubutton <> closed
+	goto sc3
+menu font bgcolor black
+menu font color lime
+set #menubutton N/A
+set %lastehours N/A
+set %lastemins N/A
+set %lastesecs N/A
+gosub initmenu
+gosub redrawstats
+menu delete g1
+menu delete g2
+menu delete g3
+menu font align right
+menu text g1 100 246 #skill
+menu text g2 160 246 %tailorgain
+menu text g3 220 246 %rate
+menu font align left
+return
+
+sub redrawstats
+menu font align right
+menu text a1 113 105 %attempts1
+menu text c1 113 120 %clothused1
+menu text l1 113 135 %leatherused1
+menu text b1 113 150 %boneused1
+menu text a2 168 105 %attempts2
+menu text c2 168 120 %clothused2
+menu text l2 168 135 %leatherused2
+menu text b2 168 150 %boneused2
+menu text a3 225 105 %attempts3
+menu text c3 225 120 %clothused3
+menu text l3 225 135 %leatherused3
+menu text b3 225 150 %boneused3
+menu font align left
+return
+
+sub CheckforMultipleCloths
+set %clothcolor N/A
+CMC1:
+finditem %clothtypes , _ , %bolttypes C
+if #findkind <> -1
+{
+	if %clothcolor = N/A
+	{
+		set %clothcolor #findcol
+		ignoreitem #findid cloth
+		goto CMC1
+	}
+	if %clothcolor <> #findcol
+	{
+		sound
+		menu font bgcolor red
+		menu font color black
+		menu delete status
+		menu text status 50 5 Invalid cloth setup, too many colors
+		menu text status2 50 20 detected! Fix and press resume.
+		menu font bgcolor black
+		menu font color lime
+		display ok All cloth Visible must be dyed the same color. Even cloth$
++not in your resource container. Please correct and$resume script.$$Script paused.
+		gosub pause
+		menu delete status2
+		menu delete status
+		ignoreitem reset cloth
+		set %clothcolor N/A
+		goto CMC1
+	}
+	ignoreitem #findid cloth
+	goto CMC1
+
+}
+ignoreitem reset cloth
+return
+
+
+sub WaitTimer
+set %timer #scnt + %1
+WT1:
+set %countdown %timer - #scnt
+menu delete timer
+menu text timer 200 5 ( , %countdown , )
+wait 5
+if #scnt < %timer
+	goto WT1
+menu delete timer
+return
+
+
+sub countresource
+; %1 = resourcetype
+set %_resourcetype %1
+set %resourcestack 0
+set %totalstacks 0
+CR1:
+finditem %_resourcetype c_ , %backpackID
+if #findkind <> -1
+{
+	set %resourcestack %resourcestack + #findstack
+	set %totalstacks %totalstacks + 1
+	ignoreitem #findid resourcestack
+	goto CR1
+}
+ignoreitem reset resourcestack
+if %totalstacks > 35
+{
+		menu delete status
+		menu text status 50 5 Recombing cloth, please wait.
+		wait %wait1
+		gosub MaterialsToResource %_resourcetype stuff
+}
+return %resourcestack
+
+
+sub cutupbolts
+set * . %520 PAUSE
+gosub WaitforPause
+cub1:
+finditem %bolttypes C_ , %backpackid
+if #findkind <> -1
+{
+	set %boltid #findid
+	finditem %scissortypes C_ , %backpackid
+	if #findkind <> -1
+	{
+		set #ltargetid %boltid
+		set #ltargetkind 1
+   		set #lobjectid #findid
+   		wait %wait2
+		event macro 17 0
+		target 4s
+		event macro 22
+   		wait %wait2
+		goto cub1
+	}
+}
+set * . %520 cut
+return
+
+sub skillchangedisplay
+for %scd 1 30
+{
+	set %c1 #random % 255
+	set %c2 #random % 255
+	set %c3 #random % 255
+	menu window color %c1 , %c2 , %c3
+	wait 2
+}
+menu window color red
+wait 5
+menu window color black
+return
+;==================================
+; Script Name:  CEO's * variable management subs (pseudo filesystem)
+; Author: CEO
+; Version: 1.1
+; Client Tested with: 4.0.1b
+; EUO version tested with: 1_41_103
+; Shard OSI / FS: OSI
+; Revision Date: 040219
+; Public Release: 040219
+; Globals Used: User specified (2 total)
+; Purpose: Allows you to use a * variable as a pseudo-filesystem
+;=======================================
+; CEO's global variable management subs:
+;      getGlobalVar  . putGlobalVar  . delGlobalVar
+;=======================================
+;
+;ver 1.1
+;changed the lock file to use *variablename_lock so it'll work with any named *variable
+;
+Sub getGlobalVar
+
+;ver 1.0 posted 19Feb04 by CEO
+;purpose: Allows you to store multiple variables in one global variable unique to
+;             each player and script. getGlobaVar retrieves a value from a global variable.
+;@returns: #result = #false if variable not found, #true if found
+;            % . %3 contains variable value
+;%1 is the global/persistant variable to use ( %1 + 1 is used for locking)
+;%2 is the script identifer or pseudo filename
+;%3 is #charid or pseudo filename
+;%4 is the variable to search for and return in %. %3
+;%5 is for lock control. By default getGlobalVar uses a lock to return a value. In some cases you may want to
+;       retrieve a variable (mostly for speed) without needing a lock as long as you are aware of
+      any potentional conflicts, that very rarely may occur. Set this param to NOLOCK to access
+      global storage without a lock.
+;sample usage:
+;               gosub getGlobalVar 50 MyScript #charid backpackid
+; Using global var *50 finds the variable labeled MyScript#charidbackpackid and returns it in %backpackid
+;
+;               gosub getGlobalVar 50 MyScript #charid clothstat NOLOCK
+; Using global var *50 find the variable labeled MyScript#charidclothstat and returns it in %clothstat without using a lock
+; Warning: do not use *1000. * %1 + 1 is used for locking and there is no *1001!
+nameSpace push
+nameSpace local #systime , _ , %2 , _ , %3 , _ , %4 , _ , GET
+set !lpc #lpc
+set #lpc 1000
+set !lock %1 , _lock
+if ( %0 = 5 ) && ( %5 = NOLOCK )
+   goto getGlobalVar_skiplock
+set !lockcount 0
+getGlobalVar_waitforlock:
+if * . !lock <> N/A && * . !lock <> #nsname
+{
+   wait 1 4
+   set !lockcount !lockcount + 1
+   if !lockcount < 10
+      goto getGlobalVar_waitforlock
+   if * . !lock <> N/A
+   {
+      set !currentlock * . !lock
+      if !currentlock = N/A
+         goto getGlobalVar_waitforlock
+      str pos !currentlock _
+      set !strres #strres - 1
+      str left !currentlock !strres
+      set !systime #systime - #strres
+      if !systime < 10000 ; if over 10 seconds assume a broken lock and take it
+      {
+         set !lockcount 0
+         goto getGlobalVar_waitforlock
+      }
+   }
+}
+set * . !lock #nsname
+wait 3 2
+if  * . !lock <> #nsname
+{
+   set !lockcount 0
+   goto getGlobalVar_waitforlock
+}
+getGlobalVar_skiplock:
+set !global * . %1
+set !varName %2 , ^ , %3 , ^ , %4 , |
+str pos !global !varName
+set #result #strres <> 0
+if #result
+{
+   set !varNamePos #strres
+   str len !varName
+   set !delString !varNamePos + #strres - 1
+   str del !global 1 !delString
+   set !global #strres
+   str pos !global |
+   set !varNamePos #strres - 1
+   str left !global !varNamePos
+   set % . %4 #strres
+}
+if ( %0 < 5 || %5 <> NOLOCK ) && * . !lock = #nsname
+   set * . !lock N/A
+set #lpc !lpc
+nameSpace Clear
+nameSpace Pop
+return #result
+
+Sub putGlobalVar
+;ver 1.0 posted 19Feb04 by CEO
+;purpose: Allows you to store multiple variables in one global variable unique to
+;             each player and script. putGlobaVar stores a value into a global variable.
+
+;@returns: #result = #false if variable not found, #true if found
+;            % . %3 contains variable
+;%1 is the global/persistant variable to use
+;%2 is the script identifer or pseudo filename
+;%3 #charid or other identifier
+;%4 is the variable name of the variable to save into the* variable identified in %1
+;sample usage:
+;               gosub putGlovalVar 50 MyScript #chardid backpackid
+; Using global var *50 stores/updates the variable labeled MyScript#charidbackpackid  with %backpackid
+; Warning: do not use *1000. * %1 + 1 is used for locking and there is no *1001!
+nameSpace push
+nameSpace local #systime , _ , %2 , _ , %3 , _ , %4 , _  , PUT
+set !lpc #lpc
+set #lpc 1000
+set !lock %1 , _lock
+set !lockcount 0
+putGlobalVar_waitforlock:
+if * . !lock <> N/A && * . !lock <> #nsname
+{
+   wait 1 4
+   set !lockcount !lockcount + 1
+   if !lockcount < 10
+      goto putGlobalVar_waitforlock
+   if * . !lock <> N/A
+   {
+      set !currentlock * . !lock
+      if !currentlock = N/A
+         goto putGlobalVar_waitforlock
+      str pos !currentlock _
+      set !strres #strres - 1
+      str left !currentlock !strres
+      set !systime #systime - #strres
+      if !systime < 10000 ; if over 10 seconds assume a hung lock and take it
+      {
+         set !lockcount 0
+         goto putGlobalVar_waitforlock
+      }
+   }
+}
+set * . !lock #nsname
+wait 4
+set !global * . %1
+set !varName %2 , ^ , %3 , ^ , %4 , |
+str pos !global !varName
+if #strres = 0
+{
+   if  * . !lock <> #nsname
+   {
+      set !lockcount 0
+      goto putGlobalVar_waitforlock
+   }
+   if  |CEO*FILESYSTEM| notin !global
+      set !global |CEO*FILESYSTEM|
+   set * . %1 !global , !varName , % . %4 , |
+   set * . !lock N/A
+   set #lpc !lpc
+   nameSpace clear
+   nameSpace pop
+   return #true
+}
+set !varNamePos #strres
+str len !varName
+set !splitString !varNamePos + #strres - 1
+str left !global !splitstring
+set !globalPart1 #strres
+str del !global 1 !splitString
+set !global #strres
+str len !global
+set !globalLen #strres
+str pos !global |
+set !splitString !globalLen - #strres + 1
+str right !global !splitstring
+set !global #strres
+if  * . !lock <> #nsname
+{
+   set !lockcount 0
+   goto putGlobalVar_waitforlock
+}
+set * . %1 !globalPart1 , % . %4 , !global
+set * . !lock N/A
+set #lpc !lpc
+nameSpace clear
+nameSpace pop
+return #true
+
+
+Sub delGlobalVar
+;ver 1.0 posted 19Feb04 by CEO
+;purpose: Allows you to delete a variable out of the globalvar pool unique to
+;             each player and script. delGlobaVar deletes a global variable in a * variable.
+
+;@returns: #result = #false if variable not found, #true if  deleted
+;
+;%1 is the global/persistant variable to use
+;%2 is the script identifer or pseudo filename
+;%3 is #charid or other identifier
+;%4 is the variable name of the variable to save into the* variable identified in %1
+;sample usage:
+;               gosub delGlovalVar 50 MyScript #charid backpackid
+; Using global var *50 deletes  the variable label MyScript#charidbackpackid  and it's associated value.
+; Warning: do not use *1000. * %1 + 1 is used for locking and there is no *1001!
+nameSpace push
+nameSpace local #systime , _ , %2 , _ , %3 , _ , %4 , _ , DEL
+set !lpc #lpc
+set #lpc 1000
+set !lock %1 , _lock
+set !lockcount 0
+delGlobalVar_waitforlock:
+if * . !lock <> N/A && * . !lock <> #nsname
+{
+   wait 1 4
+   set !lockcount !lockcount + 1
+   if !lockcount <  10
+      goto delGlobalVar_waitforlock
+
+   if * . !lock <> N/A
+   {
+      set !currentlock * . !lock
+      if !currentlock = N/A
+         goto delGlobalVar_waitforlock
+      str pos !currentlock _
+      set !strres #strres - 1
+      str left !currentlock !strres
+      set !systime #systime - #strres
+      if !systime < 10000 ; if over 10 seconds assume a broken lock and take it
+      {
+         set !lockcount 0
+         goto delGlobalVar_waitforlock
+      }
+   }
+
+}
+set * . !lock #nsname
+wait 4
+set !global * . %1
+set !varName %2 , ^ , %3 , ^ , %4 , |
+str pos !global !varName
+set #result #strres <> 0
+if #result
+{
+   set !varNamePos #strres
+   str len !varName
+   set !splitString !varNamePos + #strres - 1
+   set !delString !varNamePos - 1
+   str left !global !delString
+   set !globalPart1 #strres
+   str del !global 1 !splitString
+   set !global #strres
+   str pos !global |
+   set !delString #strres
+   str del !global 1 !delString
+   if  * . !lock <> #nsname
+   {
+      set !lockcount 0
+      goto delGlobalVar_waitforlock
+   }
+   set * . %1 !globalPart1 , #strres
+}
+if  * . !lock = #nsname
+   set * . !lock N/A
+set #lpc !lpc
+nameSpace clear
+nameSpace pop
+return #result
+
+;
+;----------------------------------- End CEOStarFileSystem
+sub InitialSetup
+set #menubutton N/A
+set %retrycount 11
+display okcancel Press OK, and we'll take care of$some configuration stuff now.
+if #dispres = cancel
+	return #false
+Display OK First, we'll go to the Skill Chart display. Use this display to$
++choose how to train your tailoring skills.$$
+set %setuptmethod %train_method
+gosub skillchart
+set %lastehours N/A
+set %lastemins N/A
+set %lastesecs N/A
+gosub initmenu
+set %hideme #true
+display yesno Would you like to always try to hide your character?$
+if #dispres = no
+	set %hideme #false
+gosub putGlobalVar %gvar %scriptname #charid hideme
+set %beepongain #true
+display yesno Would you like the script to beep (Using EUO sound command)$
++whenever you get a gain?$
+if #dispres = no
+	set %beepongain #false
+gosub putGlobalVar %gvar %scriptname #charid beepongain
+set %adjusttimer 10
+display OK  You will now be adjusting your backpack, choosing a secure or$
++bankbox, and your resource container. None of these containers $should be blocked by anything,
++ including the crafting menu.$$Press OK to continue.$
+set %securecontainerid N/A
+set %resourcebagid  N/A
+gosub putGlobalVar %gvar %scriptname #charid securecontainerid
+gosub putGlobalVar %gvar %scriptname #charid resourcebagid
+gosub AutoSetup
+if %attempts3 <> 0
+	gosub ResetStats
+menu delete status
+menu text status 50 5  Setup done.
+set #menubutton N/A
+return #true
+
+;=================================================
+;         Skill table stuff
+;=================================================
+sub SetupSkillTable
+set %_lpc #lpc
+set #lpc 1000
+if %train_method = N/A
+	set %train_method 1
+if %train_method = %ud1 || %train_method = %ud2
+{
+	set %skillTableSize N/A
+	set %fnum %train_method - %totalTrainingMethods
+	call tailor , %fnum , .txt
+	if %skillTableSize = N/A
+	{
+		menu hide
+		menu hideeuo
+		display ok tailor , %fnum , .txt is an invalid format. Changing to$
++Method 1 instead.
+		menu show
+		set %tm 1
+		set %train_method 1
+		gosub Train_ , %train . %train_method
+		gosub putGlobalVar %gvar %scriptname #charid train_method
+		goto SST_Done
+	}
+	gosub SetLowtoHigh
+	gosub setResource
+	goto SST_Done
+}
+gosub Train_ , %train . %train_method
+SST_Done:
+gosub CreateStatTable
+set %desc30 Lady, , #spc , you , #spc , are , #spc , done!
+if #sex = 0
+	set %desc30 Lord, , #spc , you , #spc , are , #spc , done!
+set #lpc %_lpc
+gosub SelectItemToMake
+set %currentitem #result
+return
+
+;
+;=========== Skill tables
+;
+sub Train_Stratics1
+set %totalskillsinmethod 9
+set %runuo #false
+for %i 1 %totalskillsinmethod
+{
+	set %nextpage . %i 0
+}
+;
+set %desc1 Doublets
+set %resource1 %clothtypes
+set %cloth1 8
+set %leather1 0
+set %bone1 0
+set %used1 7
+set %product1 XVL
+set %category1 4
+set %selection1 1
+; 
+set %desc2 plain , #spc , dresses
+set %resource2 %clothtypes
+set %cloth2 10
+set %leather2 0
+set %bone2 0
+set %used2 5
+set %product2 DWL
+set %category2 4
+set %selection2 6
+;
+set %desc3  fancy , #spc , dresses
+set %resource3 %clothtypes
+set %cloth3 12
+set %leather3 0
+set %bone3 0
+set %used3 6
+set %product3 VQL
+set %category3 4
+set %selection3 7
+;
+set %desc4 cloaks
+set %resource4 %clothtypes
+set %cloth4 14
+set %leather4 0
+set %bone4 0
+set %used4 7
+set %product4 DCI
+set %category4 4
+set %selection4 8
+;
+set %desc5 robes
+set %resource5 %clothtypes
+set %cloth5 16
+set %leather5 0
+set %bone5 0
+set %used5 8
+set %product5 FWL
+set %category5 4
+set %selection5 9
+;
+set %desc6 Oil , #spc , Cloth
+set %resource6 %clothtypes
+set %cloth6 1
+set %leather6 0
+set %bone6 0
+set %product6 %oilcloth
+set %used6 1
+set %category6 5
+set %selection6 1
+set %nextpage6 1
+;
+set %desc7 Studded , #spc , gorget
+set %resource7 %leathertypes
+set %cloth7 0
+set %leather7 6
+set %bone7 0
+set %used7 3
+set %product7 ALH
+set %category7 9
+set %selection7 1
+;
+set %desc8 Studded , #spc , gloves
+set %resource8 %leathertypes
+set %cloth8 0
+set %leather8 8
+set %bone8 0
+set %product8 XKH
+set %used8 4
+set %category8 9
+set %selection8 2
+if ( #skillcap <> 1000 ) && ( #skillcap <> 1050 ) && ( #skillcap <> 1100 ) && ( #skillcap <> 1150 ) && ( #skillcap <> 1200 )
+	gosub Tailor_1000
+else
+	gosub Tailor_ , #skillcap
+if %makebone
+{
+	set %desc9 Bone , #spc , Helmet
+	set %resource9 %leathertypes
+	set %cloth9 0
+	set %leather9 4
+	set %bone9 2
+	set %product9 YPH
+	set %used9 4
+	set %category9 11
+	set %selection9 1
+	return
+}
+;
+set %desc9 Studded , #spc , Sleeves
+set %resource9 %leathertypes
+set %cloth9 0
+set %leather9 10
+set %bone9 0
+set %product9 YKH_GLH
+set %used9 5
+set %category9 9
+set %selection9 3
+return
+
+sub Tailor_1000
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 996
+set %switchpoint7 1039
+set %switchpoint8 1079
+set %switchpoint9 1100
+return
+
+sub Tailor_1050
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 1021
+set %switchpoint7 1063
+set %switchpoint8 1104
+set %switchpoint9 1125
+return
+
+sub Tailor_1100
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 1046
+set %switchpoint7 1088
+set %switchpoint8 1129
+set %switchpoint9 1150
+return
+
+sub Tailor_1150
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 1071
+set %switchpoint7 1113
+set %switchpoint8 1154
+set %switchpoint9 1175
+return
+
+sub Tailor_1200
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 1096
+set %switchpoint7 1138
+set %switchpoint8 1179
+set %switchpoint9 1201
+return
+
+sub Train_Stratics_UOSE1
+set %totalskillsinmethod 9
+set %runuo #false
+for %i 1 %totalskillsinmethod
+{
+	set %nextpage . %i 0
+}
+;
+set %desc1 Doublets
+set %resource1 %clothtypes
+set %cloth1 8
+set %leather1 0
+set %bone1 0
+set %used1 7
+set %product1 XVL
+set %category1 4
+set %selection1 1
+; 
+set %desc2 plain , #spc , dresses
+set %resource2 %clothtypes
+set %cloth2 10
+set %leather2 0
+set %bone2 0
+set %used2 5
+set %product2 DWL
+set %category2 4
+set %selection2 6
+;
+set %desc3  fancy , #spc , dresses
+set %resource3 %clothtypes
+set %cloth3 12
+set %leather3 0
+set %bone3 0
+set %used3 6
+set %product3 VQL
+set %category3 4
+set %selection3 7
+;
+set %desc4 cloaks
+set %resource4 %clothtypes
+set %cloth4 14
+set %leather4 0
+set %bone4 0
+set %used4 7
+set %product4 DCI
+set %category4 4
+set %selection4 8
+;
+set %desc5 robes
+set %resource5 %clothtypes
+set %cloth5 16
+set %leather5 0
+set %bone5 0
+set %used5 8
+set %product5 FWL
+set %category5 4
+set %selection5 9
+;
+set %desc6 Oil , #spc , Cloth
+set %resource6 %clothtypes
+set %cloth6 1
+set %leather6 0
+set %bone6 0
+set %product6 %oilcloth
+set %used6 1
+set %category6 5
+set %selection6 1
+set %nextpage6 1
+;
+set %desc7 ninja , #spc , hoods
+set %resource7 %clothtypes
+set %cloth7 13
+set %leather7 0
+set %bone7 0
+set %product7 BCP
+set %used7 7
+set %category7 3
+set %selection7 4
+set %nextpage7 1
+;
+set %desc8 Studded , #spc , gloves
+set %resource8 %leathertypes
+set %cloth8 0
+set %leather8 8
+set %bone8 0
+set %product8 XKH
+set %used8 4
+set %category8 9
+set %selection8 2
+if ( #skillcap <> 1000 ) && ( #skillcap <> 1050 ) && ( #skillcap <> 1100 ) && ( #skillcap <> 1150 ) && ( #skillcap <> 1200 )
+	gosub UOSETailor_1000
+else
+	gosub UOSETailor_ , #skillcap
+if %makebone
+{
+	set %desc9 Bone , #spc , Helmet
+	set %resource9 %leathertypes
+	set %cloth9 0
+	set %leather9 4
+	set %bone9 2
+	set %product9 YPH
+	set %used9 4
+	set %category9 11
+	set %selection9 1
+	return
+}
+;
+set %desc9 Studded , #spc , Sleeves
+set %resource9 %leathertypes
+set %cloth9 0
+set %leather9 10
+set %bone9 0
+set %product9 YKH_GLH
+set %used9 5
+set %category9 9
+set %selection9 3
+return
+
+sub UOSETailor_1000
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 996
+set %switchpoint7 1049
+set %switchpoint8 1079
+set %switchpoint9 1100
+return
+
+sub UOSETailor_1050
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 1021
+set %switchpoint7 1073
+set %switchpoint8 1104
+set %switchpoint9 1125
+return
+
+sub UOSETailor_1100
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 1046
+set %switchpoint7 1098
+set %switchpoint8 1129
+set %switchpoint9 1150
+return
+
+sub UOSETailor_1150
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 1071
+set %switchpoint7 1123
+set %switchpoint8 1154
+set %switchpoint9 1175
+return
+
+sub UOSETailor_1200
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 1096
+set %switchpoint7 1148
+set %switchpoint8 1179
+set %switchpoint9 1201
+return
+
+sub Train_CEO1
+set %totalskillsinmethod 9
+set %runuo #false
+for %i 1 %totalskillsinmethod
+{
+	set %nextpage . %i 0
+}
+;
+;
+set %desc1 skullcaps
+set %resource1 %clothtypes
+set %cloth1 2
+set %leather1 0
+set %bone1 0
+set %used1 1
+set %product1 CZH
+set %category1 3
+set %selection1 1
+
+set %desc2 fancy , #spc , shirts
+set %resource2 %clothtypes
+set %cloth2 8
+set %leather2 0
+set %bone2 0
+set %used2 4
+set %product2 TQL
+set %category2 4
+set %selection2 7
+
+set %desc3 full , #apc , aprons
+set %resource3 %clothtypes
+set %cloth3 10
+set %leather3 0
+set %bone3 0
+set %used3 6
+set %product3 RDI
+set %category3 5
+set %selection3 3
+
+set %desc4 fur , #spc , boots
+set %resource4 %clothtypes
+set %cloth4 12
+set %leather4 0
+set %bone4 0
+set %used4 6
+set %product4 LJN
+set %category4 6
+set %selection4 2
+;
+
+set %desc5 Oil , #spc , Cloth
+set %resource5 %clothtypes
+set %cloth5 1
+set %leather5 0
+set %bone5 0
+set %product5 %oilcloth
+set %used5 1
+set %category5 5
+set %selection5 1
+set %nextpage5 1
+;
+set %desc6 Studded , #spc , gorget
+set %resource6 %leathertypes
+set %cloth6 0
+set %leather6 6
+set %bone6 0
+set %used6 3
+set %product6 ALH
+set %category6 9
+set %selection6 1
+;
+set %desc7 Studded , #spc , gloves
+set %resource7 %leathertypes
+set %cloth7 0
+set %leather7 8
+set %bone7 0
+set %product7 XKH
+set %used7 4
+set %category7 9
+set %selection7 2
+if ( #skillcap <> 1000 ) && ( #skillcap <> 1050 ) && ( #skillcap <> 1100 ) && ( #skillcap <> 1150 ) && ( #skillcap <> 1200 )
+	gosub CEOTailor_1000
+else
+	gosub CEOTailor_ , #skillcap
+if %makebone
+{
+	set %desc8 Bone , #spc , Helmet
+	set %resource8 %leathertypes
+	set %cloth8 0
+	set %leather8 4
+	set %bone8 2
+	set %product8 YPH
+	set %used8 4
+	set %category8 11
+	set %selection8 1
+	return
+}
+;
+set %desc8 Studded , #spc , Sleeves
+set %resource8 %leathertypes
+set %cloth8 0
+set %leather8 10
+set %bone8 0
+set %product8 YKH_GLH
+set %used8 5
+set %category8 9
+set %selection8 3
+return
+
+sub CEOTailor_1000
+set %switchpoint1 249
+set %switchpoint2 497
+set %switchpoint3 539
+set %switchpoint4 746
+set %switchpoint5 996
+set %switchpoint6 1039
+set %switchpoint7 1079
+set %switchpoint8 1100
+return
+
+sub CEOTailor_1050
+set %switchpoint1 249
+set %switchpoint2 497
+set %switchpoint3 539
+set %switchpoint4 746
+set %switchpoint5 1021
+set %switchpoint6 1063
+set %switchpoint7 1104
+set %switchpoint8 1125
+return
+
+sub CEOTailor_1100
+set %switchpoint1 249
+set %switchpoint2 497
+set %switchpoint3 539
+set %switchpoint4 746
+set %switchpoint5 1046
+set %switchpoint6 1088
+set %switchpoint7 1129
+set %switchpoint8 1150
+return
+
+sub CEOTailor_1150
+set %switchpoint1 249
+set %switchpoint2 497
+set %switchpoint3 539
+set %switchpoint4 746
+set %switchpoint5 1071
+set %switchpoint6 1113
+set %switchpoint7 1154
+set %switchpoint8 1175
+return
+
+sub CEOTailor_1200
+set %switchpoint1 249
+set %switchpoint2 497
+set %switchpoint3 539
+set %switchpoint4 746
+set %switchpoint5 1096
+set %switchpoint6 1138
+set %switchpoint7 1179
+set %switchpoint8 1201
+return
+
+sub Train_CEO_UOSE1
+set %totalskillsinmethod 9
+set %runuo #false
+for %i 1 %totalskillsinmethod
+{
+	set %nextpage . %i 0
+}
+;
+;
+set %desc1 skullcaps
+set %resource1 %clothtypes
+set %cloth1 2
+set %leather1 0
+set %bone1 0
+set %used1 1
+set %product1 CZH
+set %category1 3
+set %selection1 1
+
+set %desc2 fancy , #spc , shirts
+set %resource2 %clothtypes
+set %cloth2 8
+set %leather2 0
+set %bone2 0
+set %used2 4
+set %product2 TQL
+set %category2 4
+set %selection2 7
+
+set %desc3 full , #spc , aprons
+set %resource3 %clothtypes
+set %cloth3 10
+set %leather3 0
+set %bone3 0
+set %used3 6
+set %product3 RDI
+set %category3 5
+set %selection3 3
+
+set %desc4 fur , #spc , boots
+set %resource4 %clothtypes
+set %cloth4 12
+set %leather4 0
+set %bone4 0
+set %used4 6
+set %product4 LJN
+set %category4 6
+set %selection4 2
+;
+
+set %desc5 Oil , #spc , Cloth
+set %resource5 %clothtypes
+set %cloth5 1
+set %leather5 0
+set %bone5 0
+set %product5 %oilcloth
+set %used5 1
+set %category5 5
+set %selection5 1
+set %nextpage5 1
+;
+set %desc6 ninja , #spc , hoods
+set %resource6 %clothtypes
+set %cloth6 13
+set %leather6 0
+set %bone6 0
+set %product6 BCP
+set %used6 7
+set %category6 3
+set %selection6 4
+set %nextpage6 1
+;
+set %desc7 Studded , #spc , gloves
+set %resource7 %leathertypes
+set %cloth7 0
+set %leather7 8
+set %bone7 0
+set %product7 XKH
+set %used7 4
+set %category7 9
+set %selection7 2
+if ( #skillcap <> 1000 ) && ( #skillcap <> 1050 ) && ( #skillcap <> 1100 ) && ( #skillcap <> 1150 ) && ( #skillcap <> 1200 )
+	gosub CEOUOSETailor_1000
+else
+	gosub CEOUOSETailor_ , #skillcap
+if %makebone
+{
+	set %desc8 Bone , #spc , Helmet
+	set %resource8 %leathertypes
+	set %cloth8 0
+	set %leather8 4
+	set %bone8 2
+	set %product8 YPH
+	set %used8 4
+	set %category8 11
+	set %selection8 1
+	return
+}
+;
+set %desc8 Studded , #spc , Sleeves
+set %resource8 %leathertypes
+set %cloth8 0
+set %leather8 10
+set %bone8 0
+set %product8 YKH_GLH
+set %used8 5
+set %category8 9
+set %selection8 3
+return
+
+sub CEOUOSETailor_1000
+set %switchpoint1 249
+set %switchpoint2 497
+set %switchpoint3 539
+set %switchpoint4 746
+set %switchpoint5 996
+set %switchpoint6 1049
+set %switchpoint7 1079
+set %switchpoint8 1100
+return
+
+sub CEOUOSETailor_1050
+set %switchpoint1 249
+set %switchpoint2 497
+set %switchpoint3 539
+set %switchpoint4 746
+set %switchpoint5 1021
+set %switchpoint6 1073
+set %switchpoint7 1104
+set %switchpoint8 1125
+return
+
+sub CEOUOSETailor_1100
+set %switchpoint1 249
+set %switchpoint2 497
+set %switchpoint3 539
+set %switchpoint4 746
+set %switchpoint5 1046
+set %switchpoint6 1098
+set %switchpoint7 1129
+set %switchpoint8 1150
+return
+
+sub CEOUOSETailor_1150
+set %switchpoint1 249
+set %switchpoint2 497
+set %switchpoint3 539
+set %switchpoint4 746
+set %switchpoint5 1071
+set %switchpoint6 1123
+set %switchpoint7 1154
+set %switchpoint8 1175
+return
+
+sub CEOUOSETailor_1200
+set %switchpoint1 249
+set %switchpoint2 497
+set %switchpoint3 539
+set %switchpoint4 746
+set %switchpoint5 1096
+set %switchpoint6 1148
+set %switchpoint7 1179
+set %switchpoint8 1201
+return
+
+sub Train_RunUO_UOSE1
+set %totalskillsinmethod 12
+set %runuo #true
+for %i 1 %totalskillsinmethod
+{
+	set %nextpage . %i 0
+}
+;
+set %desc1 skullcaps
+set %resource1 %clothtypes
+set %cloth1 2
+set %leather1 0
+set %bone1 0
+set %used1 1
+set %product1 CZH
+set %category1 2
+set %selection1 1
+
+set %desc2 fancy , #spc , shirts
+set %resource2 %clothtypes
+set %cloth2 8
+set %leather2 0
+set %bone2 0
+set %used2 4
+set %product2 TQL
+set %category2 4
+set %selection2 7
+
+set %desc3 skirts
+set %resource3 %clothtypes
+set %cloth3 10
+set %leather3 0
+set %bone3 0
+set %used3 6
+set %product3 GCI
+set %category3 4
+set %selection3 4
+
+set %desc4 fur , #spc , boots
+set %resource4 %clothtypes
+set %cloth4 12
+set %leather4 0
+set %bone4 0
+set %used4 6
+set %product4 LJN
+set %category4 6
+set %selection4 1
+
+set %desc5 Oil , #spc , Cloth
+set %resource5 %clothtypes
+set %cloth5 1
+set %leather5 0
+set %bone5 0
+set %product5 %oilcloth
+set %used5 1
+set %category5 5
+set %selection5 4
+if %uose_menu
+	set %selection5 5
+
+set %desc6 ninja , #spc , hoods
+set %resource6 %clothtypes
+set %cloth6 13
+set %leather6 0
+set %bone6 0
+set %product6 BCP
+set %used6 7
+set %category6 2
+set %selection6 4
+set %nextpage6 1
+
+set %desc7 Studded , #spc , gloves
+set %resource7 %leathertypes
+set %cloth7 0
+set %leather7 8
+set %bone7 0
+set %product7 XKH
+set %used7 4
+set %category7 8
+set %selection7 2
+
+set %desc8 Studded , #spc , Sleeves
+set %resource8 %leathertypes
+set %cloth8 0
+set %leather8 10
+set %bone8 0
+set %product8 YKH_GLH
+set %used8 5
+set %category8 8
+set %selection8 3
+
+set %desc9 Studded , #spc , Leggings
+set %resource9 %leathertypes
+set %cloth9 0
+set %leather9 12
+set %bone9 0
+set %product9 MLH
+set %used9 6
+set %category9 8
+set %selection9 4
+
+set %desc10 Studded , #spc , haidate
+set %resource10 %leathertypes
+set %cloth10 0
+set %leather10 14
+set %bone10 0
+set %product10 FCP
+set %used10 7
+set %category10 8
+set %selection10 10
+
+set %desc11 Studded , #spc , Tunic
+set %resource11 %leathertypes
+set %cloth11 0
+set %leather11 14
+set %bone11 0
+set %product11 LLH
+set %used11 7
+set %category11 8
+set %selection11 5
+
+set %desc12 Bone , #spc , Leggings
+set %resource12 %leathertypes
+set %cloth12 0
+set %leather12 10
+set %bone12 6
+set %product12 CQH
+set %used12 10
+set %category12 10
+set %selection12 4
+
+set %switchpoint1 249
+set %switchpoint2 497
+set %switchpoint3 539
+set %switchpoint4 746
+set %switchpoint5 996
+set %switchpoint6 1050
+set %switchpoint7 1079
+set %switchpoint8 1121
+set %switchpoint9 1162
+set %switchpoint10 1170
+set %switchpoint11 1190
+set %switchpoint12 1201
+
+return
+
+Sub Train_RunUO1
+set %totalskillsinmethod 12
+set %runuo #true
+for %i 1 %totalskillsinmethod
+{
+	set %nextpage . %i 0
+}
+;
+set %desc1 Doublets
+set %resource1 %clothtypes
+set %cloth1 8
+set %leather1 0
+set %bone1 0
+set %used1 7
+set %product1 XVL
+set %category1 3
+set %selection1 1
+
+set %desc2 plain , #spc , dresses
+set %resource2 %clothtypes
+set %cloth2 10
+set %leather2 0
+set %bone2 0
+set %used2 5
+set %product2 DWL
+set %category2 4
+set %selection2 6
+
+set %desc3  fancy , #spc , dresses
+set %resource3 %clothtypes
+set %cloth3 12
+set %leather3 0
+set %bone3 0
+set %used3 6
+set %product3 VQL_EWL
+set %category3 4
+set %selection3 7
+
+set %desc4 cloaks
+set %resource4 %clothtypes
+set %cloth4 14
+set %leather4 0
+set %bone4 0
+set %used4 7
+set %product4 DCI
+set %category4 4
+set %selection4 8
+;
+set %desc5 robes
+set %resource5 %clothtypes
+set %cloth5 16
+set %leather5 0
+set %bone5 0
+set %used5 8
+set %product5 FWL
+set %category5 4
+set %selection5 9
+;
+set %desc6 Oil , #spc , Cloth
+set %resource6 %clothtypes
+set %cloth6 1
+set %leather6 0
+set %bone6 0
+set %product6 %oilcloth
+set %used6 1
+set %category6 6
+set %selection6 1
+set %nextpage6 1
+if %uose_menu
+	set %selection6 1
+;
+set %desc7 Studded , #spc , gorget
+set %resource7 %leathertypes
+set %cloth7 0
+set %leather7 6
+set %bone7 0
+set %used7 3
+set %product7 ALH
+set %category7 9
+set %selection7 1
+;
+set %desc8 Studded , #spc , gloves
+set %resource8 %leathertypes
+set %cloth8 0
+set %leather8 8
+set %bone8 0
+set %product8 XKH
+set %used8 4
+set %category8 9
+set %selection8 2
+;
+set %desc9 Studded , #spc , Sleeves
+set %resource9 %leathertypes
+set %cloth9 0
+set %leather9 10
+set %bone9 0
+set %product9 YKH_GLH
+set %used9 5
+set %category9 9
+set %selection9 3
+
+set %desc10 Studded , #spc , Leggings
+set %resource10 %leathertypes
+set %cloth10 0
+set %leather10 12
+set %bone10 0
+set %product10 MLH
+set %used10 6
+set %category10 9
+set %selection10 4
+
+set %desc11 Studded , #spc , Tunic
+set %resource11 %leathertypes
+set %cloth11 0
+set %leather11 14
+set %bone11 0
+set %product11 LLH
+set %used11 7
+set %category11 9
+set %selection11 5
+
+set %desc12 Studded , #spc , Do
+set %resource12 %leathertypes
+set %cloth12 0
+set %leather12 14
+set %bone12 0
+set %product12 HZO
+set %used12 7
+set %category12 9
+set %selection12 7
+
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 996
+set %switchpoint7 1038
+set %switchpoint8 1079
+set %switchpoint9 1121
+set %switchpoint10 1162
+set %switchpoint11 1190
+set %switchpoint12 1201
+return
+
+Sub Train_RunUO2
+set %totalskillsinmethod 12
+set %runuo #true
+for %i 1 %totalskillsinmethod
+{
+	set %nextpage . %i 0
+}
+;
+set %desc1 Doublets
+set %resource1 %clothtypes
+set %cloth1 8
+set %leather1 0
+set %bone1 0
+set %used1 7
+set %product1 XVL
+set %category1 4
+set %selection1 1
+
+set %desc2 plain , #spc , dresses
+set %resource2 %clothtypes
+set %cloth2 10
+set %leather2 0
+set %bone2 0
+set %used2 5
+set %product2 DWL
+set %category2 4
+set %selection2 6
+
+set %desc3  fancy , #spc , dresses
+set %resource3 %clothtypes
+set %cloth3 12
+set %leather3 0
+set %bone3 0
+set %used3 6
+set %product3 VQL_EWL
+set %category3 4
+set %selection3 7
+
+set %desc4 cloaks
+set %resource4 %clothtypes
+set %cloth4 14
+set %leather4 0
+set %bone4 0
+set %used4 7
+set %product4 DCI
+set %category4 4
+set %selection4 8
+;
+set %desc5 robes
+set %resource5 %clothtypes
+set %cloth5 16
+set %leather5 0
+set %bone5 0
+set %used5 8
+set %product5 FWL
+set %category5 4
+set %selection5 9
+;
+set %desc6 Oil , #spc , Cloth
+set %resource6 %clothtypes
+set %cloth6 1
+set %leather6 0
+set %bone6 0
+set %product6 %oilcloth
+set %used6 1
+set %category6 6
+set %selection6 5
+if %uose_menu
+	set %selection6 5
+;
+set %desc7 Studded , #spc , gorget
+set %resource7 %leathertypes
+set %cloth7 0
+set %leather7 6
+set %bone7 0
+set %used7 3
+set %product7 ALH
+set %category7 9
+set %selection7 1
+;
+set %desc8 Studded , #spc , gloves
+set %resource8 %leathertypes
+set %cloth8 0
+set %leather8 8
+set %bone8 0
+set %product8 XKH
+set %used8 4
+set %category8 9
+set %selection8 2
+;
+set %desc9 Studded , #spc , Sleeves
+set %resource9 %leathertypes
+set %cloth9 0
+set %leather9 10
+set %bone9 0
+set %product9 YKH_GLH
+set %used9 5
+set %category9 9
+set %selection9 3
+
+set %desc10 Studded , #spc , Leggings
+set %resource10 %leathertypes
+set %cloth10 0
+set %leather10 12
+set %bone10 0
+set %product10 MLH
+set %used10 6
+set %category10 9
+set %selection10 4
+
+set %desc11 Studded , #spc , Tunic
+set %resource11 %leathertypes
+set %cloth11 0
+set %leather11 14
+set %bone11 0
+set %product11 LLH
+set %used11 7
+set %category11 9
+set %selection11 5
+
+set %desc12 Bone , #spc , Leggings
+set %resource12 %leathertypes
+set %cloth12 0
+set %leather12 10
+set %bone12 6
+set %product12 CQH
+set %used12 10
+set %category12 11
+set %selection12 4
+
+set %switchpoint1 124
+set %switchpoint2 331
+set %switchpoint3 414
+set %switchpoint4 539
+set %switchpoint5 746
+set %switchpoint6 996
+set %switchpoint7 1038
+set %switchpoint8 1079
+set %switchpoint9 1121
+set %switchpoint10 1162
+set %switchpoint11 1190
+set %switchpoint12 1201
+return
+
+; type      #           min        started at
+; NJL lcap  2  leather  6.2 skill
+; NJI sands 4  leather 12.4 skill (20.0)
+; PVI shoes 6  leather 16.5 skill (30.0)
+; TVI boots 8  leather 33.1 skill (41.6)
+; ZVI thigh 10 leather 41.1 skill (53.5)
+;     ljing 4  leather 45.0 skill
+; KKH lglov 3  leather 51.8 skill (59.0)
+; JKH lgorg 4  leather 53.9 skill (64.1)
+; OWO lhiro 5  leather 55.0 skill (70.7)
+; VKH llegs 10 leather 66.3 skill (76.2)
+; ALH sgorg 6  leather 78.0 skill (83.7)
+; XKH sglov 8  leather 82.9 skill (91.0)
+; GLH sslee 10 leather 87.1 skill (95.0)
+; MLH slegs 10 leather 91.2
+; LLH stuni 14 leather 94.0
+
+Sub Train_RunUO2_scryptor
+set %totalskillsinmethod 15
+set %runuo #true
+for %i 1 %totalskillsinmethod
+{
+  set %nextpage . %i 0
+}
+;
+set %desc1 Leather , #spc , Cap
+set %resource1 %leathertypes
+set %cloth1 0
+set %leather1 2
+set %bone1 0
+set %used1
+set %product1 NJL
+set %category1  3
+set %selection1  4
+
+set %desc2 Sandals
+set %resource2 %leathertypes
+set %cloth2 0
+set %leather2 4
+set %bone2 0
+set %used2
+set %product2 NVI
+set %category2  7
+set %selection2  4
+
+set %desc3 Shoes
+set %resource3 %leathertypes
+set %cloth3 0
+set %leather3 6
+set %bone3 0
+set %used3
+set %product3 PVI
+set %category3  7
+set %selection3  5
+
+set %desc4 Boots
+set %resource4 %leathertypes
+set %cloth4 0
+set %leather4 8
+set %bone4 0
+set %used4
+set %product4 TVI
+set %category4 7
+set %selection4 6
+;
+set %desc5 Thigh , #spc , Boots
+set %resource5 %leathertypes
+set %cloth5 0
+set %leather5 10
+set %bone5 0
+set %used5
+set %product5 ZVI
+set %category5  7
+set %selection5  7
+;
+set %desc6 Leather , #spc , Gloves
+set %resource6 %leathertypes
+set %cloth6 0
+set %leather6 3
+set %bone6 0
+set %product6 KKH
+set %used6
+set %category6  8
+set %selection6  3
+;
+set %desc7 Leather , #spc , Gorget
+set %resource7 %leathertypes
+set %cloth7 0
+set %leather7 4
+set %bone7 0
+set %used7
+set %product7 JKH_KKH
+set %category7  8
+set %selection7  1
+;
+set %desc8 Leather , #spc , Hiro
+set %resource8 %leathertypes
+set %cloth8 0
+set %leather8 5
+set %bone8 0
+set %product8 OWO_JKH
+set %used8
+set %category8  8
+set %selection8  10
+if %uose_menu
+  set %selection8 10
+;
+set %desc9 Leather , #spc , Leggings
+set %resource9 %leathertypes
+set %cloth9 0
+set %leather9 10
+set %bone9 0
+set %product9 VKH_OWO
+set %used9
+set %category9  8
+set %selection9  5
+
+set %desc10 Studded , #spc , Gorget
+set %resource10 %leathertypes
+set %cloth10 0
+set %leather10 6
+set %bone10 0
+set %product10 ALH_VKH
+set %used10 3
+set %category10 9
+set %selection10 1
+
+set %desc11 Studded , #spc , Gloves
+set %resource11 %leathertypes
+set %cloth11 0
+set %leather11 8
+set %bone11 0
+set %product11 XKH_ALH
+set %used11 4
+set %category11 9
+set %selection11 2
+
+set %desc12 Studded , #spc , Sleeves
+set %resource12 %leathertypes
+set %cloth12 0
+set %leather12 10
+set %bone12 0
+set %product12 GLH_XIH
+set %used12 5
+set %category12 9
+set %selection12 3
+
+set %desc13 Studded , #spc , Leggings
+set %resource13 %leathertypes
+set %cloth13 0
+set %leather13 10
+set %bone13 0
+set %product13 MLH_GLH
+set %used13 6
+set %category13 9
+set %selection13 4
+
+set %desc14 Studded , #spc , Tunic
+set %resource14 %leathertypes
+set %cloth14 0
+set %leather14 14
+set %bone14 0
+set %product14 LLH_MLH
+set %used14 7
+set %category14 9
+set %selection14 5
+
+set %desc15 Bone , #spc , Leggings
+set %resource15 %leathertypes
+set %cloth15 0
+set %leather15 10
+set %bone15 6
+set %product15 CQH
+set %used15 10
+set %category15 11
+set %selection15 4
+
+; if min skill
+set %switchpoint1 124
+set %switchpoint2 165
+set %switchpoint3 331
+set %switchpoint4 414
+set %switchpoint5 518
+set %switchpoint6 539
+set %switchpoint7 550
+set %switchpoint8 663
+set %switchpoint9 788
+set %switchpoint10 829
+set %switchpoint11 871
+set %switchpoint12 912
+set %switchpoint13 940
+set %switchpoint14 1190
+set %switchpoint15 1201
+return
+
+sub CEOWorldSaveChecker
+; sub to pause a script during a RunUO world save.
+set %_text1 %1
+set %_text2 %2
+set %_text3 %3
+if %_worldsaveupcoming
+{
+	if %_worldsavetimer < #scnt
+	{
+		set %_worldsavetimer #scnt + %5
+		gosub popupworldsave 85 blue
+		goto _WSC_WAIT1
+	}
+	return
+}
+_WSC1:
+if %_worldsavejournalindex > #jindex
+	return
+scanjournal %_worldsavejournalindex
+if %_text1  in #journal
+{
+	set %_worldsaveupcoming #true
+	set %_worldsavetimer #scnt + %4
+	set %_worldsavejournalindex  %_worldsavejournalindex + 1
+	return
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC1
+_WSC_WAIT1:
+if %_worldsavetimer < #scnt
+	goto _WSC_Complete
+wait 5
+set *_WorldSaving #true
+if %_worldsavejournalindex > #jindex
+	goto _WSC_WAIT1
+scanjournal %_worldsavejournalindex
+if %_text2 in #journal
+{
+	gosub popupworldsave 85 yellow
+	set %_worldsavejournalindex  %_worldsavejournalindex + 1
+	goto _WSC_WAIT2
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC_WAIT1
+_WSC_WAIT2:
+if %_worldsavetimer < #scnt
+	goto _WSC_Complete
+wait 5
+if %_worldsavejournalindex > #jindex
+	goto _WSC_WAIT2
+scanjournal %_worldsavejournalindex
+if %_text3 notin #journal
+{
+	set %_worldsavejournalindex  %_worldsavejournalindex + 1
+	goto _WSC_WAIT2
+}
+_WSC_Complete:
+set %_worldsavejournalindex  #jindex
+set %_worldsaveupcoming #false
+set *_WorldSaving #false
+set *save2 *save2 + 1
+menu delete worldsave
+return
+
+sub popupworldsave
+set %x %1
+set %worldcolor %2
+menu shape worldsave %x 70 125 125 1 7 2 olive 7 %worldcolor
+menu font bgcolor %worldcolor
+menu font color black
+menu font type b
+menu font size 15
+set %x %x + 30
+menu text worldsave %x 100 World
+set %x %x + 15
+menu text worldsave %x 120 Save
+set %x %x + 15
+menu text worldsave %x 140 Wait
+menu font size 9
+menu font bgcolor black
+menu font color lime
+menu font type n
+return
+
+sub recordTurboStats
+gosub getGlobalVar TURBOSTATS  %scriptname #charid charname NOLOCK
+if ! #result
+{
+	gosub getGlobalVar TURBOSTATS  %scriptname STATS total NOLOCK
+	if ! #result
+	{
+		set %total 0
+		gosub putGlobalVar TURBOSTATS  %scriptname STATS total
+	}
+	set %total %total + 1
+	gosub putGlobalVar TURBOSTATS  %scriptname STATS total
+	set %charname #charname
+	gosub putGlobalVar TURBOSTATS  %scriptname #charid charname
+}
+return
+
+
+sub PayPalPopup
+menu clear
+menu window size 365 425
+menu window title PayPal Request
+menu window color black
+menu font color white
+menu font bgcolor black
+menu font size 15
+menu font style bu
+menu text  paypal1 20 0 Please consider a paypal donation.
+menu font style n
+menu font size 9
+menu text paypal2 10 25 Many people have ask me if they could donate cash as a way
+menu text paypal2 10 40 to thank me for the hundreds of hours I've spent working on my
+menu text paypal2 10 55 TurboScripts. And think of all the TIME I've SAVED you, especially
+menu text paypal2 10 70 all the clicking! Let's face it EA charges 29.95usd to raise some
+menu text paypal2 10 85  of your skills to 85 max! My TurboScripts can GM+ nearly any
+menu text paypal5 10 100 crafting skill in under a day! What's that worth to you? Please
+menu text paypal5 10 115 support my efforts by making a small donation! Thank you!
+set %y 130
+menu font bgcolor black
+menu font color lime
+menu font style n
+gosub getHistoryStats
+menu font color lime
+menu font size 8
+set %y %y + 20
+menu font color yellow
+menu font style i
+menu text  sug 10 %y Suggested donation:
+menu font color lime
+menu font style n
+menu text sug 115 %y Under 5 skills(1 or 2 USD), 5-10 Skills(3 to 5 USD),
+set %y %y + 15
+menu text sug 115 %y Over 10 skills(you decide what that's worth!).
+menu font style b
+set %exitx 150
+set %y %y + 15
+menu font size 8
+menu font style b
+menu font bgcolor gray
+menu font color blue
+menu text nosend 5 %y Visit the script's thread or see the Paypal link in my sig please!
+set %y %y + 14
+if send in #opts
+{
+	menu text send 5 %y Or click here:
+	menu font bgcolor teal
+	menu font color black
+	menu font size 12
+	menu button PayPal 80 %y 150 20 PayPal Donation
+	menu font bgcolor black
+	menu font color lime
+	set %exitx 250
+}
+menu font size 12
+menu font style b
+menu font bgcolor teal
+menu font color black
+menu button exit %exitx %y 60 20 Exit
+menu font bgcolor gray
+set %y 385
+menu shape myshape1 3 %y 359 1 3 7 5 red 3 white
+menu font size 9
+set %y %y + 7
+menu shape myshape1 2 %y 361 30 3 7 5 gray 7 gray
+menu text freeshard 5 %y Don't forget to try the Alexandria freeshard, the official EASYUO
+set %y %y + 14
+menu text freeshard 5 %y shard where macroing is ALLOWED! http://www.easyuo.com
+set %setupx #clixres / 2 - ( 365 / 2 )
+set %setupy #cliyres / 2 - ( 425 / 2 )
+menu window transparent 100
+menu show %setupx %setupy
+set #menubutton N/A
+PopupWait:
+wait 5
+if #menubutton = n/a
+	goto PopupWait
+if #menubutton = PayPal
+{
+	gosub PayPalExecute
+	set #menubutton n/a
+	goto PopupWait
+}
+return
+
+sub PayPalExecute
+set %paypalURL https://www.paypal.com/xclick/business=ceo%40easyuo%2ecom&item_name=CEO's%20TurboEncouragement( , %scriptname , )%20fund!&no_shipping=0&no_note=1
+execute %paypalURL
+return
+
+sub getHistoryStats
+set %turbo1 Tailor
+set %turbo2 Smithy
+set %turbo3 Tinker
+set %turbo4 Alchemy
+set %turbo5 Carpenter
+set %turbo6 Fletcher
+set %turbo7 Inscription
+set %turbo8 Cartography
+set %turbo9 Cooking
+menu font bgcolor transparent
+menu font color yellow
+menu font size 15
+menu font style bu
+set %y1 %y + 15
+menu text stats 10 %y Turbo Statistics
+menu text stats 230 %y Other
+set %othery %y + 25
+menu font style n
+menu font color white
+menu font size 10
+for %i 1 9
+{
+	gosub getGlobalVar TURBOSTATS  CEOTurbo , %turbo . %i STATS total NOLOCK
+	if ! #result
+	{
+		set %total 0
+		gosub putGlobalVar TURBOSTATS  CEOTurbo , %turbo . %i STATS total
+
+	}
+	set %total . %i %total
+	set %y %i * 15 + %y1
+	menu text stats 10 %y %turbo . %i
+	menu font align right
+	menu text stats 157 %y %total
+	menu font align left
+	set %gmtotal %gmtotal + %total
+}
+menu font align right
+set %y %y + 20
+menu font style b
+menu font color red
+menu text stats 157 %y %gmtotal
+menu font align left
+menu text stats 10 %y Total Skills Worked:
+menu font style n
+menu font color white
+gosub getGlobalVar STATS spellbooks STATS total NOLOCK
+if ! #result
+{
+	set %total 0
+	gosub putGlobalVar  STATS spellboks STATS total
+
+}
+menu text stats 195 %othery Spellbooks(Full)
+menu font align right
+menu text stats 315 %othery %total
+menu font align left
+set %othery %othery + 16
+menu text stats 195 %othery Kegs Filled(Full)
+gosub getGlobalVar STATS KEGS STATS total NOLOCK
+if ! #result
+{
+	set %total 0
+	gosub putGlobalVar  STATS KEGS STATS total
+
+}
+menu font align right
+menu text stats 315 %othery %total
+menu font align left
+set %othery %othery + 16
+menu text stats 195 %othery Animal Lore
+gosub getGlobalVar STATS CEOANIMALLORE STATS total NOLOCK
+if ! #result
+{
+	set %total 0
+	gosub putGlobalVar  STATS CEOANIMALLORE STATS total
+
+}
+menu font align right
+menu text stats 315 %othery %total
+menu font align left
+set %othery %othery + 16
+menu text stats 195 %othery Veternary
+gosub getGlobalVar STATS CEOONEPETVET STATS total NOLOCK
+if ! #result
+{
+	set %total 0
+	gosub putGlobalVar  STATS CEOONEPETVET STATS total
+
+}
+menu font align right
+menu text stats 315 %othery %total
+menu font align left
+set %othery %othery + 20
+menu font color aqua
+menu font size 8
+menu text stat 210 %othery And don't forget these
+set %othery %othery + 13
+menu font style u
+menu text stat 200 %othery other popular CEO Scripts
+menu font style n
+menu font color white
+set %othery %othery + 13
+menu text stats 170 %othery CEOMedic,
+menu font color olive
+menu text stats 224 %othery CEOSuitBuilder,
+menu font color red
+menu text stats 300 %othery CEOAlerter,
+set %othery %othery + 13
+menu font color $4488bb
+menu text stats 170 %othery CEOBookcopier,
+menu font color gray
+menu text stats 249 %othery CEOLeatherandBones,
+set %othery %othery + 13
+menu font color green
+menu text stats 170 %othery CEOWoolandFeathers,
+menu font color purple
+menu text stats 281 %othery CEORailRunner,
+set %othery %othery + 13
+menu font color maroon
+menu text stats 170 %othery CEOAutoRailWriter,
+menu font color skyblue
+menu text stats 267 %othery CEOAutoTither,
+set %othery %othery + 13
+menu font color white
+menu text stats 170 %othery CEOSnowballFun,
+menu font color lime
+menu text stats 263 %othery AND MANY MORE!!!
+return
+
+sub shardType
+;Shards 0,1,2,3 anything higher we'll assume it has to be EA
+if Alexandria in #shard
+  set %Alexandria #true
+else
+  set %Alexandria #false
+return ( ( Atlantic in #shard || Lake , #spc , Superior in #shard ||  Pacific in #shard
++ || Great , #spc , Lakes in #shard ) || ( #lshard > 3 ) )
+

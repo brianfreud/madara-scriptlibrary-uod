@@ -1,0 +1,21 @@
+// One macro to use Pouch and trap when it is un-trapped
+//
+if findtype 0xe79 'any' 'backpack' 1 1
+if findalias 'PouchOk'
+  useobject! 'found'
+  unsetalias 'PouchOk'
+else
+  @settimer 'timeout' 0
+  cast 'Magic Trap'
+  while not @targetexists 'server'
+  if timer 'timeout' >= 1500 or @injournal 'concentration' 'system'
+    break
+  endif
+  endwhile
+  @clearjournal
+  if targetexists 'server'
+  target! 'found'
+  setalias 'PouchOk' 'found'
+  endif
+endif
+endif

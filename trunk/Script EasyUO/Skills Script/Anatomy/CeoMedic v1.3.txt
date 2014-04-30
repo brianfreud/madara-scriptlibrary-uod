@@ -1,0 +1,2612 @@
+;===================
+; Script Name: CEOMedic
+; Author: CEO
+; Version: 1.31
+; Client Tested with: 4.0.1b 
+; EUO version tested with: 1.4 (005C)
+; Shard OSI / FS: 
+; Revision Date: 02-05-03
+; Public Release:11-01-03
+; Purpose: The complete autohealing solution. See script's thread for details.
+; Script's Thread: http://www.easyuo.com/forum/viewtopic.php?p=13869#13869
+initevents
+CEOMedic:
+set %version 1.31
+;=================================================================
+; Variables that can be set here or overwritten in a specific character setup:
+;=================================================================
+; If your computer is slow or you have a slow connection set this to true
+set %slowconnection #false
+;
+; This tells the program whether to wait if the cursor is a target (due to external commands) or to key escape.
+; #true = wait, #false = send "esc" to client to make target go away
+set %waitothertarget #true
+;
+; This tells the program to look for food (any kind) in opened packs and keep your character fed
+set %keepfed #true
+;
+; This determines whether the script will forget movement based healing and try to heal no matter what if your
+; character HP drops below a certain level (#true), or go into a paused state and allow you to runaway (#false).
+; Once HP goes back above %hptrouble (60% of  max HP) the script will automatically resume.
+set %emergencyheal #true
+;
+; The next four variables tells the script if it should try recalling if in emergency pause mode. 
+; Note: %emergencyheal must be #false in order to go into emergency pause mode, otherwise the script is healing.
+; You must be in pause mode for a minimum of 2 seconds without moving before recalling will kick in 
+; (gives you time to runaway). Recalling by magery takes precedence over chivalry.
+; If either recall option is true the script will find a primary and secondary rune (if available) in your backpack with 
+; either "bank", "britian" or "home" in it's description. "bank" and "britian" must be trammel locations, "home" can be 
+; anywhere. If  rune number one fails (checks if character position is changed) it'll try the next rune. 
+; Afterwards, the script will either pause or hide, depending on your options, regardless if recall succeeded
+; or not. If you know how to find itemtypes you can set %recallrune1 and %recallrune2 to your own choices rather 
+; then having the script check. The itemid can be a rune or runebook. It is up to you to figure out itemids DO NOT
+; PM me or ask how in the script's thread. 
+set %recallbymagery #false
+set %recallbychivalry #false
+set %recallrune1 N/A
+set %recallrune2 N/A
+; The next two variables tells the script if it should try hiding if in emergency pause mode. 
+; Note: %emergencyheal must be #false in order to go into emergency pause mode, otherwise the script is healing.
+; Also if any recall options are setup for emergency mode the script will always try to recall first and then hide. No
+; checking is done if the recall succeeds or fails so you may end up hiding in your current spot or the end of the
+; recalled spot.
+; If both are true it'll try hiding by skill first, then hiding by magery. You must be in pause mode for a minimum of 2
+; seconds without moving before the hiding will kick in (gives you time to runaway).
+set %hidebyskill #false
+set %hidebymagery #false
+; Open the menu window in "full-menu" mode with all the buttons (#true) or minimized (#false).
+set %WindowMax #true
+;
+; defines the position for the full-size window or minized window, change to suit your setup
+set %maxwinPosX 5
+set %maxwinPosY 5
+set %minwinPosX 5
+set %minwinPosY 5
+; 
+; Determine if EasyUO should exit/terminate if the close button of the menu window is pressed.
+set %exitonclose #true
+;
+; Change this to something other then N/A to enable a message over your corpse to aid in finding it. (read the
+; comments about %ripnotify on the website please)
+set %ripnotify N/A
+;
+; Additional Pally spells not in original plan
+;
+set %dispelEvil #false
+set %RemoveCurse #false
+;
+;set %aid_delay 150 ; Might need this for freeshards 
+set %aid_delay ( 6 - ( #dex / 20 )  ) * 10 + 60 ; old test center formula, appears live on normal shards now
+; This one seems to be the current formula now, if heals overlap increment  11 by 1 until they don't
+set %aid_delay ( 11 - #dex / 20 ) * 10
+;
+; OSI shards don't appear to require any time at all between drinking cure pots. Set to #of secs if different for yours.
+set %curebypotsTimer 0
+;
+;Make this value larger to inscrease delay for updating health stats and 
+;checking for petals/food/trinsic rose/stamina pots. May help CPU usage
+; for slow systems. (Default is  to update/check every 2 seconds)
+set %updatetimer_delay 2
+;===== End
+;=================================================================
+set *511 N/A
+set *510 starting
+if #charname = N/A
+{
+	Event Macro 8 2
+	wait 1s
+	if #charname = N/A
+		gosub LoggedOffPause
+}
+set #result #false
+gosub ScriptLoaded
+if #result <> #true
+{
+	display ok STOP! STOP! STOP!$This script is not fully loaded and will not work.$Most likely this is an
++ issue with Windows 98 and EasyUO.$Read the EasyUO forums for ways to solve this problem.$
++I'm sorry. :( CEO
+	halt
+}
+set #lhandid XXX
+set #rhandid XXX
+set %cmd N/A
+set %charid #charid
+set %debug #false
+set %underattack #false
+set %CEOMedicInit #false
+set %eatorangepetals #false
+set %eattrinsicpetals #false
+set %skiprearm #false
+set %starting #true
+set %dispelparam1 40
+set %yellowlevel 66
+set %hptrouble 60
+set %redlevel 33
+set %corspeid N/A
+set %disarm OFF
+set %rhandbow #false
+set %2hands #false
+set %orangepetaltries 0
+set %trinsicpetaltries 0
+set %corpsetype YFM_KNF_JNF
+set %petaltype RFG
+set %orangepetalhue 43
+set %trinsicpetalhue 14
+set %foodtypes QQD_FUD_PRD_HND_YRD_PQD_SQD_AQD_BND_RQD_MLI_FGI_JGI_
+ +NLI_EGI_QLI_KGI_HGI_YLI_RGG_ZBG_WLI_TWI_QRD_XLI_QSD_NRD_ACG_GSD
+set %weapontypes FMH_GFF_EPH_LPH_BPH_CUO_TSF_LPO_JPH_ZTH_MPF_RMH_SOH_TLH_
+ +FUO_WSF_ATF_OMH_XPO_QPO_NMH_WOH_BNF_LTF_VPO_TOH_WTH_VRH_KTF_LMH_
+ +OLH_FFF_ZSF_YTH_BUO_ASF_ISF_BSF_QPF_KPH_CUH_NPO_MPH_UOH_TRH_XRH_CSF_
+ +KPO_POH_RRH_WPO_EMH_MSF_OPO_BUH_GUO_MMH_VTH_BFF_QMH_YSF_NSF_LSF_
+ +GMH_JTF_SRH_CNF_FBG_HNF_ZPF_GBG_OSF_INF_HSF_AUO_ZTO_FSF_WRH_MTF_JPO_
+ +RPF_HFF_XSF_YPO_JSF_DMH_XTH_PPO_QOH_URH_CQF_CFF_PMH_AUH_SPO_CPH_AQF_
+ +MPO_YRH_USF_JOH_KSF_ZRF_PPF
+set %shieldtypes LIK_MIK_CLK_AIK_CIK_LYD_GIK_NIK_ZHK_HLK_BLK_FIK_BIK_OIK
+set %rhandbowtypes TOH_WOH_JSF_USF_LMH_MMH
+set %runetype QWL
+set %healmethod1 pots
+set %healmethod2 chivalry
+set %healmethod3 lesser
+set %healmethod4 greater
+set %healmethod5 spirit
+set %healmethod6 aids
+gosub GetWeaponID
+gosub GetShieldID
+set %filename Med , #charid , #dot , txt
+call %filename
+if !  %CEOMedicInit
+	CALL RKCharacterSetup.txt CEOMedic
+if !  %CEOMedicInit
+	gosub AutoSetup
+if %slowconnection
+{
+	set %lpc 10
+	set %minwait1 10
+	set %wait1 15
+	set %disarmwait1 20
+	set %disarmwait2 45
+}
+else
+{
+	set %lpc 50
+	set %minwait1 5
+	set %wait1 10
+	set %disarmwait1 10
+	set %disarmwait2 35
+}
+if  ( %recallbymagery || %recallbychivalry )
+{
+	gosub CheckRecallRunes
+	if %recallrune1 = N/A
+		gosub FindRecallRunes
+	if %recallrune1 = N/A && %recallrune2 = N/A
+	{
+		set %recallbymagery #false
+		set %recallbychivalry #false
+	}
+}
+init1:
+set %healpot_timer 0
+set %curepot_timer 0
+set %refreshpot_timer 0
+set %aid_timer 0
+set %spell_timer 0
+set %food_timer 0
+set %orangepetal_timer 0
+set %trinsicpetal_timer 0
+set %trinsicpetal_hp 0
+set %updatetimer 0
+set %food_delay 900
+set %orangepetal_delay 305
+set %trinsicpetal_delay 305
+set %pot_delay1 2
+set %pot_delay2 10
+menu hide
+gosub InitMenu
+gosub StatusBarUp
+gosub SetupTimers
+set %starthits #maxhits
+set %startdex #dex
+set %startint #int
+set %lasthits ( #maxhits - %trinsicpetal_hp - 5 )
+set %starting #false
+set %statschanged #false
+set %lasthp 0
+set %lastmana 0
+set %laststamina 0
+linespercycle %lpc
+set #menubutton N/A
+Mainloop:
+wait 2
+if C in #charstatus
+	gosub CurePoison
+gosub CheckForPause
+if %updatetimer < #scnt
+{
+	if %hptrouble < #hits || #charname = N/A
+		gosub UpdateStats
+	wait 1
+	if %eatorangepetals && %orangepetal_timer < #scnt
+		gosub EatOrangePetals
+	if %eattrinsicpetals && %trinsicpetal_timer < #scnt
+		gosub EatTrinsicPetals
+	wait 1
+	if  ( %UseRefreshPots ) && ( #scnt > %refreshpot_timer ) && ( #stamina < %lowstamina )
+		gosub checkstamina
+	wait 1
+	if %keepfed && %food_timer < #scnt && %highpoint < #hits
+		gosub CheckFoodTimer
+	set %updatetimer #scnt + %updatetimer_delay
+}
+wait 2
+if #menubutton <> N/A
+{
+	set *510 #menubutton
+	gosub #menubutton
+	set #menubutton N/A
+}
+if C in #charstatus
+	gosub CurePoison
+set %lastpos #charposx , #charposy
+set %minwaittime %minwait1 + abs ( ( ( ( #hits - (  #maxhits - 10 ) ) > 0 ) * ( #hits -  ( #maxhits - 10 ) ) ) )
+wait %minwaittime
+if C in #charstatus
+	gosub CurePoison
+if %hptrouble < #hits
+	gosub CheckForStatChange
+if #hits < %emergencytrigger
+{
+	if %emergencyheal
+		goto emergency
+	gosub EmergencyPause
+}
+wait 1
+if %lastpos <> #charposx , #charposy
+	goto mainloop1
+if #enemyid <> N/A && #enemyid <> %lastenemyid
+	gosub CheckEnemy
+emergency:
+if #hits < %highpoint
+{
+	menu font color yellow
+	menu delete status
+	menu text status 50 25 Hurt
+	set *510 medic
+	gosub healcheck
+	if  ( %UseRefreshPots ) && ( #scnt > %refreshpot_timer ) && ( #stamina < %lowstamina )
+		gosub checkstamina
+	goto mainloop
+}
+mainloop1:
+wait 1
+if %healtouse6 && ( #hits < %timetoheal6 ) && ( #scnt2 > %aid_timer )
+{
+	set *510 running_aids
+	gosub aids
+	goto mainloop
+}
+if %healtouse1 && ( #hits < %timetoheal1 ) && ( #scnt > %healpot_timer ) && ( C notin #charstatus )
+{
+	set *510 running_pots
+	gosub pots
+}
+wait 1
+if C notin #charstatus && #hits >= %highpoint && %highpoint <> 0
+{
+	if *510 = ok
+		goto mainloop
+	menu font color white
+	menu delete status
+	menu text status 50 25 ok
+	set *510 ok
+	goto mainloop
+}
+if %highpoint = 0
+{
+	menu font bgcolor red
+	menu font color black
+	menu delete status
+	menu text status 50 25 No Healing Methods!
+	menu font bgcolor black
+	set *510 nomethod
+	goto mainloop
+}
+if *510 <> hurt  && #charname <> N/A
+{
+	menu font color yellow
+	menu delete status
+	menu text status 50 25 Hurt
+	set *510 hurt
+}
+goto mainloop
+
+
+sub CheckForStatChange
+gosub StatusBarUp
+if  #maxhits <  %lasthits  && ( #maxhits - %trinsicpetal_hp ) <> %starthits
+{
+	gosub CounterCurse
+}
+if %lasthits <> #maxhits
+{
+	gosub SetupTimers
+}
+set %lasthits ( #maxhits - %trinsicpetal_hp - 5 )
+wait 1
+if #maxhits <> %starthits
+{
+	if ! %statschanged
+	{
+		menu delete Thp
+		menu font bgcolor yellow
+		menu font color black
+		menu text Thp 5 5 HP:
+		menu font bgcolor black
+		set %statschanged #true
+	}
+	return
+}
+if %statschanged
+{
+	set %statschanged #false
+	menu delete Thp
+	menu font bgcolor black
+	menu font color white
+	menu text Thp 5 5 HP:
+}
+return
+
+sub checkstamina
+finditem ZUF C
+if #findkind <> -1
+{
+	set %potid #findid
+CS1:
+	gosub ArmDisarm DISARM
+	menu font color blue
+	menu delete status
+	menu text status 50 25 Drinking Refresh
+	set #lobjectid %potid
+	gosub ResetJournal
+	event macro 17 0
+	wait %wait1
+	gosub FindJournalMessage MUST_HAVE_A_FREE_HAND_TO_DRINK
+	if #result
+	{
+		gosub GetWeaponID
+		gosub GetShieldID
+		gosub DetermineDisarmMethod
+		goto CS1
+	}
+	gosub ArmDisarm ARM
+	set %refreshpot_timer #scnt + %pot_delay1
+	return
+}
+set %UseRefreshPots #false
+return
+
+sub SetupTimers
+set %highpoint 0
+for %i 1 6
+{
+	set %timetoheal . %i  ( ( #maxhits * 10 )  *  %healpoint . %i / 100 ) / 10
+	if ! %healtouse . %i
+		goto SetupTimers1
+	if %timetoheal . %i > %highpoint
+		set %highpoint %timetoheal . %i
+SetupTimers1:
+}
+wait 1
+set %lowstamina   ( ( ( #dex * 10 ) * %staminapoint / 100 ) ) / 10 )
+set %yellowhp   ( ( ( #maxhits * 10 ) * %yellowlevel / 100 ) ) / 10 )
+set %redhp ( ( ( #maxhits * 10 ) * %redlevel / 100 ) ) / 10 )
+set %yellowmana   ( ( ( #int * 10 ) * %yellowlevel / 100 ) ) / 10 )
+set %redmana ( ( ( #int * 10 ) * %redlevel / 100 ) ) / 10 )
+set %yellowstamina   ( ( ( #dex * 10 ) * %yellowlevel / 100 ) ) / 10 )
+set %redstamina ( ( ( #dex * 10 ) * %redlevel / 100 ) ) / 10 )
+set %emergencytrigger %redhp - 10
+if %emergencytrigger < 15
+	set %emergencytrigger 15
+set %hptrouble ( ( ( #maxhits * 10 ) * 60 / 100 ) ) / 10 )
+gosub DisplayHealPoints
+set *512 %highpoint
+return
+
+sub DisplayHealPoints
+menu delete tth1
+menu font size 7
+menu font color yellow
+menu font align right
+menu text tth1 163 68 %timetoheal1
+menu text tth1 163 88 %timetoheal6
+menu text tth1 163 108 %timetoheal3
+menu text tth1 163 128 %timetoheal4
+menu text tth1 163 148 %timetoheal5
+menu text tth1 163 168 %timetoheal2
+menu font size 9
+menu font align left
+return
+
+sub CurePoison
+set *510 poisoned
+menu font size 10
+menu font color lime
+menu delete status
+menu text status 50 25 Poisoned
+wait 5
+if %CurebyPots && #scnt >= %curepot_timer
+	gosub CureByPots
+if C notin #charstatus
+	return
+if %CurebyMagery && #scnt > %spell_timer
+	gosub CurebyMagery
+if C notin #charstatus
+	return
+wait 5
+If %CurebyChivalry && #scnt > %spell_timer
+	gosub CurebyChivalry
+if C notin #charstatus
+	return
+if %CurebyAids && #scnt2 > %aid_timer
+{
+	gosub WaitOtherTarget
+	gosub aids
+}
+return
+
+sub CureByPots
+if C notin #charstatus
+	return
+finditem nuf c
+if #findkind <> -1
+{
+	set %potid #findid
+CBP1:
+	set %skiprearm #false
+	gosub ArmDisarm DISARM
+	menu font color blue
+	menu delete status
+	menu text status 50 25 Drinking Cure Pot
+	set #lobjectid %potid
+	gosub ResetJournal
+	event macro 17 0
+	wait %wait1
+	gosub FindJournalMessage MUST_HAVE_A_FREE_HAND_TO_DRINK
+	if #result
+	{
+		if ( ! %curebymagery ) && ( ! %curebychivalry )
+		{
+			gosub GetWeaponID
+			gosub GetShieldID
+			gosub DetermineDisarmMethod
+			goto CBP1
+		}
+		set %curepot_timer #scnt + %curebypotsTimer
+		return
+	}
+	set %curepot_timer #scnt + %curebypotsTimer
+	gosub ArmDisarm ARM
+	return
+}
+menu font color red
+menu delete status
+menu text status 50 25 Out of Cure Pots!
+wait 5
+set %CurebyPots #false
+menu button ToggleCurePots 250 45 30 20 Off
+return
+
+sub CurebyMagery
+gosub WaitOtherTarget
+menu delete status
+menu text status 50 25 Cure by Magery
+gosub CastMagery1 15 10
+if ! #result
+	return
+target 4s
+gosub ResetJournal
+event macro 23 0
+wait %wait1
+gosub FindJournalMessage MORE_REAGENTS_ARE_NEEDED
+if #result
+{
+	set %CurebyMagery #false
+	menu button ToggleCurebyMagery 250 65 30 20 Off
+	return
+}
+set %spell_timer #scnt + 2
+return
+
+sub CurebyChivalry
+gosub WaitOtherTarget
+menu delete status
+menu text status 50 25 Cure by Chivalry
+gosub CastChivalry 15 201
+if #result = TE
+{
+	set %CurebyChivalry #false
+	menu button ToggleCurebyChivalry 250 85 30 20 Off
+	return
+}
+if ! #result
+	return
+target 4s
+event macro 23 0
+wait 5
+set %spell_timer #scnt + 2
+return
+
+sub healcheck
+set %tth 999
+set %healmethod none
+;pause
+set %poisoned #false
+if C in #charstatus
+	goto hc5
+if  ( #scnt < %healpot_timer  || ! %healtouse1 )
+	goto hc2
+if %timetoheal2 < %tth && %timetoheal1 > #hits
+{
+	set %tth %timetoheal1
+	set %healmethod %healmethod1
+}
+hc2:
+if ( #scnt < %spell_timer )
+	goto hc6
+if ( #mana < 10 || ! %healtouse2 )
+	goto hc3
+if %timetoheal2 < %tth && %timetoheal2 > #hits
+{
+	set %tth %timetoheal2
+	set %healmethod %healmethod2
+}
+hc3:
+wait 1
+if ( #mana < 4 || ! %healtouse3 )
+	goto hc4
+if %timetoheal3 < %tth && %timetoheal3 > #hits
+{
+	set %tth %timetoheal3
+	set %healmethod %healmethod3
+}
+hc4:
+if ( #mana < 11 || ! %healtouse4 )
+	goto hc5
+if %timetoheal4 < %tth && %timetoheal4 > #hits
+{
+	set %tth %timetoheal4
+	set %healmethod %healmethod4
+}
+hc5:
+if ( #mana < 10 || ! %healtouse5 )
+	goto hc6
+if %timetoheal5 < %tth && %timetoheal5 > #hits
+{
+	set %tth %timetoheal5
+	set %healmethod %healmethod5
+}
+
+hc6:
+wait 1
+if ( #scnt2 < %aid_timer || ! %healtouse6 )
+	goto hcdone
+if %timetoheal6 < %tth && %timetoheal6 > #hits
+{
+	set %tth %timetoheal6
+	set %healmethod %healmethod6
+}
+hcdone:
+if %healtouse5 && ( %healmethod = %healmethod2 || %healmethod = %healmethod3 || %healmethod = %healmethod4 )
+{
+	finditem YFM_KNF_JNF G_3
+	wait 1
+	if #findkind <> -1
+	{
+		set %healmethod %healmethod5
+		set %corspeid #findid
+	}
+}
+if %healmethod = none
+	return
+set *510 %healmethod
+gosub %healmethod
+return
+
+sub lesser
+gosub WaitOtherTarget
+menu font color yellow
+menu delete status
+menu text status 50 25 Healing(Lesser Heal)
+gosub CastMagery1 15 3
+if ! #result
+	return
+target 4s
+if C in #charstatus
+{
+	key esc
+	return
+}
+gosub ResetJournal
+event macro 23 0
+wait %wait1
+gosub FindJournalMessage MORE_REAGENTS_ARE_NEEDED
+if #result
+{
+	if %healtouse3
+		gosub Toggle ToggleLesser 3 3
+	if %healtouse4
+		gosub Toggle ToggleGreater 4 4
+	return
+}
+set %spell_timer #scnt + 2
+return
+
+sub greater
+gosub WaitOtherTarget
+menu font color yellow
+menu delete status
+menu text status 50 25 Healing(Greater Heal)
+gosub ResetJournal
+gosub CastMagery1 15 28
+if ! #result
+	return
+target 4s
+if C in #charstatus
+{
+	key esc
+	return
+}
+gosub ResetJournal
+event macro 23 0
+wait %wait1
+gosub FindJournalMessage MORE_REAGENTS_ARE_NEEDED
+if #result
+{
+	if %healtouse4
+		gosub Toggle ToggleGreater 4 4
+	return
+}
+set %spell_timer #scnt + 2
+return
+
+sub chivalry
+gosub WaitOtherTarget
+menu font color yellow
+menu delete status
+menu text status 50 25 Healing(Chivalry)
+gosub CastChivalry 15 202
+if #result = TE
+{
+	if %healtouse2
+		gosub Toggle ToggleChivalry 2 6
+	return
+}
+if ! #result
+	return
+target 4s
+if C in #charstatus
+{
+	key esc
+	return
+}
+event macro 23 0
+set %spell_timer #scnt + 2
+return
+
+sub aids
+finditem ZLF C
+if #findkind <> -1
+{
+	gosub WaitOtherTarget
+	menu font color yellow
+	menu delete status
+	menu text status 50 25 Healing(Aids)
+	set #lobjectid #findid
+	gosub resetjournal
+	event macro 17 0
+	target 4s
+	event macro 23 0
+	wait %wait1
+	gosub FindJournalMessage YOU_MUST_WAIT
+	if #result
+		return
+;uncomment out the below line to set the timer based on current stamina.
+;This is pretty much only for freeshards that calculate the delay like this.
+;	set %aid_delay ( 6 - ( #STAMINA / 20 )  ) * 10 + 60 
+	set %aid_timer #scnt2 + %aid_delay
+	return
+}
+if %healtouse6
+	gosub Toggle ToggleAids 6 2
+return
+
+sub spirit
+menu font color yellow
+menu delete status
+menu text status 50 25 Healing(Spirit Speak)
+gosub ResetJournal
+set %currentmana #mana
+event macro 13 32
+wait %wait1
+gosub FindJournalMessage YOU_MUST_WAIT DISTURBED CANNOT_CAST
+if #result
+{
+	set %spell_timer #scnt + 3
+	menu font color red
+	menu delete status
+	menu text status 50 25 Busy
+	wait %wait1
+	return
+}
+if %corspeid <> N/A
+{
+	ignoreitem %corspeid
+	set %corspeid N/A
+	set %spell_timer #scnt + 3
+	return
+}
+set %spell_timer #scnt + 3
+return
+
+sub pots
+finditem UUF C
+if #findkind <> -1
+{
+	set %potid #findid
+P1:
+	set %skiprearm #false
+	gosub ArmDisarm DISARM
+	if C in #charstatus
+		gosub CurePoison
+	menu font color blue
+	menu delete status
+	menu text status 50 25 Drinking Heal Pot
+	set #lobjectid %potid
+	gosub ResetJournal
+	event macro 17 0
+	wait %wait1
+	gosub FindJournalMessage MUST_HAVE_A_FREE_HAND_TO_DRINK
+	if #result
+	{
+		gosub GetWeaponID
+		gosub GetShieldID
+		gosub DetermineDisarmMethod
+		goto P1
+	}
+	set %healpot_timer #scnt + %pot_delay2
+	gosub ArmDisarm ARM
+	return
+}
+menu font color red
+menu delete status
+menu text status 50 25 Out of Heal Pots!
+wait 5
+if %healtouse1
+	gosub Toggle TogglePotHeal 1 1
+return
+
+sub CounterCurse
+if %CounterwithPots
+{
+	gosub DrinkStrengthPot
+	if ! #result && %bless && #mana > 8
+		gosub bless
+	return
+}
+if %bless && #mana > 8
+	gosub bless
+if %RemoveCurse && #mana > 20
+	gosub RemoveCurse
+return
+
+sub bless
+set *510 Bless
+gosub WaitOtherTarget
+gosub ResetJournal
+menu font color yellow
+menu delete status
+menu text status 50 25 Blessing
+gosub CastMagery1 15 16
+if ! #result
+	return
+gosub CastMagery2
+if ! #result
+{
+	set %bless #false
+	menu button ToggleBless 250 170 30 20 Off
+	return
+}
+gosub SetupTimers
+set %spell_timer #scnt + 2
+return
+
+sub Dispel
+set *510 Dispel
+gosub WaitOtherTarget
+menu font color yellow
+menu delete status
+menu text status 50 25 Dispel Summons
+gosub CastMagery1 15 %dispelparam1
+if ! #result
+	return
+target 4s
+if %enemyid = N/A
+	return
+set #ltargetkind 1
+if %dispelparam1 = 53
+	set #ltargetkind 2
+set #ltargetid %enemyid
+gosub ResetJournal
+Event macro 22
+wait %wait1
+gosub FindJournalMessage MORE_REAGENTS_ARE_NEEDED
+if #result
+{
+	set %dispel #false
+	set %massdispel #false
+	menu button ToggleBless 250 170 30 20 Off
+	return
+}
+set %spell_timer #scnt + 2
+set %enemyid N/A
+return
+
+sub dispelEvil
+set *510 DispelEvil
+gosub WaitOtherTarget
+menu font color yellow
+menu delete status
+menu text status 50 25 Dispel Evil
+gosub CastChivalry 15 204
+if #result = TE
+{
+	set %dispelEvil #false
+	return
+}
+if ! #result
+	return
+set %spell_timer #scnt + 2
+return
+
+sub RemoveCurse
+set *510 RemoveCurse
+gosub WaitOtherTarget
+menu font color yellow
+menu delete status
+menu text status 50 25 Remove Curse
+gosub CastChivalry 15 209
+if #result = TE
+{
+	set %removecurse #false
+	return
+}
+if ! #result
+	return
+target 4s
+if C in #charstatus
+{
+	key esc
+	return
+}
+event macro 23 0
+set %spell_timer #scnt + 2
+return
+
+sub hidebymagery
+set *510 HidebyMagery
+gosub WaitOtherTarget
+menu font color yellow
+menu delete status
+menu text status 50 25 Casting Invisibility
+gosub CastMagery1 15 43
+if ! #result
+	return
+gosub CastMagery2
+if ! #result
+	set %hidebymagery #false
+set %spell_timer #scnt + 2
+return
+
+sub CastMagery1
+set %_1 %1
+set %_2 %2
+gosub ResetJournal
+event macro %_1 %_2
+wait %wait1
+gosub FindJournalMessage YOU_MUST_WAIT ALREADY_CASTING_A_SPELL HAVE_NOT_YET CANNOT_CAST
+if #result
+{
+	set %spell_timer #scnt + 1
+	menu font color red
+	menu delete status
+	menu text status 50 25 Busy
+	wait %wait1
+	return #false
+}
+return #true
+
+sub CastMagery2
+target 4s
+gosub ResetJournal
+event macro 23 0
+wait %wait1
+gosub FindJournalMessage MORE_REAGENTS_ARE_NEEDED
+if #result
+	return #false
+return #true
+
+sub CastChivalry
+set %_1 %1
+set %_2 %2
+gosub ResetJournal
+event macro %_1 %_2
+wait %wait1
+gosub FindJournalMessage ALREADY_CASTING_A_SPELL HAVE_NOT_YET CANNOT_USE YOU_MUST_HAVE_AT_LEAST
+if #result
+{
+	if YOU_MUST_HAVE_AT_LEAST in #journal
+	{
+		return TE
+	}
+	set %spell_timer #scnt + 1
+	menu font color red
+	menu delete status
+	menu text status 50 25 Busy
+	wait %wait1
+	return #false
+}
+return #true
+
+
+sub hidebyskill
+set *510 HidebySkill
+menu font color yellow
+menu delete status
+menu text status 50 25 Attempting to hide
+event macro 13 21
+wait %wait1
+return
+
+sub DrinkStrengthPot
+set *510 DrinkStrength
+finditem XUF C
+if #findkind <> -1
+{
+	set %potid #findid
+DSP1:
+	set %skiprearm #false
+	gosub ArmDisarm DISARM
+	menu font color blue
+	menu delete status
+	menu text status 50 25 Drinking Strength Pot
+	set #lobjectid %potid
+	gosub ResetJournal
+	event macro 17 0
+	wait %wait1
+	gosub FindJournalMessage MUST_HAVE_A_FREE_HAND_TO_DRINK
+	if #result
+	{
+		gosub GetWeaponID
+		gosub GetShieldID
+		gosub DetermineDisarmMethod
+		goto DSP1
+	}
+	if %agilitypots
+		gosub DrinkAgilityPot
+	gosub ArmDisarm ARM
+	set %refreshpot_timer #scnt + %pot_delay1
+	return #true
+}
+set %CounterwithPots #false
+menu button ToggleCounterwithPots 250 150 30 20 Off
+return #false
+
+sub DrinkAgilityPot
+set *510 DrinkAgility
+finditem YUF C
+if #findkind <> -1
+{
+	set %potid #findid
+	menu font color blue
+	menu delete status
+	menu text status 50 25 Drinking Agility Pot
+	set #lobjectid %potid
+	wait 20
+	event macro 17 0
+	wait %wait1
+	set %refreshpot_timer #scnt + %pot_delay1
+	return #true
+}
+set %agilitypots #false
+return
+
+sub StatusBarUp
+set %attempts 0
+StatusBarUp1:
+set %attempts %attempts + 1
+if %attempts > 5
+{
+	gosub LoggedOffPause
+	set %attempts 0
+}
+IF #charname = N/A
+{
+	Event Macro 8 2
+	wait %wait1
+	goto StatusBarUp1
+}
+return
+
+sub ToggleWindowSize
+if %windowmax
+	set %windowmax #false
+else
+	set %windowmax #true
+gosub InitMenu
+set #menubutton N/A
+return
+
+
+sub InitMenu
+set *510 InitMenu
+menu clear
+;set %windowmax #true
+if %WindowMax
+	menu window size 290 245
+else
+	menu window size 310 45
+menu window title CEOMedic %version ( , #charname , )
+menu window color black
+menu font color white
+menu font bgcolor black
+menu font size 9
+menu font style n
+menu text Thp 5 5 HP:
+menu text Tmana 80 5 Mana:
+menu text Tstamina 166 5 Stamina:
+set %lasthp 0
+set %lastmana 0
+set %laststamina 0
+gosub UpdateStats
+menu font color white
+menu font style b
+menu text Tstatus 5 25 Status:
+if ! %windowmax
+	goto Initmenu1
+menu font color red
+menu font style bu
+menu text title1 10 45 Healing Methods
+menu text title1 185 25 Cure Methods
+menu text title1 177 130 Counter Methods
+menu font style n
+menu font size 7
+menu font color white
+menu text title2 121 40 Heal @
+menu font size 7
+menu text title2 115 51 (% of HP)
+menu font size 9
+menu font bgcolor grey
+menu button pots 10 65 80 20 Potion
+if %healtouse1
+	menu button TogglePotHeal 90 65 30 20 On
+else
+	menu button TogglePotHeal 90 65 30 20 Off
+menu button aids 10 85 80 20 Aids
+if %healtouse6
+	menu button ToggleAids 90 85 30 20 On
+else
+	menu button ToggleAids 90 85 30 20 Off
+menu button lesser 10 105 80 20 Lesser Heal
+if %healtouse3
+	menu button ToggleLesser 90 105 30 20 On
+else
+	menu button ToggleLesser 90 105 30 20 Off
+menu button greater 10 125 80 20 Greater Heal
+if %healtouse4
+	menu button ToggleGreater 90 125 30 20 On
+else
+	menu button ToggleGreater 90 125 30 20 Off
+menu button spirit 10 145 80 20 Spirit Speak
+if %healtouse5
+	menu button ToggleSpirit 90 145 30 20 On
+else
+	menu button ToggleSpirit 90 145 30 20 Off
+menu button chivalry 10 165 80 20 Chivalry
+if %healtouse2
+	menu button ToggleChivalry 90 165 30 20 On
+else
+	menu button ToggleChivalry 90 165 30 20 Off
+menu button CurebyPots 170 45 80 20 Potion
+if %CurebyPots
+	menu button ToggleCurePots 250 45 30 20 On
+else
+	menu button ToggleCurePots 250 45 30 20 Off
+menu button CurebyMagery 170 65 80 20 Magery
+if %CurebyMagery
+	menu button ToggleCurebyMagery 250 65 30 20 On
+else
+	menu button ToggleCurebyMagery 250 65 30 20 Off
+menu button CurebyChivalry 170 85 80 20 Chivalry
+if %CurebyChivalry
+	menu button ToggleCurebyChivalry 250 85 30 20 On
+else
+	menu button ToggleCurebyChivalry 250 85 30 20 Off
+menu button aids 170 105 80 20 Aids
+if %CurebyAids
+	menu button ToggleCurebyAids 250 105 30 20 On
+else
+	menu button ToggleCurebyAids 250 105 30 20 Off
+menu button DrinkStrengthPot 170 150 80 20 Potions
+if %CounterwithPots
+	menu button ToggleCounterwithPots 250 150 30 20 On
+else
+	menu button ToggleCounterwithPots 250 150 30 20 Off
+menu button Bless 170 170 80 20 Bless
+if %bless
+	menu button ToggleBless 250 170 30 20 On
+else
+	menu button ToggleBless 250 170 30 20 Off
+menu button Dispel 170 190 80 20 Dispel
+if %dispel
+	menu button ToggleDispel 250 190 30 20 On
+else
+	menu button ToggleDispel 250 190 30 20 Off
+menu font size 7
+menu font bgcolor black
+menu font color white
+menu edit hp1 125 65 25 %healpoint1
+menu edit hp6 125 85 25 %healpoint6
+menu edit hp3 125 105 25 %healpoint3
+menu edit hp4 125 125 25 %healpoint4
+menu edit hp5 125 145 25 %healpoint5
+menu edit hp2 125 165 25 %healpoint2
+gosub DisplayHealPoints
+menu font size 8
+menu button UpdateHealPoints 125 187 30 20 Upd
+menu font color red
+menu font size 9
+menu font bgcolor grey
+gosub DisplayDisarmButton
+menu font bgcolor black
+Initmenu1:
+menu font size 9
+menu font style n
+if %windowmax
+{
+	menu button doPause 5 220 55 20 Pause
+	menu button ToggleWindowSize 265 5 20 15 M
+	menu font bgcolor $0044ff
+	menu font size 8
+	if %eatorangepetals
+	{
+		menu font color white
+		menu button ToggleOrangePetal 70 220 45 20 OP:ON
+	}
+	else
+	{
+		menu font color black
+		menu button ToggleOrangePetal 70 220 45 20 OP:OFF
+	}
+	menu font bgcolor $770077
+	if %eattrinsicpetals
+	{
+		menu font color white
+		menu button ToggleTrinsicPetal 120 220 45 20 TP:ON
+	}
+	else
+	{
+		menu font color black
+		menu button ToggleTrinsicPetal 120 220 45 20 TP:OFF
+	}
+	menu font bgcolor black
+	menu font size 9
+	menu font color white
+}
+else
+{
+	menu font size 8
+	menu font bgcolor black
+	menu button doPause 200 22 55 20 Pause
+	menu button ToggleWindowSize 285 5 20 15 M
+	menu font bgcolor $0044ff
+	menu font color black
+	if %eatorangepetals
+		menu font color white
+	menu button ToggleOrangePetal 285 25 20 15 OP
+	menu font bgcolor black
+	menu font bgcolor $770077
+	menu font color black
+	if %eattrinsicpetals
+		menu font color white
+	menu button ToggleTrinsicPetal 260 25 20 15 TP
+	menu font bgcolor black
+	menu font color white
+	menu font size 9
+}
+if *511 = pause
+{
+	if %windowmax
+	{
+		menu font bgcolor black
+		menu button SaveSetup 15 195 50 20 Save
+		menu button PositionWindow 65 195 50 20 PosWin
+		menu button resume 5 220 55 20 Resume
+	}
+	if ! %windowmax
+		menu button resume 200 22 55 20 Resume
+	menu font bgcolor black
+}
+menu font color red
+menu font stlye n
+menu font size 9
+set #menubutton N/A
+if %windowmax
+   menu show %maxwinPosX %maxwinPosY
+else
+   menu show %minwinPosX %minwinPosY
+if ! %debug
+	menu hideeuo
+wait 5
+if %windowmax
+   menu show %maxwinPosX %maxwinPosY
+else
+   menu show %minwinPosX %minwinPosY
+wait 5
+;halt
+return
+
+sub UpdateStats
+gosub StatusBarUp
+gosub UpdateStatusTitle
+menu font size 9
+menu font style n
+US1:
+wait 1
+if %lasthp = #hits
+	goto US2
+menu font color lime
+if C in #charstatus
+	menu font bgcolor green
+if #hits < %yellowhp
+	menu font color yellow
+if #hits < %redhp
+	menu font color red
+menu delete hp
+menu text hp 28 5 #hits , / , #maxhits
+set %lasthp #hits
+
+US2:
+wait 1
+menu font bgcolor black
+if %lastmana = #mana
+	goto US3
+menu font color lime
+if #mana < %yellowmana
+	menu font color yellow
+if #mana < %redmana
+	menu font color red
+menu delete mana
+menu text mana 115 5 #mana , / , #MAXMANA
+set %lastmana #mana
+
+US3:
+wait 1
+if %laststamina = #stamina
+	return
+menu font color lime
+if #stamina < %yellowstamina
+	menu font color yellow
+if #stamina < %redstamina
+	menu font color red
+menu delete stamina
+menu text stamina 219 5 #stamina , / , #MAXSTAM
+set %laststamina #stamina
+return
+
+sub UpdateStatusTitle
+if #enemyid <> N/A && ! %underattack
+{
+	set %underattack #true
+	menu font color red
+	menu font style b
+	menu delete Tstatus
+	menu text Tstatus 5 25 Status:
+	menu font style n
+	return
+}
+wait 1
+if #enemyid = N/A && %underattack
+{
+	set %underattack #false
+	menu font color white
+	menu font style b
+	menu delete Tstatus
+	menu text Tstatus 5 25 Status:
+	menu font style n
+}
+return
+
+sub UpdateHealPoints
+menu getnum hp1
+set %healpoint1 #MenuRes
+menu getnum hp2
+set %healpoint2 #MenuRes
+menu getnum hp3
+set %healpoint3 #MenuRes
+menu getnum hp4
+set %healpoint4 #MenuRes
+menu getnum hp5
+set %healpoint5 #MenuRes
+menu getnum hp6
+set %healpoint6 #MenuRes
+set %highpoint 0
+gosub SetupTimers
+set #menubutton N/A
+return
+
+sub TogglePotHeal
+gosub Toggle #menubutton 1 1
+return
+
+sub ToggleChivalry
+gosub Toggle #menubutton 2 6
+return
+
+sub ToggleLesser
+gosub Toggle #menubutton 3 3
+return
+
+sub ToggleGreater
+gosub Toggle #menubutton 4 4
+return
+
+sub ToggleSpirit
+gosub Toggle #menubutton 5 5
+return
+
+sub ToggleAids
+gosub Toggle #menubutton 6 2
+return
+
+sub Toggle
+set #menubutton N/A
+set %_1 %1
+set %_2 %2
+set %x 45 + ( %3 * 20 )
+if %healtouse . %_2
+{
+	set %healtouse . %_2 #false
+	menu button %_1 90 %x 30 20 Off
+	gosub SetupTimers
+	return
+}
+set %healtouse . %_2 #true
+menu button %_1 90 %x 30 20 On
+gosub SetupTimers
+return
+
+sub ToggleCurePots
+if %CurebyPots
+{
+	set %CurebyPots #false
+	menu button ToggleCurePots 250 45 30 20 Off
+	return
+}
+set %CurebyPots #true
+menu button ToggleCurePots 250 45 30 20 On
+return
+
+sub ToggleCurebyMagery
+if %CurebyMagery
+{
+	set %CurebyMagery #false
+	menu button ToggleCurebyMagery 250 65 30 20 Off
+	return
+}
+set %CurebyMagery #true
+menu button ToggleCurebyMagery 250 65 30 20 On
+return
+
+sub ToggleCurebyChivalry
+if %CurebyChivalry
+{
+	set %CurebyChivalry #false
+	menu button ToggleCurebyChivalry 250 85 30 20 Off
+	return
+}
+set %CurebyChivalry #true
+menu button ToggleCurebyChivalry 250 85 30 20 On
+return
+
+sub ToggleCurebyAids
+if %CurebyAids
+{
+	set %CurebyAids #false
+	menu button ToggleCurebyAids 250 105 30 20 Off
+	return
+}
+set %CurebyAids #true
+menu button ToggleCurebyAids 250 105 30 20 On
+return
+
+
+sub ToggleCounterwithPots
+if %CounterwithPots
+{
+	set %CounterwithPots #false
+	menu button ToggleCounterwithPots 250 150 30 20 Off
+	return
+}
+set %CounterwithPots #true
+menu button ToggleCounterwithPots 250 150 30 20 On
+return
+
+sub ToggleBless
+if %bless
+{
+	set %bless #false
+	menu button ToggleBless 250 170 30 20 Off
+	return
+}
+set %bless #true
+menu button ToggleBless 250 170 30 20 On
+return
+
+sub ToggleDispel
+if %dispel
+{
+	set %dispel #false
+	menu button ToggleDispel 250 190 30 20 Off
+	return
+}
+set %dispel #true
+menu button ToggleDispel 250 190 30 20 On
+return
+
+sub ToggleDisarm
+if %disarm = OFF
+{
+	set %disarm WEAPON
+	gosub GetWeaponID
+	gosub GetShieldID
+	if %weaponid <> N/A
+	{
+		set %disarmid %weaponid
+	}
+	menu button ToggleDisarm 170 220 110 20 Disarm: Weapon
+	return
+}
+if %disarm = WEAPON
+{
+	set %disarm SHIELD
+	gosub GetWeaponID
+	gosub GetShieldID
+	if %shieldid <> N/A
+	{
+		set %disarmid %shieldid
+	}
+	menu button ToggleDisarm 170 220 110 20 Disarm: Shield
+	return
+}
+if %disarm = SHIELD
+{
+	set %disarm OFF
+	menu button ToggleDisarm 170 220 110 20 Disarm: Off
+}
+return
+
+sub DisplayDisarmButton
+if %disarm = OFF
+	menu button ToggleDisarm 170 220 110 20 Disarm: OFF
+if %disarm = WEAPON
+	menu button ToggleDisarm 170 220 110 20 Disarm: Weapon
+if %disarm = SHIELD
+	menu button ToggleDisarm 170 220 110 20 Disarm: Shield
+return
+
+sub CheckForPause
+if *511 = pause
+	gosub DoPause
+if H in #charstatus
+	gosub HidingPause
+if #charghost = YES
+	gosub GhostPause
+return
+
+sub HidingPause
+menu font color fuchsia
+menu delete status
+menu text status 50 25 Paused(Hidden)
+set *510 hiding
+hiding1:
+wait %wait1
+if #menubutton <> N/A
+{
+	gosub #menubutton
+	set #menubutton N/A
+}
+if H in #charstatus
+	goto hiding1
+return
+
+sub EmergencyPause
+if C in #charstatus
+	gosub CurePoison
+set %hideonce #false
+menu font color fuchsia
+menu delete status
+menu text status 50 25 Paused(Emergency)
+set *510 emergency
+if  ( %recallbymagery || %recallbychivalry ) && %recallrune1 <> N/A
+	gosub EmergencyRecall
+if %hidebyskill || %hidebymagery
+	goto Emer2
+Emer1:
+wait %wait1
+if #menubutton <> N/A && #menubutton <> DoPause
+{
+	if #menubutton = resume
+		goto Emer3
+	gosub #menubutton
+	set #menubutton N/A
+	goto Emer1
+}
+if #charghost = YES
+{
+	gosub GhostPause
+	menu font color fuchsia
+	menu delete status
+	menu text status 50 25 Paused(Emergency)
+	goto Emer1
+}
+if #hits < %hptrouble
+	goto Emer1
+return
+Emer2:
+set %lastpos #charposx , #charposy
+wait 2s
+if #menubutton <> N/A && #menubutton <> DoPause
+{
+	gosub #menubutton
+	set #menubutton N/A
+	goto Emer2
+}
+if #charghost = YES
+{
+	gosub GhostPause
+	menu font color fuchsia
+	menu delete status
+	menu text status 50 25 Paused(Emergency)
+	goto Emer2
+}
+if %lastpos <> #charposx , #charposy
+	goto Emer2
+if ! %hideonce
+{
+	gosub HideMe
+	set %hideonce #true
+}
+if H in #charstatus
+{
+	gosub HidingPause
+	menu font color fuchsia
+	menu delete status
+	menu text status 50 25 Paused(Emergency)
+	goto Emer1
+}
+if #hits < %hptrouble
+	goto Emer2
+Emer3:
+set #menubutton N/A
+return
+
+sub GhostPause
+menu font color fuchsia
+menu delete status
+menu text status 50 25 Paused(Dead!)
+set *510 dead
+set %mybodyid N/A
+set %riptimer 0
+wait 4s
+gosub StatusBarUp
+wait %wait1
+Findbody1:
+finditem %corpsetype G
+if #findkind <> -1
+{
+	event property #findid
+	wait %wait1
+	if #charname in #property && ( corpse in #property || remains in #property )
+	{
+		set %mybodyid #findid
+		if %ripnotify <> N/A
+			event ExMsg #findid 0 33 %ripnotify
+		set %riptimer #scnt + 6
+		goto GhostPause1
+	}
+	ignoreitem #findid
+	goto Findbody1
+}
+GhostPause1:
+if %riptimer < #scnt && %mybodyid <> N/A
+{
+	if %ripnotify <> N/A
+		event ExMsg %mybodyid 0 33 %ripnotify
+	set %riptimer #scnt + 6
+}
+wait %wait1
+if #charghost = YES
+	goto GhostPause1
+event macro 8 7
+wait %wait1
+if %hidebyskill
+	gosub hidebyskill
+gosub FindBodyPause
+return
+
+sub FindBodyPause
+menu font color fuchsia
+menu delete status
+menu text status 50 25 Paused(Go to Corspe!)
+set *510 ressurected
+menu delete DoPause
+if %windowmax
+{
+	menu button resume 5 220 55 20 Resume
+	goto FindBodyPause1
+}
+menu button resume 200 22 55 20 Resume
+if %mybodyid <> N/A
+	goto FindBodyPause2
+FindBodyPause1:
+wait %wait1
+finditem %corpsetype G
+if #findkind <> -1
+{
+	event property #findid
+	wait %wait1
+	if #charname in #property && corpse in #property
+	{
+		set %mybodyid #findid
+		goto FindBodyPause2
+	}
+	ignoreitem #findid
+}
+if #menubutton = resume
+	goto FindbodyPause3
+goto FindBodyPause1
+FindBodyPause2:
+wait %wait1
+if %riptimer < #scnt
+{
+	if %ripnotify <> N/A
+		event ExMsg %mybodyid 0 33 %ripnotify
+	set %riptimer #scnt + 6
+}
+finditem %mybodyid
+if #findkind <> -1
+{
+	if #finddist < 3
+	{
+		set #lobjectid %mybodyid
+   		event macro 17
+		menu delete status
+		menu text status 50 25 Paused(Body Looted!)
+		wait 1s
+		goto FindBodyPause3
+	}
+}
+if #menubutton = resume
+	goto FindbodyPause3
+goto FindBodyPause2
+FindBodyPause3:
+set #menubutton N/A
+menu delete resume
+set *511 N/A
+if %windowmax
+{
+	menu button DoPause 5 220 55 20 Pause
+	return
+}
+menu button DoPause 200 22 55 20 Pause
+return
+
+sub LoggedOffPause
+menu font color fuchsia
+menu delete status
+menu text status 50 25 Paused(Logged Off)
+set *510 logged
+LoggedOffPause1:
+wait %wait1
+if #contname = MainMenu_gump || #contname = normal_gump || #contname = login_gump
+	goto LoggedOffPause1
+if #charname = N/A
+{
+	Event Macro 8 2
+	wait %wait1
+	goto LoggedOffPause1
+}
+menu font color fuchsia
+menu delete status
+if ! %starting && ( %charid <> #charid )
+{
+	menu font color red
+	menu delete status
+	menu text status 50 25 Restarting Script:
+	gosub wait8 147
+	exit
+}
+menu font color yellow
+menu delete status
+menu text status 50 25 Login in progress:
+gosub wait8 155
+return
+
+sub wait8
+set %countdown 8
+wait8loop:
+wait 1s
+menu delete countdown
+menu text countdown %1 25 %countdown
+set %countdown %countdown - 1
+if %countdown > 0
+	goto wait8loop
+wait 1s
+menu delete countdown
+return
+
+sub DoPause
+set *510 paused
+if *511 = pause
+{
+	menu font color fuchsia
+	menu delete status
+	menu text status 50 25 Paused(*511)
+	goto DoPause1
+}
+menu font color fuchsia
+menu delete status
+menu text status 50 25 Paused
+set *511 pause
+set #menubutton N/A
+DoPause1:
+menu delete DoPause
+if %windowmax
+{
+	menu button SaveSetup 15 195 50 20 Save
+	menu button PositionWindow 65 195 50 20 PosWin
+	menu button resume 5 220 55 20 Resume
+	goto DoPause2
+}
+menu button resume 200 22 55 20 Resume
+
+DoPause2:
+wait %wait1
+if #menubutton <> N/A && #menubutton <> resume
+{
+	gosub #menubutton
+	set #menubutton N/A
+	menu font color fuchsia
+	menu delete status
+	menu text status 50 25 Paused
+}
+if #menubutton <> resume && *511 <> resume
+		goto DoPause2
+set #menubutton N/A
+menu delete resume
+if %windowmax
+{
+	menu delete SaveSetup
+	menu delete PositionWindow
+	menu button DoPause 5 220 55 20 Pause
+	goto DoPause3
+}
+menu button DoPause 200 22 55 20 Pause
+DoPause3:
+set *511 N/A
+return
+
+sub DetermineDisarmMethod
+set %disarm OFF
+set %disarmid N/A
+if %weaponid = N/A && %shieldid = N/A
+{
+	gosub DisplayDisarmButton
+	return
+}
+if %weaponid <> N/A && %2hands
+{
+	set %disarmid %weaponid
+	set %disarm WEAPON
+	gosub DisplayDisarmButton
+	return
+}
+if ( %weaponid <> N/A && %shieldid = N/A ) || ( %shieldid <> N/A && %weaponid = N/A )
+{
+	gosub DisplayDisarmButton
+	return
+}
+gosub WeaponorShield
+gosub DisplayDisarmButton
+return
+
+sub GetWeaponID
+set %weaponid N/A
+set %2hands #false
+set %rhandbow #false
+finditem %weapontypes C_ , #charid
+wait 5
+if #findkind <> -1
+{
+	set %weaponid #findid
+	event property %weaponid
+	if two-handed in #property
+	{
+		set %2hands #true
+		set #lhandid %weaponid
+		set #rhandid %weaponid
+		if #findtype in %rhandbowtypes
+			set %rhandbow #true
+		return
+	}
+	set #rhandid %weaponid
+}
+return
+
+sub GetShieldID
+if %2hands
+	return
+set %shieldid N/A
+finditem %shieldtypes C_ , #charid
+wait 5
+if #findkind <> -1
+{
+	set %shieldid #findid
+	set #lhandid %shieldid
+}
+return
+
+sub WeaponorShield
+chooseskill parr
+set %parrying #skill
+chooseskill swor
+set %swords #skill
+choosekill fenc
+set %fencing #skill
+if %parrying > %swords && %parrying > %fencing
+{
+	set %disarm WEAPON
+	set %disarmid %weaponid
+	return
+}
+set %disarm SHIELD
+set %disarmid %shieldid
+return
+
+sub CheckIfArmed
+finditem %weaponid C_ , #charid
+if #findkind = -1
+	return #false
+if %shieldid = N/A || %2hands
+	return #true
+finditem %shieldid C_ , #charid
+	if #findkind = -1
+		return #false
+return #true
+
+sub ArmDisarm
+set %p1 %1
+if %disarm = OFF || %disarmid = N/A
+	return
+if ( %weaponid <> N/A && %shieldid = N/A && ! %2hands ) || ( %shieldid <> N/A && %weaponid = N/A )
+	return
+if %p1 = ARM && %skiprearm
+{
+	set %skiprearm #false
+	return
+}
+if %p1 = DISARM
+{
+	Gosub CheckIfArmed
+	if ! #result
+	{
+		set %skiprearm #true
+		return
+	}
+}
+wait 1
+if %disarm = WEAPON
+	goto ArmDisarmWeapon
+set %param2 1
+menu font color yellow
+menu delete status
+menu text status 50 25 %p1 , (Shield)
+goto ArmDisarm1
+
+ArmDisarmWeapon:
+set %param2 2
+if %2hands && ! %rhandbow
+	set %param2 1
+menu font color yellow
+menu delete status
+menu text status 50 25 %p1 , (Weapon)
+
+ArmDisarm1:
+wait %wait1
+finditem %disarmid C_ , #charid
+if #findkind <> -1 && %p1 = DISARM
+{
+	gosub EventMacro24 %param2
+	return
+}
+if #findkind = -1 && %p1 = ARM
+{
+	gosub EventMacro24 %param2
+	return
+}
+return
+
+sub EventMacro24
+set #rhandid %disarmid
+set #lhandid %disarmid
+set %lastpos #charposx , #charposy
+event macro 24 %1
+wait 10
+if %lastpos = #charposx , #charposy
+{
+	wait %disarmwait1
+	return
+}
+wait %disarmwait2
+return
+
+sub CheckEnemy
+set %enemyid N/A
+finditem #enemyid
+wait 1
+if #findkind <> -1
+{
+;	pause
+	if ( _ , #findtype , _ in _YI_SY_YC_ ) && ( %dispel || %dispelevil )
+	{
+		set %enemyid #enemyid
+		if ( #hits > %redhp ) &&  ( %massdispel ) && ( #mana > 39 ) && ( #finddist < 11 ) &&  ( %spell_timer  < #scnt )
+		{
+			ignoreitem %enemyid
+			finditem YI_SY_YC
+			wait 1
+			if #findkind <> -1
+			{
+				ignoreitem reset
+				set %dispelparam1 53
+				gosub dispel
+				set %dispelparam1 40
+				ignoreitem reset 1
+				set %lastenemyid #enemyid
+				return
+			}
+			ignoreitem reset
+		}
+		finditem %enemyid
+		if ( #hits > %redhp ) && ( #mana > 19 ) && ( #finddist < 11 ) && ( %dispel ) &&  ( %spell_timer  < #scnt )
+		{
+			set %dispelparam1 40
+			gosub dispel
+			set %lastenemyid #enemyid
+			return
+		}
+		if ( #hits > %redhp ) && ( #mana > 9 ) && ( #finddist < 11 ) && ( %dispelevil ) && ( %spell_timer  < #scnt )
+		{
+			gosub dispelevil
+		}
+		set %lastenemyid #enemyid
+		return
+	}
+}
+set %lastenemyid #enemyid
+return
+
+sub EatOrangePetals
+set *510 EatingOrangePetals
+EOP1:
+finditem %petaltype C
+if #findkind <> -1
+{
+	if #findcol <> %orangepetalhue
+	{
+		ignoreitem #findid petals
+		goto EOP1
+	}
+	set %eatorangepetals #true
+	menu font color $0044ff
+	menu delete status
+	menu text status 50 25 Eating Orange Petal
+	set #lobjectid #findid
+	gosub WaitOtherTarget
+	gosub ResetJournal
+	event macro 17 0
+	wait %wait1
+	gosub FindJournalMessage YOU_EAT_THE_ORANGE
+	if #result
+	{
+		set %orangepetal_timer #scnt + %orangepetal_delay
+		set %orangepetaltries 0
+		ignoreitem reset petals
+		return
+	}
+	set %orangepetal_timer #scnt + 30
+	set %orangepetaltries %orangepetaltries + 1
+	if %orangepetaltries > 9
+	{
+		menu font color $0044ff
+		menu delete status
+		menu text status 50 25 Petals Off (10 tries)
+		gosub ToggleOrangePetal
+	}
+	ignoreitem reset petals
+	return
+}
+menu font color $0044ff
+menu delete status
+menu text status 50 25 Out of Orange Petals!
+wait %wait1
+gosub ToggleOrangePetal
+ignoreitem reset petals
+return
+
+sub ToggleOrangePetal
+menu font color $0044ff
+if ! %eatorangepetals
+	goto TOPON
+TOPOFF:
+set %eatorangepetals #false
+menu delete status
+menu text status 50 25 Orange Petals : OFF
+menu font color black
+set %buttontext OP:OFF
+goto TOPDisplay
+TOPON:
+set %eatorangepetals #true
+set %orangepetaltries 0
+menu delete status
+menu text status 50 25 Orange Petals : ON
+menu font color white
+set %buttontext OP:ON
+;set %orangepetal_timer 0
+TOPDisplay:
+menu font size 8
+menu font bgcolor $0044ff
+if %windowmax
+	goto TOPMax
+menu button ToggleOrangePetal 285 25 20 15 OP
+goto TTPReturn
+TOPMax:
+menu button ToggleOrangePetal 70 220 45 20 %buttontext
+TOPReturn:
+menu font color white
+menu font bgcolor black
+menu font size 9
+return
+
+sub EatTrinsicPetals
+set *510 EatingTrinsicPetals
+ETP1:
+finditem %petaltype C
+if #findkind <> -1
+{
+	if #findcol <> %trinsicpetalhue
+	{
+		ignoreitem #findid petals
+		goto ETP1
+	}
+	set %eattrinsicpetals #true
+	menu font color $ff00ff
+	menu delete status
+	menu text status 50 25 Eating Trinsic Petal
+	set #lobjectid #findid
+	gosub WaitOtherTarget
+	gosub ResetJournal
+	event macro 17 0
+	wait %wait1
+	gosub FindJournalMessage no_benefit
+	if #result
+	{
+		set %trinsicpetal_hp 5
+		set %trinsicpetal_timer #scnt + 30
+		set %trinsicpetaltries %trinsicpetaltries + 1
+		if %trinsicpetaltries > 9
+		{
+			menu font color $ff00ff
+			menu delete status
+			menu text status 50 25 Trinsic Off (10 tries)
+			gosub ToggleTrinsicPetal
+		}
+		ignoreitem reset petals
+		return
+	}
+	set %trinsicpetal_timer #scnt + %trinsicpetal_delay
+	set %trinsicpetaltries 0
+	set %trinsicpetal_hp 5
+	ignoreitem reset petals
+	return
+}
+menu font color $ff00ff
+menu delete status
+menu text status 50 25 Out of Trinsic Petals!
+wait %wait1
+gosub ToggleTrinsicPetal
+ignoreitem reset petals
+return
+
+sub ToggleTrinsicPetal
+menu font color $ff00ff
+if ! %eattrinsicpetals
+	goto TTPON
+TTPOFF:
+set %eattrinsicpetals #false
+menu delete status
+menu text status 50 25 Trinsic Petals : OFF
+menu font color black
+set %buttontext TP:OFF
+set %trinsicpetal_hp 0
+goto TTPDisplay
+TTPON:
+set %eattrinsicpetals #true
+set %trinsicpetaltries 0
+menu delete status
+menu text status 50 25 Trinsic Petals : ON
+menu font color white
+set %buttontext TP:ON
+;set %trinsicpetal_timer 0
+TTPDisplay:
+menu font size 8
+menu font bgcolor $770077
+if %windowmax
+	goto TTPMax
+menu button ToggleTrinsicPetal 260 25 20 15 TP
+goto TTPReturn
+TTPMax:
+menu button ToggleTrinsicPetal 120 220 45 20 %buttontext
+TTPReturn:
+menu font color white
+menu font bgcolor black
+menu font size 9
+return
+
+
+
+sub CheckFoodTimer
+set *510 EatingFood
+finditem %foodtypes C
+if #findkind <> -1
+{
+	menu font color fuchsia
+	menu delete status
+	menu text status 50 25 Eating Food
+	set #lobjectid #findid
+	gosub WaitOtherTarget
+	gosub ResetJournal
+	event macro 17 0
+	wait %wait1
+	gosub FindJournalMessage SIMPLY_TOO_FULL_TO_EAT FEEL_QUITE_FULL MANAGE
+	if #result
+	{
+		set %food_timer #scnt + %food_delay
+		menu font color fuchsia
+		menu delete status
+		menu text status 50 25 You are full!
+		return
+	}
+	set %food_timer #scnt + 5
+	return
+}
+set %keepfed #false
+menu font color fuchsia
+menu delete status
+menu text status 50 25 No food to eat!
+return
+
+sub ResetJournal
+scanjournal 1
+deletejournal
+return
+
+sub FindJournalMessage
+set %jc 1
+FJM1:
+scanjournal %jc
+if #journal = N/A
+	return #false
+for %_i 1 %0
+{
+ 	if % . %_i in #journal
+	{
+		deletejournal
+		return #true
+	}
+}
+set %jc %jc + 1
+goto FJM1
+
+
+sub WaitOtherTarget
+if ! %waitothertarget && #targcurs = 1
+{
+	key esc
+	wait %minwait
+	return
+}
+if #targCurs = 0
+	return
+set %waittime #scnt + 5
+menu font color red
+menu delete status
+menu text status 50 25 Waiting on Target :
+WOT:
+set %tcount %waittime - #scnt
+menu delete targetcount
+menu text targetcount 155 25 %tcount
+wait 5
+if #targCurs = 1 && #scnt < %waittime
+	goto WOT
+menu delete targetcount
+if H in #charstatus
+	gosub HidingPause
+if #targCurs = 1
+{
+	key esc
+	wait %minwait
+}
+return
+
+sub HideMe
+if H in #charstatus
+	return
+if %hidebyskill
+	gosub hidebyskill
+if H in #charstatus
+	return
+if %hidebymagery && #mana > 19
+	gosub hidebymagery
+return
+
+sub AutoSetup
+; pots
+set %healpoint1 60
+set %healtouse1 #false
+;
+; chivalry
+set %healpoint2 85
+set %healtouse2 #false
+;
+; lesser heal
+set %healpoint3 90
+set %healtouse3 #false
+;
+;greater heal
+set %healpoint4 85
+set %healtouse4 #false
+;
+;sprit speak
+set %healpoint5 85
+set %healtouse5 #false
+;
+;aids
+set %healpoint6 95
+set %healtouse6 #false
+;
+set %staminapoint 60
+set %CurebyMagery #false
+set %CurebyChivalry #false
+set %CurebyAids #false
+set %CurebyPots #false
+set %UseRefreshPots #false
+set %AgilityPots #false
+set %bless #false
+set %dispel #false
+set %massdispel #false
+set %hidebyskill #false
+set %hidebymagery #false
+;
+; Pots
+;
+finditem UUF C
+if #findkind <> -1
+	set %healtouse1 #true
+finditem NUF C
+if #findkind <> -1
+	set %CurebyPots #true
+finditem ZUF C
+if #findkind <> -1
+	set %UseRefreshPots #true
+finditem XUF C
+if #findkind <> -1
+	set %CounterwithPots #true
+finditem YUF C
+if #findkind <> -1
+	set %agilitypots #true
+;
+;---- Check skill levels
+;
+chooseskill spir
+set %spiritspeak #skill
+chooseskill mage
+set %magery #skill
+chooseskill chiv
+set %chivalry #skill
+chooseskill heal
+set %healing #skill
+chooseskill eval
+set %evalint #skill
+chooseskill anat
+set %anatomy #skill
+chooseskill hidi
+set %hiding #skill
+if %magery > 199
+	set %healtouse3 #true
+if %magery > 349
+	set %CurebyMagery #true
+if %magery > 629
+	set %healtouse4 #true
+if %magery > 899
+{
+	set %hidebymagery #true
+	set %dispel #true
+}
+if %magery > 989
+	set %massdispel #true
+if %spiritspeak > 799
+	set %healtouse5 #true
+if %magery > 489 && %evalint > 300
+	set %bless #true
+if %chivalry > 350
+	set %RemoveCurse  #true
+if %chivalry > 500
+{
+	set %healtouse2 #true
+	set %CurebyChivalry #true
+	set %dispelEvil #true
+}
+if %healing > 599
+{
+	set %healtouse6 #true
+	if %anatomy > 499
+		set %CurebyAids #true
+}
+gosub DetermineDisarmMethod
+if %hiding > 799
+	set %hidebyskill #true
+set %CEOMedicInit #true
+return
+
+sub closed
+set #menubutton N/A
+if %exitonclose
+	terminate euo
+return
+
+sub CheckRecallRunes
+if %recallrune1 <> N/A
+{
+	finditem %recallrune1
+	if #findkind = -1
+		set %recallrune1 N/A
+}
+if %recallrune2 <> N/A
+{
+	finditem %recallrune2
+	if #findkind = -1
+		set %recallrune2 N/A
+}
+return
+
+sub PositionWindow
+set %tempwindow %windowmax
+set %windowmax #true
+gosub initmenu
+set %count #scnt + 6
+menu font color white
+menu delete status
+set %count2 %count - #scnt
+menu text status 50 25 Positioning MAX Window
+PW1:
+wait 5
+set %count2 %count - #scnt
+menu window title #cursorx , / , #cursory , #spc , : , %count2
+menu show #cursorx #cursory
+if #scnt < %count
+	goto PW1
+set %maxwinPosX #cursorx
+set %maxwinPosY #cursory
+set %windowmax #false
+gosub initmenu
+menu font color white
+menu delete status
+menu text status 50 25 Positioning MIN Window
+set %count #scnt + 6
+PW2:
+wait 5
+set %count2 %count - #scnt
+menu window title #cursorx , / , #cursory , #spc , : , %count2
+menu show #cursorx #cursory
+if #scnt < %count
+	goto PW2
+set %minwinPosX #cursorx
+set %minwinPosY #cursory
+set %windowmax %tempwindow
+gosub initmenu
+menu window title CEOMedic %version ( , #charname , )
+return
+
+sub FindRecallRunes
+set %count 1
+FRR1:
+finditem %runetype  C
+if #findkind <> -1
+{
+	event property #findid
+	if ( Trammel in #property && bank in #property ) || ( Trammel in #property && britain in #property ) ||
++ ( home in #property )
+	{
+		set %recallrune . %count #findid
+		set %count %count + 1
+		if %recallrune2 <> N/A
+			return
+		if %count = 3
+		{
+			ignoreitem reset 2
+			return
+		}
+		ignoreitem #findid 2
+		goto FRR1
+	}
+}
+return
+
+sub EmergencyRecall
+set %recallcount 1
+ER1:
+if %recallbymagery && #mana > 10
+{
+	menu font color yellow
+	menu delete status
+	menu text status 50 25 Recalling (Rune: , #spc , %recallcount , )
+	key esc
+	set %lastpos #charposx , #charposy
+	event macro 15 31
+	target 4s
+   	set #ltargetid %recallrune . %recallcount
+   	set #ltargetkind 1
+	event macro 22 0
+	wait 3s
+	if %lastpos = #charposx , #charposy
+	{
+		set %recallcount %recallcount + 1
+		if %recallcount = 3
+		{
+			goto ER2
+		}
+		if %recallrune2 <> N/A
+			goto ER1
+	}
+	return
+}
+ER2:
+set %recallcount 1
+ER3:
+if %recallbychivalry && #mana > 9
+{
+	menu font color yellow
+	menu delete status
+	menu text status 50 25 Recalling (Rune: , #spc , %recallcount , )
+	key esc
+	set %lastpos #charposx , #charposy
+	event macro 15 210
+	target 4s
+   	set #ltargetid %recallrune . %recallcount
+   	set #ltargetkind 1
+	event macro 22 0
+	wait 3s
+	if %lastpos = #charposx , #charposy
+	{
+		set %recallcount %recallcount + 1
+		if %recallcount = 3
+		{
+			return
+		}
+		if %recallrune2 <> N/A
+			goto ER3
+	}
+	return
+}
+return
+
+sub SaveSetup
+if EXEC notin #opts
+{
+	Display ok You must have Options->Configuration>Allow Execute enabled in order to save$your character 's CEOMedic configuration.$
+	return
+}
+display okcancel Saving your config file will take about 1 minute. Make sure you are in a safe spot!$Press OK to continue.
+if #dispRes = cancel
+	return
+if %cmd <> N/A
+	goto SaveSetup1
+display yesno I see you haven't saved configs with this character before.$
++ $Press YES to use the "cmd" shell method (XP/2000)$Press NO to use the "command" shell method (Win95/98/98SE/ME?)
++ $If one method doesn't work try the other.$
+set %cmd cmd
+if #dispRes = no
+	set %cmd command
+SaveSetup1:
+str mid #date 3 2
+set %date #strres
+str right #date 2
+set %date %date , / , #strres
+str left #date 2
+set %date %date , / , #strres
+menu font color white
+menu delete status
+menu text status 50 25 Saving.
+execute %cmd /c echo #smc , * Created with CEOMedic on , #spc , %date , #spc , * > %filename
+execute %cmd /c echo #smc , #spc >> %filename
+execute %cmd /c echo #smc , Shard: , #spc , #shard >> %filename
+execute %cmd /c echo #smc , Character: , #spc , #charname >> %filename
+execute %cmd /c echo #smc , #spc >> %filename
+execute %cmd /c echo #smc , False , = , 0 , #spc , and , #spc , True , = , -1 , >> %filename
+execute %cmd /c echo #smc , #spc >> %filename
+execute %cmd /c echo #smc ,  ------------------------------------------------------------------------------------- >> %filename
+menu font color yellow
+menu text status 50 25 Saving..
+for %h 1 6
+{
+	execute %cmd /c echo #smc , #spc , %healmethod . %h >> %filename
+	execute %cmd /c echo set % , healtouse , %h , #spc , %healtouse . %h >> %filename
+	execute %cmd /c echo set % , healpoint , %h , #spc , %healpoint . %h >> %filename
+}
+menu font color lime
+menu text status 50 25 Saving...
+execute %cmd /c echo set % , UseRefreshPots , #spc , %UseRefreshPots >> %filename
+execute %cmd /c echo set % , staminapoint , #spc , %staminapoint >> %filename
+execute %cmd /c echo set % , CurebyMagery , #spc , %CurebyMagery >> %filename
+execute %cmd /c echo set % , CurebyChivalry , #spc , %CurebyChivalry >> %filename
+execute %cmd /c echo set % , CurebyAids , #spc , %CurebyAids >> %filename
+execute %cmd /c echo set % , CurebyPots , #spc , %CurebyPots >> %filename
+execute %cmd /c echo set % , CounterwithPots , #spc , %CounterwithPots >> %filename
+execute %cmd /c echo set % , AgilityPots , #spc , %AgilityPots >> %filename
+execute %cmd /c echo set % , bless , #spc , %bless >> %filename
+execute %cmd /c echo set % , removecurse , #spc , %removecurse >> %filename
+execute %cmd /c echo set % , dispel , #spc , %dispel >> %filename
+execute %cmd /c echo set % , massdispel , #spc , %massdispel >> %filename
+execute %cmd /c echo set % , dispelEvil , #spc , %dispelEvil >> %filename
+menu font color blue
+menu text status 50 25 Saving....
+execute %cmd /c echo set % , emergencyheal , #spc , %emergencyheal >> %filename
+execute %cmd /c echo set % , recallbymagery , #spc , %recallbymagery >> %filename
+execute %cmd /c echo set % , recallbychivalry , #spc , %recallbychivalry >> %filename
+execute %cmd /c echo set % , recallrune1 , #spc , %recallrune1 >> %filename
+execute %cmd /c echo set % , recallrune2 , #spc , %recallrune2 >> %filename
+execute %cmd /c echo set % , hidebyskill , #spc , %hidebyskill >> %filename
+execute %cmd /c echo set % , hidebymagery , #spc , %hidebymagery >> %filename
+execute %cmd /c echo set % , disarm , #spc , %disarm  >> %filename
+execute %cmd /c echo set % , keepfed , #spc , %keepfed >> %filename
+menu font color fuchsia
+menu text status 50 25 Saving.....
+execute %cmd /c echo set % , slowconnection , #spc , %slowconnection >> %filename
+execute %cmd /c echo set % , waitothertarget , #spc , %waitothertarget >> %filename
+execute %cmd /c echo set % , windowmax , #spc , # , false >> %filename
+execute %cmd /c echo set % , maxwinPosX , #spc , %maxwinPosX >> %filename
+execute %cmd /c echo set % , maxwinPosY , #spc , %maxwinPosY >> %filename
+execute %cmd /c echo set % , minwinPosX , #spc , %minwinPosX >> %filename
+execute %cmd /c echo set % , minwinPosY , #spc , %minwinPosY >> %filename
+execute %cmd /c echo set % , exitonclose , #spc , %exitonclose >> %filename
+execute %cmd /c echo set % , cmd , #spc , %cmd >> %filename
+execute %cmd /c echo set % , ripnotify , #spc , %ripnotify >> %filename
+execute %cmd /c echo set % , CEOMedicInit # , true>> %filename
+menu font color white
+menu text status 50 25 Saving.....Done
+wait 3s
+return
+
+sub ScriptLoaded
+return #true

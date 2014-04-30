@@ -1,0 +1,159 @@
+;----------------------------------------------------------- 
+; Script Name: Alamar's Stealing Trainer 
+; Authors: Alamar, Phule 
+; Version: 1.0a
+; Client Tested with: 4.0.6a 
+; EUO version tested with: 1.42.009B 
+; Shard: OSI (FS Unsupported) 
+; Revision Date: November 22, 2004
+; Public Release: November 4, 2004 
+; Global Variables Used: None
+; Purpose: Trains Stealing Using Jewelery Method 
+;-----------------------------------------------------------
+; Procuratevi blanck scroll, bende, gold. Poi una cassa che 
+; lockerete in casa e il gioco è fatto vi basta avviare e 
+; seguire le istruzioni.
+;
+; This script will help train you to GM stealing using the Jewelry Method
+; It can be modified to help train upto 120 stealing. Modify %StealTypes for that.
+; Please contact me if you have any questions, bug reports, or suggestions
+;
+; You need to have a packy and some sort of a barrel, trashcan, or pack on the ground
+; to dispose of your garbage as you go.
+;
+
+; Version 1.0 - initial release
+; Version 1.0a - corrected typo errors
+
+; Setup is automated
+chooseskill STEA
+if #skillcap < 1099
+{
+set %StealTypes DBG ; dyetubs
+set %StealName DyeTubs
+}
+else
+{
+set %StealTypes PPF ; pitchforks
+set %StealName Pitchforks
+}
+set #LTargetID N/A
+Event Macro 3 0 All Guard Me
+Event Macro 8 7
+wait 20
+contPos 900 700
+wait 20
+Event Macro 8 2
+ContPos 200 700
+wait 20
+Display ok Target your pack animal.
+SetTargCurs:
+set #LTargetID ABCDEFG
+set #TargCurs 1
+GetPackID:
+if #LTargetID = ABCDEFG
+{
+if #TargCurs = 1
+{
+goto GetPackID
+}
+goto SetTargCurs
+}
+set #LObjectID #LTargetID
+OpenPackie:
+event macro 17 0
+if #ContSize <> 230_204 || #ContName <> container_gump
+goto OpenPackie
+Contpos 700 700
+set %packie #contID
+;set #LObjectID #LTargetID
+wait 20
+chooseskill stea real
+if #skilllock <> up
+event SkillLock STEA up
+Display ok Target your trash container.
+SetTargCurs2:
+set #LTargetID ABCDEFG
+set #TargCurs 1
+GetTrashID:
+if #LTargetID = ABCDEFG
+{
+if #TargCurs = 1
+{
+goto GetTrashID
+}
+goto SetTargCurs2
+}
+set %trash #ContID
+set #LObjectID #LTargetID
+event macro 17 0
+wait 20
+Contpos 700 500
+wait 20
+
+
+mainloop:
+finditem %StealTypes C_ , %packie
+if #findkind = -1
+{
+display ok Sorry, but you can't gain anymore from these.$
++Please go buy more %StealName to steal.
+halt
+}
+TryAgain:
+set %skill #skill
+event macro 13 33
+target 3s
+set #LTargetID #FindID
+set #LTargetKind 1
+set %_JIndex #JIndex
+event macro 22 0
+set %_sendThis #jindex - %_jindex
+wait 10
+gosub checkJournal You_fail_to_steal %_sendThis
+if #result
+{
+wait 10s
+goto TryAgain
+}
+if #skill = #skillcap
+{
+Display OK You've capped out, Congrats!
+Halt
+}
+if #skill <> %skill
+{
+set %GainItem #LTargetID
+goto StealThisTub
+}
+event drag #findid
+click 800 600
+wait 10s
+goto mainloop
+
+StealThisTub:
+event drag %GainItem
+wait 20
+click 800 800 ; drop in packie's pack
+Wait 10s
+goto TryAgain
+
+
+sub checkJournal
+nameSpace Push
+nameSpace local yMW
+if %0 = 0 || %0 = n/a
+set %1 1
+for !_i 1 %1
+{
+scanjournal !_i
+if %1 in #journal
+{
+nameSpace Clear
+nameSpace Pop
+return #true
+}
+}
+nameSpace Clear
+nameSpace Pop
+return #false

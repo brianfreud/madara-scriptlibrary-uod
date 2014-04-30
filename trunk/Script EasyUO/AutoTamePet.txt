@@ -1,0 +1,103 @@
+;==================================
+; Script Name:   autoretame.txt
+; Author: Wolfbrother
+; Version: 1.0
+; Client Tested with: OSI 4.0.1b
+; EUO version tested with: 1.41 (build 0067)
+; Shard OSI / FS: OSI.  I don't pla the FS's.
+; Revision Date: 1/28/2004
+; Public Release: 1/28/2004
+; Purpose: when ran, prompts you to target what you wish to tame.  It will continually try to retame the animal/monster until it is tame.  Then hides yourself from it.
+; Specifically made with dragons, nightmares, wyrms, etc in mind.  Also has a healthwatch sub built in.
+;==================================
+initevents
+Display Please target pet to tame.  You have 2 seconds
+set #targcurs 1
+wait 2s
+set %tame #ltargetid
+Gosub tameloop:
+sub tameloop:
+gosub life:
+set #ltargetid %tame
+event macro 13 35
+target
+event macro 22 0
+set %journalscanlines 15
+deletejournal
+wait 1s
+scanjournal 1
+if you_start in #journal
+        {
+        gosub life:
+        wait 10s
+        gosub tameloop:
+        }
+If that_animal_looks in #journal
+        gosub master:
+gosub tameloop:
+sub life:
+sub master:
+event macro 15 43
+wait 2s
+msg All follow me$
+target 5s
+event macro 23 0
+gosub done:
+Sub life:
+start:
+if #charstatus = c
+        gosub cure:
+if #hits < 60
+        gosub bigheal:
+if #hits < 88
+        gosub smallheal:
+return
+sub smallheal:
+event macro 15 3
+target
+event macro 23 0
+wait 2s
+sub bigheal:
+If #hits < 25
+        gosub yellow:
+event macro 15 28
+target
+event macro 23 0
+deletejournal
+scanjournal 1
+if Your_concentration in #journal
+        {
+        wait 1s
+        gosub bigheal:
+        }
+wait 2s
+return
+sub cure:
+wait 1s
+event macro 15 10
+target
+event macro 23 0
+if #charstatus = c
+        {
+        wait 1s
+        event macro 15 10
+        target
+        event macro 23 0
+        wait 2s
+        }
+if #charstatus = c
+        gosub orange:
+return
+sub yellow:
+finditem UUF C
+set #lobjectid #findid
+event macro 17 0
+return
+sub orange:
+finditem NUF C
+set #lobjectid #findid
+event macro 17 0
+return
+return
+sub done:
+halt

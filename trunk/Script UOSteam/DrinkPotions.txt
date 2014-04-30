@@ -1,0 +1,17 @@
+if stam < 10
+ // Refresh potion
+ usetype! 0xf0b
+endif
+if poisoned 'self'
+ // Cure potion
+ usetype! 0xf07
+endif
+if not yellowhits 'self'
+ if diffhits >= 20
+  // Heal potion
+  usetype! 0xf0c
+ endif
+else
+ // Enchanted apple
+ usetype! 0x2fd8
+endif

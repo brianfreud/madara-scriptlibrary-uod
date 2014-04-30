@@ -1,0 +1,657 @@
+;=============================================================
+; Script Name: the Birds
+; Author: Machine
+; Credits: Madara
+; Version: 1.1
+; Client Tested with: 7.0.22.0
+; EUO version tested with: 1.5 V.236
+; Shard OSI / FS: Only tested on Alexandria. Should work
+;                 wherever item types are same
+; Revision Date: 12/02/2013
+; Public Release: 22/02/2007
+; Global Variables Used: NONE
+; Purpose:
+; Makes all birds attack you, also automatically cuts and
+; collects feathers and raw birds if desired.
+; Script thread:
+; http://www.easyuo.com/forum/viewtopic.php?p=266119
+; =============================================================
+; ============================================================
+; INFO:
+; This script makes all birds around you attack you, Hitchcock
+; style. After the birds are dead, the script can cut and loot
+; the feathers and raw birds if desired. If you are running
+; this script together with a proper looter it's best to
+; disable the built-in looter since it is very primitive. It
+; only loots feathers and (optionally) raw birds, leaving
+; everything else.
+; If you turn off the option to loot it should run smoothly
+; with any looter scripts you may have running.
+; DISCLAIMER:
+; This script does NOT have any attack or healing functions,
+; it merely makes sure that all birds around attack you. And
+; frankly, if you get killed by a bird, you deserved to die ;)
+; ============================================================
+
+; ===========================
+; SCRIPT BEHAVIOUR
+; EDIT BELOW
+; ===========================
+; To reset the knife, you just say "reset" in game.
+; Set Recall(Magery, Chiva), rune for bank(1/16) and rune for bird(1/16)
+set %Recall Magery
+set %runa_bank 1
+set %runa_bird 3
+set %attack_method classic ; (classic - one_for_one)
+set %quantity_b 100 ; quantity board to craft
+set %quantity_f 100
+; Set this to #false if you use an external looter, else
+; #true
+set %doLooting #true
+; Set %featherBag to the id of the bag you want the looter
+; to use. Defaults to your backpack
+set %featherBag #backpackId
+; Set to #true if you want to loot raw birds
+set %collectRawBirds #false
+; Set to #true if you want to close any opened corpses
+set %closeCorpse #false
+
+; Set to #true if you want to experience the Birds...
+set %scaryMode #false
+
+; ===========================
+; ITEM AND BIRD TYPES
+; ===========================
+set %birdTypes WC_TC_
+set %rawBirdType PUD
+set %featherType VLK
+set %RuneBook ZBN
+
+
+
+initEvents
+set #lpc 5
+
+if %doLooting = #true
+{
+  if *knife = N/A
+  {
+   display ok Target a weapon to be used in cutting corpses
+   gosub getTargetIDType
+   set *knife #result
+  }
+}
+
+loop:
+  gosub attackBird
+  if %doLooting = #true
+     gosub lootBird
+  if #weight >= #maxweight
+  {
+     event sysmessage Backpack pieno. Vado in bank a posare i feathers.
+     set %runa %runa_bank
+     gosub save_clean
+     riprova:
+     deletejournal
+     gosub recall
+     scanjournal
+     if That_location_is_blocked in #journal
+     {
+        wait 10s
+        event sysmessage Posizione bloccata. Riprovo tra 10 secondi.
+        goto riprova
+     }
+     wait 3s
+     while #conttype <> IKF && #contsize <> 180_240
+      msg bank $
+     wait 10
+     finditem %featherType C_ , #backpackid
+     exevent drag #findid #findstack
+     wait 10
+     exevent dropc #contid
+     wait 10
+     ;craft bolts
+     finditem UFG C_ , #backpackid
+     if #findid = X || #findcnt <= 1
+     {
+      recraft:
+      gosub save_clean
+      while #conttype <> IKF && #contsize <> 180_240
+       msg bank $
+      finditem ENK C_ , #contid
+      if #findid = X || #findstack <= 3
+      {
+       event sysmessage Iron finito. Continuo lo stesso.
+       goto exit
+      }
+      exevent drag #findid 3
+      wait 10
+      exevent dropc #backpackid
+      wait 10
+      tool:
+      gosub save_clean
+      finditem KTL C_ , #backpackid
+      if #findid = X || #findcnt <= 1
+      {
+       wait 10
+       if #findid = X
+       {
+        event sysmessage Tool Kit finiti. Continuo lo stesso.
+        goto exit
+       }
+       while #conttype <> IKF && #contsize <> 180_240
+        msg bank $
+       finditem ENK C_ , #contid
+       wait 10
+       if #findid = X || #findstack <= 2
+       {
+        event sysmessage Iron finito. Continuo lo stesso.
+        goto exit
+       }
+       exevent drag #findid 2
+       wait 10
+       exevent dropc #backpackid
+       wait 10
+       finditem KTL C_ , #backpackid
+       set #lobjectid #findid
+       wait 1s
+       while #contname <> generic_gump
+        event macro 17
+       wait 10
+       set %x ( #contposx + 30 )
+       set %y ( #contposy + 112 )
+       click %x %y
+       wait 10
+       set %x ( #contposx + 232 )
+       set %y ( #contposy + 129 )
+       click %x %y
+       wait 3s
+       if #findcnt <= 1
+        goto tool
+       else
+        click %x %y r
+      }
+      set #lobjectid #findid
+      wait 1s
+      while #contname <> generic_gump
+       event macro 17
+      wait 10
+      set %x ( #contposx + 27 )
+      set %y ( #contposy + 111 )
+      click %x %y
+      wait 10
+      set %x ( #contposx + 382 )
+      set %y ( #contposy + 271 )
+      click %x %y
+      wait 10
+      click %x %y
+      wait 10
+      click %x %y
+      wait 10
+      set %x ( #contposx + 232 )
+      set %y ( #contposy + 68 )
+      click %x %y
+      wait 3s
+      gosub save_clean
+      finditem UFG C_ , #backpackid
+      if #findcnt <= 1
+       goto recraft
+      else
+       click %x %y r
+     }
+     repeat:
+     finditem UFG C_ , #backpackid
+     if #findid = X || #findcnt <= 1
+       goto recraft
+     gosub save_clean
+     finditem TLK C_ , #contid
+     set %feather #findid
+     set %featherq #findstack
+     finditem VLK C_ , #contid
+     set %board #findid
+     set %boardq #findstack
+     wait 10
+     if %boardq <= %quantity_b || %featherq <= %quantity_f
+     {
+      event sysmessage Torno a uccidere bird.
+      wait 10
+      goto exit
+     }
+     else
+     {
+      exevent drag %board %quantity_b
+      wait 10
+      exevent dropc #backpackid
+      wait 10
+      exevent drag %feather %quantity_f
+      wait 10
+      exevent dropc #backpackid
+      wait 10
+      shaft:
+      gosub save_clean
+      finditem UFG C_ , #backpackid
+      set #lobjectid #findid
+      wait 1s
+      while #contname <> generic_gump
+       event macro 17
+      wait 10
+      set %x ( #contposx + 27 )
+      set %y ( #contposy + 89 )
+      click %x %y
+      wait 10
+      set %x ( #contposx + 233 )
+      set %y ( #contposy + 90 )
+      click %x %y
+      wait 3s
+      click %x %y r
+      wait 10
+      finditem SLK C_ , #backpackid
+      if #findid = X
+       goto shaft
+      else
+      {
+       bolt:
+       gosub save_clean
+       finditem UFG C_ , #backpackid
+       set #lobjectid #findid
+       wait 1s
+       while #contname <> generic_gump
+        event macro 17
+       wait 10
+       set %x ( #contposx + 28 )
+       set %y ( #contposy + 108 )
+       click %x %y
+       wait 10
+       set %x ( #contposx + 233 )
+       set %y ( #contposy + 89 )
+       click %x %y
+       wait 3s
+       click %x %y r
+       wait 10
+       finditem LNK C_ , #backpackid
+       if #findid = X
+        goto bolt
+       else
+       {
+        while #conttype <> IKF && #contsize <> 180_240
+         msg bank $
+        exevent drag #findid #findstack
+        wait 10
+        exevent dropc #contid
+        wait 10
+        goto repeat
+       }
+      }
+     }
+     exit:
+     set %runa %runa_bird
+     gosub save_clean
+     riprova2:
+     gosub recall
+     if That_location_is_blocked in #journal
+     {
+        wait 10s
+        event sysmessage Posizione bloccata. Riprovo tra 10 secondi.
+        goto riprova2
+     }
+     wait 3s
+  }
+  scanjournal 1
+  if reset in #journal
+  {
+   display ok Target a weapon to be used in cutting corpses
+   gosub getTargetIDType
+   set *knife #result
+  }
+  deletejournal
+goto loop
+
+sub attackBird
+ if %attack_method = one_for_one
+ {
+    findItem %birdTypes G_10
+    if #findid <> X
+    {
+     set #ltargetid #findid
+     re_kill:
+     findItem #ltargetid
+     event pathfind #findx #findy
+     event macro 27
+    }
+    if #findkind <> -1
+     goto re_kill
+ }
+ if %attack_method = classic
+ {
+    findItem %birdTypes G_15
+    set !result #findcnt <> 0
+    if #findcnt > 0
+    {
+      namespace push
+      namespace Local Attacker
+      set !lTargetId #lTargetId
+       for !i 1 #findcnt
+       {
+          set #findindex !i
+          if #findId notin !oldTargets && %scaryMode = #true
+          {
+             set !oldTargets !oldTargets , _ , #findId
+             event ExMsg #charposx 3 33 Another bird sweeps down to attack you!
+          }
+          set #lTargetId #findId
+          set #lTargetKind 1
+          event Macro 27
+       }
+       set #lTargetId !lTargetId
+       namespace pop
+    }
+  return !result
+ }
+return
+
+sub walk
+return
+
+sub lootBird
+    gosub equipTool *knife id
+    findItem YFM
+    if #findcnt <> 0
+    {
+       set !lTargetId #lTargetId
+       for !i 1 #findCnt
+       {
+         set #findIndex !i
+         set #lTargetId #findId
+         set #lTargetKind 1
+         event Macro 17
+         target 5s
+         event Macro 22
+         wait 5
+         set !birdId #lTargetId
+         gosub openCorpse !birdId
+         if #result = #true
+         {
+           gosub getFeathers
+           if %closeCorpse = #true
+              gosub closeCorpse !birdId
+           ignoreItem !birdId corpses
+         }
+       }
+       set #lTargetId !targetId
+    }
+return
+
+sub equipTool
+    namespace Push
+    namespace Local Equip
+    set !types %1
+    if %0 > 1
+       set %argType %2
+    if %argType = id
+       set #lObjectId %1
+    else
+    {
+    findKnife:
+      findItem !types C_ , #backpackId
+      if #findcnt = 0
+         findItem !types C_ , #charId
+      if #findcnt = 0       6
+      {
+         set #sysmsgcol 33
+         event Sysmessage Unable to locate a knife! Script paused.
+         pause
+         goto findKnife
+      }
+      set #lObjectId #findId
+    }
+    namespace Pop
+return
+
+sub openCorpse
+    namespace push
+    namespace Local openCorpse
+    set !id %1
+    set !lObjectId #lObjectId
+    set #lObjectId !id
+    set #nextCPosX 0
+    set #nextCPosY 0
+    event Macro 17
+    gosub waitForVar contid = #lObjectId
+    set #lObjectId !lObjectId
+    namespace pop
+return #result
+
+sub closeCorpse
+    namespace push
+    namespace Local closeCorpse
+    set !gumpId %1
+    set !lObjectId #lObjectId
+    set #lObjectId !gumpId
+    event Macro 17
+    gosub waitForVar contid = !gumpId
+    if #result = #true
+    {
+       str Pos #contsize _
+       set !_Pos #strRes
+       str Len #contSize
+       set !xLen !_Pos - 1
+       set !yLen #strRes - !_Pos
+       str Left #contSize !xLen
+       set !xSize #strres
+       set !x #contPosX + !xSize / 2
+       str Right #contSize !yLen
+       set !y #contPosy + #strRes / 2
+       wait 5
+       click !x !y dmc r
+    }
+    set #lObjectId !lObjectId
+    namespace pop
+return #result
+
+sub getFeathers
+    set !toFind %featherType
+    if %collectRawBirds = #true
+       set !toFind %featherType , _ , %rawBirdType
+    findItem !toFind C_ , #contId
+    if #findcnt <> 0
+    {
+       for !i 1 #findCnt
+       {
+          set #findIndex !i
+          exEvent drag #findId #findStack
+          wait 15
+          exEvent dropc %featherBag
+          wait 20
+       }
+    }
+return
+
+sub waitForVar
+	set %timeout #time + 5
+	if  %0 > 3
+		set %timeout #time + %4
+	waitForVarLoop:
+	if # . %1 %2 %3
+		return #true
+	if #time >= %timeout
+		return #false
+	goto waitForVarLoop
+
+
+sub GetTargetIDType
+	set #targCurs 1
+	targLoop:
+	if #targCurs = 1
+		goto targLoop
+	finditem #lTargetID
+	if %1 = Type
+		return #FINDTYPE
+return #lTargetID
+
+
+Sub recall
+GoSub OpenBook
+GoSub Pagina
+GoSub PaginaSet
+GoSub Skill
+Wait 10
+Return
+
+Sub OpenBook
+OpenBook:
+finditem %RuneBook C_ , #backpackid
+set #lobjectid #findid
+wait 1s
+while #contname <> generic_gump
+ event macro 17
+Return
+
+Sub Pagina
+If %runa <= 16
+{
+  Set %ClickX #ContPosX + 415
+  Set %ClickY #ContPosY + 195
+}
+If %runa <= 14
+{
+  Set %ClickX #ContPosX + 380
+  Set %ClickY #ContPosY + 195
+}
+If %runa <= 12
+{
+  Set %ClickX #ContPosX + 345
+  Set %ClickY #ContPosY + 195
+}
+If %runa <= 10
+{
+  Set %ClickX #ContPosX + 310
+  Set %ClickY #ContPosY + 195
+}
+If %runa <= 8
+{
+  Set %ClickX #ContPosX + 245
+  Set %ClickY #ContPosY + 195
+}
+If %runa <= 6
+{
+  Set %ClickX #ContPosX + 210
+  Set %ClickY #ContPosY + 195
+}
+If %runa <= 4
+{
+  Set %ClickX #ContPosX + 175
+  Set %ClickY #ContPosY + 195
+}
+If %runa <= 2
+{
+  Set %ClickX #ContPosX + 140
+  Set %ClickY #ContPosY + 195
+}
+Click %ClickX %ClickY x 2
+Return
+
+Sub PaginaSet
+If %Runa = 1
+{
+  Set %Pagina 1
+  return
+}
+If %Runa in 1_3_5_7_9_11_13_15
+{
+  Set %Pagina 1
+}
+If %Runa in 2_4_6_8_10_12_14_16
+{
+  Set %Pagina 2
+}
+Return
+
+Sub Skill
+If %Pagina = 1
+{
+  If %Recall = Magery
+  {
+    Set %ClickX #ContPosX + 140
+    Set %ClickY #ContPosY + 145
+  }
+  If %Recall = Chiva
+  {
+    Set %ClickX #ContPosX + 140
+    Set %ClickY #ContPosY + 180
+  }
+}
+If %Pagina = 2
+{
+  If %Recall = Magery
+  {
+    Set %ClickX #ContPosX + 300
+    Set %ClickY #ContPosY + 145
+  }
+  If %Recall = Chiva
+  {
+    Set %ClickX #ContPosX + 300
+    Set %ClickY #ContPosY + 180
+  }
+}
+Click %ClickX %ClickY x 2
+Return
+
+
+sub save_clean
+ set #lpc 50000
+ for %l 1 10
+  {
+  scanjournal %l
+  if World_save in #journal && #jcolor = 53
+   {
+   set #lpc 5
+   return
+   }
+  if saving in #journal && #jcolor = 53
+   {
+   while 1 = 1
+    {
+    if World_save in #sysmsg
+     {
+     set #lpc 5
+     return
+     }
+    }
+   }
+  if The_world_will in #journal && #jcolor = 53
+   {
+   while 1 = 1
+    {
+    if saving in #sysmsg
+     {
+     while 1 = 1
+      {
+      if World_save in #sysmsg
+       {
+       set #lpc 5
+       return
+       }
+      }
+     }
+    }
+   }
+  if Cleaning in #journal && #jcolor = 53
+   {
+   while 1 = 1
+    {
+    if Cleaned in #sysmsg
+     {
+     set #lpc 5
+     return
+     }
+    }
+   }
+  if Cleaned in #journal && #jcolor = 53
+   {
+   set #lpc 5
+   return
+   }
+  }
+ set #lpc 5
+return
+
