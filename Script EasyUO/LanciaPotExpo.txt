@@ -1,0 +1,26 @@
+;lo script lancia la pozione dopo 2600 millisecondi
+set %greaterexplosion TUF
+
+while ( #true )
+{
+onhotkey 1
+gosub lanciapozioni %greaterexplosion
+}
+return
+
+sub lanciapozioni
+finditem %1 CA_ , #BACKPACKID
+if #FINDSTACK = 0
+{
+set #sysmsgcol 38
+event sysmessage Pozioni finite !
+event mi fermo !
+halt
+return
+}
+set #LOBJECTTYPE %1
+set #LOBJECTID #FINDID
+event macro 17 0
+wait 52
+event macro 22 0
+return

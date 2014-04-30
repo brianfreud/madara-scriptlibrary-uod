@@ -1,0 +1,63 @@
+;TELEPORT DISMOUNT DA SPELL (esegue automaticamente un teleport nel momento in cui vi dismontano)
+
+
+set #lpc 20
+set %d 11
+set %Journal #jindex
+
+loop:
+if #jindex > %Journal
+{
+set %Journal %Journal + 1
+scanjournal %Journal
+if ( you_have_been_knocked_of in #journal || you_fall_off_of_your_mount in #journal ) && #jcolor = 946
+gosub teleport
+}
+goto loop
+
+sub teleport
+; set %ltarget #ltargetid
+; set %lkind #LTARGETKIND
+; if #AR > 60
+; {
+; event macro 15 14
+; wait 12
+; }
+event macro 15 21
+if ( 0 = 1 )
+{
+target 30
+set %x #CHARPOSX
+set %y #CHARPOSY
+set %z #CHARPOSZ
+if #CHARDIR = 0 1 ;N
+set %y %y - %d
+if #CHARDIR = 1 2 ;NE
+set %y %y - %d
+set %x %x + %d
+if #CHARDIR = 2 1 ;E
+set %x %x + %d
+if #CHARDIR = 3 2 ;SE
+set %x %x + %d
+set %y %y + %d
+if #CHARDIR = 4 1 ;S
+set %y %y + %d
+if #CHARDIR = 5 2 ;SW
+set %y %y + %d
+set %x %x - %d
+if #CHARDIR = 6 1 ;W
+set %x %x - %d
+if #CHARDIR = 7 2 ;WN
+set %x %x - %d
+set %y %y - %d
+set #ltargetx %x
+set #ltargety %y
+set #ltargetz %z
+set #ltargetkind 2
+event macro 22 0
+_telefarExit:
+set #LTARGETKIND %lkind
+set #ltargetid %ltarget
+set %Journal #jindex
+}
+return

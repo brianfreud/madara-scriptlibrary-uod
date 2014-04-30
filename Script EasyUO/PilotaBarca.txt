@@ -1,0 +1,113 @@
+;==================================
+; Script Name: First Matey
+; Author: Goldfish - Scripting / Imtcb - Menu Interface / Edit - CEO
+; Version: 3.0a
+; Client Tested with: 4.0.0.p
+; EUO version tested with: 1.40
+; Shard OSI / FS: Both
+; Revision Date: October 03, 2003
+; Public Release: October 02, 2003
+; Purpose: A boat control menu.
+;==================================
+
+; ==== Goldfish Productions Present's ====
+; ==== In association with imtcb Scripting Corp. ====
+; ==== Directed by CEO ====
+; ==== First Matey! A Boat Control Script ====
+initevents 
+
+start: 
+
+; == Menu Setup ==
+menu Clear 
+menu Activate main
+menu HideEUO 
+menu Window Size 110 110 
+menu Window Title First Matey
+menu Window Color btnface
+menu Font BGColor skyblue
+menu Font Color black
+; == End Menu Setup ==
+
+menu Font Style b
+menu Font Size 10 
+menu Font Name Wingdings
+menu Button forward_left 25 25 20 20 ã
+menu Button forward 45 25 20 20 á
+menu Button forward_right 65 25 20 20 ä
+menu Button turn_left 5 45 20 20 Å
+menu Button left 25 45 20 20 ß
+menu Button stop 45 45 20 20 û
+menu Button right 65 45 20 20 à
+menu Button turn_right 85 45 20 20 Æ
+menu Button back_left 25 65 20 20 å
+menu Button backward 45 65 20 20 â
+menu Button back_right 65 65 20 20 æ
+menu Button raise_anchor 5 85 20 20 G
+menu Button turn_around 45 85 20 20 ô
+menu Button lower_anchor 85 85 20 20 H
+menu Font Name Arial
+menu Button SPEED 25 5 60 20 NORMAL
+menu show 
+set #menubutton N/A
+set %sindex 1 
+set %speed1 normal
+set %speed2 slow
+set %speed3 one
+
+MainLoop: 
+wait 5 
+if #menubutton = N/A
+goto MainLoop
+if #menubutton = closed
+gosub closed
+if _ in #menubutton 
+gosub replace_
+if #menubutton = speed || #menubutton = stop || turn in #menubutton || anchor in #menubutton 2 
+gosub boatcommand2
+goto MainLoop
+gosub boatcommand
+goto MainLoop
+
+sub boatcommand
+if %sindex = 1 
+set %temp #menubutton 
+else 
+{ 
+set %temp %speed . %sindex , #spc , #menubutton 
+
+} 
+str lower %temp 
+event macro 3 0 #strres 
+set #menubutton N/A
+return 
+
+sub boatcommand2
+if #menubutton <> speed
+{ 
+str lower #menubutton 
+event macro 3 0 #strres 
+goto cont1
+} 
+set %sindex %sindex + 1 
+if %sindex = 4 
+set %sindex 1 
+menu delete speed
+menu button speed 25 5 60 20 %speed . %sindex 
+cont1: 
+set #menuButton N/A
+return 
+
+sub replace_
+str pos #menubutton _
+set %strlen #strres - 1 
+set %strlen2 #strres + 1 
+str left #menubutton %strlen 
+set %_1 #strres 
+str mid #menubutton %strlen2 10 
+set #menubutton %_1 , #spc , #strres 
+return 
+
+sub CLOSED
+terminate euo 
+return

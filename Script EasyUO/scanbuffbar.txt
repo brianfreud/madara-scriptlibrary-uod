@@ -1,0 +1,596 @@
+;========================================================================================
+; Script Name: BuffBarScanner
+; Author: JosephAJ
+; Version: V21
+; Client Tested with: ...
+; EUO version tested with: 1.5 (TV...)
+; Shard OSI / FS: OSI
+; Revision Date: 09.29/10.17-08, 07.25/9.30-09, 9.29/11.29/12.8-10, 3.29/3.30-11
+; Revision Date: 3/30/2011
+; Public Release: 10/06
+; Purpose: Scan and Manipulate The Buff/Debuff Bar (50 Icons Recognized)
+; Requirments: None.
+;========================================================================================
+; (C) 2006-2010 All Rights Reserved JosephAJ
+;========================================================================================
+; Disclaimer:  By downloading, copying, running or otherwise using this script, you
+; accept the contents of this limited personal use licence agreement. This limited
+; personal use license agreement can be changed at any time for any reason; without any
+; notice.
+; This script is only authorized to be distributed on www.Scriptuo.com and/or
+; www.EasyUo.com . If you purchase this script, or acquire it from any other source, it
+; is not considered an authorized copy and should be deleted immediately. Endless Night
+; AKA JosephAJ(Author) provides no warranty for use, function, or safe interaction with
+; any software or hardware. User downloads and runs this script at his-her own risk.
+; User shall hold Author and the distribution sites www.scriptuo.com and or
+; www.easyuo.com harmless for any loss of items, accounts, money, virtual currency or
+; items associated with the use of this script. User shall hold the author harmless for
+; any consequences that may result from the use of this script as intended. Furthermore,
+; you promise not to distribute or sell this script to anyone without the express
+; written permission of the author, Endless Night AKA JosephAJ. You further promise NOT
+; to modify and repost, post on other websites, post as part of a script or work you
+; yourself have created, email or transfer to another person by any method, or
+; otherwise distribute without written permision from the author. This Applies to the
+; script as a whole and any given part of the script.
+;
+; Commercial usage of any kind requires written permission from the author.
+;
+; Violation of this agreement will result in one or more of the following: litigation,
+; www.scriptuo.com account termination, bad karma for your next life, and most
+; definitely causing a black mark placed on your soul.
+;
+; This Script will never become by any definition of the words "Abandon ware",
+; this script will always remain the property of the author unless rights are
+; transfered by auther in writing (not email Writing).
+;
+; I worked very hard to bring this script to you, so please use it responisibily and
+; respectfully.  If you have any questions, please reach me at Joseph@Technobods.com
+;
+; (c) 2007-2010 JosephAJ, All Rights Reserved
+; Please respect my property rights.. :)
+;========================================================================================
+; If in doubt dont do it contact the author.
+;========================================================================================
+;========================================================================================
+; NOTE: My scripts or any derivative of them are *not* for use in other players script!
+;========================================================================================
+;Thanks/Credits
+;~~~~~~~~~~~~~~~~
+; At the time of writting these subs the Buff/Debuff bar was/is a relatively new thing, something I had started to visually use
+;  alot. So when it was suggested on the threads below, it gave me the kick needed to write the code.
+;
+;  URL=http://www.easyuo.com/forum/viewtopic.php?p=247400&highlight=#247400]http://www.easyuo.com/forum/viewtopic.php?p=247400&highlight=#247400[/URL]
+;  url=http://www.easyuo.com/forum/viewtopic.php?p=247402&highlight=#247402]http://www.easyuo.com/forum/viewtopic.php?p=247402&highlight=#247402[/url]
+;
+;   Thanks to BookWibble For pointing out that thier are 2 BloodOath icons not 1 (caster/Curse).
+;        Also even more  thanks to BookWibble for his vocal and energetic support of this script that got this script entered
+;        into the EasyUO psl very much faster than otherwise would have happened.
+;   Thanks to Cake For Helping to Add MortalStrike and BleedAttack
+;   Thanks to fnurov for pointing out a way to reduce bar reopenings. (no longer used)
+;   Thanks to Scripty for cornering me into updating the script to totally elimate the need to reopen the bar unless it gets closed.
+;========================================================================================
+; Thread Location:
+;   http://www.easyuo.com/forum/viewtopic.php?p=247583#247583
+;   http://www.scriptuo.com/index.php?topic=1508.msg11033
+;========================================================================================
+; ScanSpeed  - fluctuates on 2 factors:
+; ~~~~~~~~~~     1)-Lag / Network Speed
+;                2)-Actual icons being scanned relative to thier postion in the Icon list in the Script.
+; Fastest scan times 1st-nth scan are 15ms, 15ms respectively
+;========================================================================================
+;-- Recognizes These Icons on the Buff/DeBuff Bar:
+;-- Misc                  - Hidden/Stealthing, Meditation, FishPie
+;-- Magery                - NightSight, ReactiveArmour, Agility, Cunning, Protection, Strength,
+;--                         Bless, Incognito, MagicReflection, Invisibility, Polymorph
+;-- Magery(castOnyou)     - Clumsy, Feeblemind, Weaken, Poison, Curse, Paralyze
+;-- Chivalry              - DivineFury, EnemyOfOne
+;-- Necomancy             - CurseBloodOath (CastOn u), CasterBloodOath, CorpseSkin,
+;--                         EvilOmen, MindRot, PainSpike, Stranglee
+;-- SpellWeaving          - GiftOfRenewal, Attunement, GiftOfLife, ArcaneEmpowerment, EtherealVoyage
+;-- SpellweavingOffensive - EssenseOfWind, Thunderstorm
+;-- SpecailMoves          - MortalStrike , BleedAttack
+;-- Gargole               - Flying, Berserk
+;-- Mystisicm             - Sleep, StoneForm, SpellPlague
+;-- Ninjitsu              - AnimalForm
+;-- Bard_Peacemaking      - Resilience, Preservance
+;-- Bard_Provocation      - Inspire, Invigorate
+;-- Bard_Discordance      - Tribulation, Despair
+;========================================================================================
+;========================================================================================
+; How to use...
+; ~~~~~~~~~~~~~~~~
+; From your script you call it like below (presumes you have saved file ScanBuffBar.txt
+; in the C:\easyuo directory or where ever EUOX is located)
+; Call ScanBuffBar  ; Optional %1 %2 %3  { x y Direction (UP/DOWN/LEFT/RIGHT) }
+;                   eg
+;                   Call ScanBuffBar   ; Leaves the bar in Current postion.[/code]
+;                   Call ScanBuffBar LEFT  ; Makes Bar Face Left
+;                   call ScanBuffBar 1 493  ; Moves Bar to 1 493
+;                   Call ScanBuffBar 1 493 UP  ; Moves bar below main screen facing UP
+;========================================================================================
+; Example of code usage:-- Arms/Disarms when BloodOathed
+; ~~~~~~~~~~~~~~~~~~~~~~~
+; When wanting to find out if icon is in the bar, use the exact labeling as is used
+; in list above and Add a _ to front and back ie _EnemyOfOne_
+;
+; set %Armed #True
+; Repeat
+;  Call ScanBuffBar  ; Presumes file is in same location as euo
+;  set !oathed _CurseBloodOath_ in %BuffBarIconNames
+;  If  ( !oathed && %Armed ) || ( ( ! !oathed ) && ( ! %Armed ) )
+;     {
+;     event macro 24 2  ; dis/Arm right change to 24 1 for left
+;     set %armed ! %Armed
+;     }
+;   Wait 5
+; Until #CharGhost = YES || #CliLogged = 0
+; halt
+;========================================================================================
+; Notes and information .. the average user needs to read no further
+;========================================================================================
+; Advanced settings
+; ~~~~~~~~~~~~~~~~~~~~~
+; set %BuffBarPixelScanMemoryLocation  ; if n/a defaults to 916  - ScanPix Memory Location usage
+; set %BuffBarColorRange               ; if n/a defaults to 1024 - Range to detect icons on diff graphics cards
+; set %BuffBarRecordAllIcons           ; if n/a defaults to NO   - record unknown icons in returned values
+;========================================================================================
+; Un-Found Icons -  Run below code in new file. Note icon values and add to list.
+; ~~~~~~~~~~~~~~~~~
+;  New Icons - Full Definition must be recorded and analyses via OpenEUO Version of script.
+;              Possible new data location solected.
+;  set %BuffBarRecordAllIcons YES
+;  Call ScanBuffBar  ; Presumes file is in same location as euo
+;  Display ok %BuffBarCalls : %BuffBarTime : %BuffBarScanMethod - BAR: %BuffbarDirection - Icons: %BuffBarIconsFound - %BuffBarIconNames
+;  Halt
+;========================================================================================
+namespace push
+namespace local BuffBarSubs
+Set %BuffBarOLDLPC #LPC
+Set #LPC 9999
+set %BuffBarStartTime #systime
+GoSub BuffBarOpenVarsPassed %0 %1 %2 %3
+Gosub scanBuffBar
+set %BuffBarEndTime #systime
+set %BuffBarTime    %BuffBarEndTime - %BuffBarStartTime
+Set #LPC %BuffBarOLDLPC
+namespace pop
+exit
+
+Sub BuffBarOpenVarsPassed
+  Set %BuffBarOpenMoveGump NO
+  Set %BuffBarOpenMoveDirection NO
+  If %1 = 2 || %1 = 3
+    {
+    set %BuffBarOpenMoveGump YES
+    set %BuffBarOpenMoveTox %2
+    set %BuffBarOpenMovetoy %3
+    }
+  If %1 = 3
+    Set %BuffBarOpenMoveDirection %4
+  If %1 = 1
+    Set %BuffBarOpenMoveDirection %2
+  if %BuffBarCharid <> #CharId && %BuffBarCharid <> N/A
+    {
+    gosub BuffBarSaveVars %BuffBarCharid
+    gosub BuffBarLoadVars #charid
+    }
+  If %BuffBarCalls = N/A
+    Gosub BuffBarInitialize
+Return
+
+Sub ScanBuffBar
+  set %BuffBarCalls %BuffBarCalls + 1
+  GoSub OpenPositionBuffBarCheck
+  If %BuffBarScanMethod = NotByContsize
+    {
+    while %BuffBarIconsNotFoundInARow < %BuffBarTolerance
+      GoSub ScanAndIDIcon
+    }
+  If %BuffBarScanMethod = ByContsize
+    {
+    For %Count 1 %BuffBarIconMaxCount
+       GoSub ScanandIDIcon
+    }
+  If %BuffBarIconsFound = 0 && %BuffBarScanMethod = NotByContsize  && ( %BuffBarDirection = RIGHT || %BuffBarDirection = UP )
+    set %BuffBarOpened NO  ; Force reopening of bar next time.
+Return
+
+Sub ScanAndIDIcon
+  Set !x1 %Scanx + %BuffBarPixel1X - 1
+  set !y1 %ScanY + %BuffBarPixel1Y - 1
+  Set !x2 %Scanx + %BuffBarPixel2X - 1
+  set !y2 %ScanY + %BuffBarPixel2Y - 1
+  savePix !x1 !y1 %BuffBarPixelScanMemoryLocation
+  set %BuffBarScanPixcol1 #pixcol
+  savePix !x2 !y2 %BuffBarPixelScanMemoryLocation
+  set %BuffBarScanPixcol2 #pixcol
+
+  set %Scanx %Scanx + %BuffBarScanAdjX  ; Increment
+  set %Scany %ScanY + %BuffBarScanAdjY  ; Increment
+
+  set %BuffBarFoundTheIcon #false
+  set !Count 0
+  if %BuffBarScanPixcol1 <> 0
+    {
+    While !Count < %BuffBarIconsCount && %BuffBarFoundTheIcon = #false
+      {
+      set !Count !Count + 1
+      if %BuffBarScanPixcol1 >= %BuffBarIconCol1Low_ . !count && %BuffBarScanPixcol1 <= %BuffBarIconCol1High_ . !count
+        {
+        if %BuffBarScanPixcol2 >= %BuffBarIconCol2Low_ . !count && %BuffBarScanPixcol2 <= %BuffBarIconCol2High_ . !count
+             {
+             Set %BuffBarIconsFound   %BuffBarIconsFound + 1
+             set %BuffBarIconNames    %BuffBarIconNames , %BuffBarIconName_ . !Count , _
+             set %BuffBarFoundTheIcon #true
+             set %BuffBarIconsNotFoundInArow 0
+;             display ok icon: %BuffBarIconName_ . !Count $  %BuffBarScanPixcol1 - %BuffBarIconCol1Low_ . !count - %BuffBarIconCol1High_ . !count $ !Count
+             }
+          }
+      }
+    }
+  IF %BuffBarFoundTheIcon = #false
+    {
+    set %BuffBarIconsNotFoundInArow %BuffBarIconsNotFoundInArow + 1
+    if %BuffBarRecordAllIcons = YES
+      {
+      Set %BuffBarIconsFound %BuffBarIconsFound + 1
+      set %BuffBarIconNames %BuffBarIconNames , %BuffBarScanPixcol1 , ~ , %BuffBarScanPixcol2 , _
+      }
+    }
+Return
+
+Sub OpenPositionBuffBarCheck
+  if %BuffBarOpenMoveDirection <> NO && %BuffBarOpenMoveDirection <> %BuffBarDirection
+    set %BuffBarOpened NO ;  forced direction change then
+  if %BuffBarOpenMoveGump = YES && %BuffBarOpenMoveTox <> %BuffBarX && %BuffBarOpenMovetoy <> %BuffBarY
+    set %BuffBarOpened NO ;  forced gump position change.
+
+  if %BuffBarOpened = YES
+    gosub CheckBarStillInPosition
+;  display ok %BuffBarOpened : %BuffBarScanMethod
+  if %BuffBarOpened = NO
+    goSub OpenBuffbar
+  ; Initialize Vars
+  set %BuffBarIconsNotFoundInARow 0
+  set %BuffBarIconsFound 0
+  set %BuffBarIconNames _
+  set %ScanX %BuffBarScanX
+  set %ScanY %BuffBarScanY
+Return
+
+sub CheckBarStillInPosition
+  if %BuffBarDirection = LEFT || %BuffBarDirection = DOWN
+     {
+     set %BuffBarTolerance 1
+     goSub ScanForButton
+     If #result = #false
+        set %BuffBarOpened NO   ; check button is in same place.
+     }
+  if %BuffBarDirection = RIGHT || %BuffBarDirection = UP
+     {
+     set %BuffBarOpened YES  ; what to do
+     set %BuffBarTolerance 2
+     }
+  if %BuffBarOpened = YES
+    set %BuffBarScanMethod NotByContsize
+return
+
+Sub OpenBuffbar
+  set %BuffBarScanMethod ByContsize
+;  if #Contname = BuffIcons_Gump
+;    contpos #Contposx #Contposy  ; move it no where to refresh values
+  if #Contname <> BuffIcons_Gump
+     {
+     Repeat
+       event macro 57
+       wait 1
+     Until #Contname = BuffIcons_Gump
+     }
+  if %BuffBarOpenMoveGump = YES && %BuffBarOpenMoveTox <> #ContposX && %BuffBarOpenMovetoy <> #ContposY
+       contpos %newx %newy
+  gosub SetBuffBarVars
+  if %BuffBarOpenMoveDirection <> NO && %BuffBarOpenMoveDirection <> %BuffBarDirection
+     gosub setBuffBarDirection %BuffBarOpenMoveDirection
+Return
+
+Sub SetBuffBarVars
+  Set %BuffBarOpened  YES
+  set %BuffBarX #Contposx
+  set %BuffBary #Contposy
+  set %BuffBarSize #contsize
+  ; Parse Out X and Y from X_Y
+    str pos %BuffBarsize _
+    Set !Left #strres - 1
+    Str Len %BuffBarSize
+    set !right #strres - !left - 1
+    Str Left %BuffBarSize !Left
+    set %BuffBarSizeX #StrRes
+    Str Right %BuffBarsize !Right
+    set %BuffBarSizeY #StrRes
+  ; GetBuffBarMaxIconCount
+    set %BuffBarIconMaxCount 3
+    If %BuffBarSizeX > 139
+      Set %BuffBarIconMaxCount  ( ( %BuffBarSizeX - 47 ) / 31 )
+    If %BuffBarSizeY > 139
+      Set %BuffBarIconMaxCount  ( ( %BuffBarSizeY - 47 ) / 31 )
+  ; Button Click Adjustments (Right and up)
+  set %BuffBarButtonClickAdj 31
+  If %BuffBarSize = 120_60 || %BuffBarSize = 60_120
+      Set %BuffBarButtonClickAdj 11
+  gosub GetBuffBarDirection
+Return
+
+sub GetBuffBarDirection
+  If %BuffBarSizeX > %BuffBarSizeY
+    {
+     gosub SetBuffBarDirectionData LEFT
+     goSub ScanForButton
+     If #Result = #false
+       gosub SetBuffBarDirectionData RIGHT
+    }
+  ELSE
+    {
+     gosub SetBuffBarDirectionData DOWN
+     goSub ScanForButton
+     If  #result = #false
+       gosub SetBuffBarDirectionData UP
+     }
+Return
+
+Sub ScanForButton
+  set !Result #false
+  set !x %BuffBarButtonPosX - 3
+  set !y %BuffBarButtonPosY - 3
+  savePix !x !y %BuffBarPixelScanMemoryLocation
+  set %BuffBarButtonPixcol1 #pixcol
+  If %BuffBarButtonPixcol1 >= %BuffBarButtonCol1Low && %BuffBarButtonPixcol1 <= %BuffBarButtonCol1High
+     {
+     set !x %BuffBarButtonPosX + 3
+     set !y %BuffBarButtonPosY + 3
+     savePix !x !y %BuffBarPixelScanMemoryLocation
+     set %BuffBarButtonPixcol2 #pixcol
+     if %BuffBarButtonPixcol2 >= %BuffBarButtonCol2Low && %BuffBarButtonPixcol2 <= %BuffBarButtonCol2High
+        set !Result #true
+     }
+Return !result
+
+
+Sub SetBuffBarDirection
+  ; %1 = UP / DOWN / LEFT / RIGHT
+  If %1 in LEFT_RIGHT_UP_DOWN
+    {
+    set %NewBarDirection %1
+    If %BuffBarDirection notin LEFT_RIGHT_UP_DOWN
+       gosub GetBuffBarDirection
+    If %NewBarDirection <> %BuffBarDirection
+      {
+      REPEAT
+        set %ExitCount 3
+        Repeat
+          Set %ExitCount %ExitCount - 1
+          click %BuffBarButtonPosX %BuffBarButtonPosY f
+          wait 1
+          IF #Contsize <> %BuffBarSize || #contposx <> %BuffBarX || #Contposy <> %BuffBarY
+            {
+            set %ExitCount 0
+            Set %BuffBarDirection %BuffBarButtonsNewDirection
+            wait 1
+            }
+        Until %ExitCount <= 0
+        GoSub SetBuffBarVars
+      UNTIL %BuffBarDirection = %NewBarDirection
+      }
+    }
+Return
+
+sub SetBuffBarDirectionData ; %1 - direction
+  Set %BuffBarDirection          %1
+  set %BuffBarButtonPosX         %BuffBarButtonX . %1 + %BuffBarX + ( %BuffBarAdjX . %1 * ( %BuffBarSizeX - %BuffBarButtonClickAdj ) )
+  set %BuffBarButtonPosY         %BuffBarButtonY . %1 + %BuffBarY + ( %BuffBarAdjY . %1 * ( %BuffBarSizeY - %BuffBarButtonClickAdj ) )
+  set %BuffBarButtonCol1         %BuffBarButtonColor1 . %1
+  set %BuffBarButtonCol1Low      %BuffBarButtonCol1 - %BuffBarColorRange
+  set %BuffBarButtonCol1High     %BuffBarButtonCol1 + %BuffBarColorRange
+  set %BuffBarButtonCol2         %BuffBarButtonColor2 . %1
+  set %BuffBarButtonCol2Low      %BuffBarButtonCol2 - %BuffBarColorRange
+  set %BuffBarButtonCol2High     %BuffBarButtonCol2 + %BuffBarColorRange
+  set %BuffBarButtonNewDirection %BuffBarButtonNewDirection . %1
+  set %BuffBarScanX              %BuffBarScanX . %1    + %BuffBarX ;+ ( %BuffBarAdjX . %1 * ( ( 31 * %BuffBarIconMaxCount ) - 26 ) )
+  set %BuffBarScanY              %BuffBarScanY . %1    + %BuffBarY ;+ ( %BuffBarAdjY . %1 * ( ( 31 * %BuffBarIconMaxCount ) - 26 ) )
+  set %BuffBarScanAdjX           %BuffBarScanAdjX . %1
+  set %BuffBarScanAdjY           %BuffBarScanAdjY . %1
+return
+
+sub AddBuffBarDirectionData
+  ; direction Buttonx Buttony  ScanX ScanY (adjx Adjy ) newDir ButtonPixCol1 ButtonPixCol2
+  set %BuffBarButtonDirection    . %1 %1
+  set %BuffBarButtonX            . %1 %2
+  set %BuffBarButtonY            . %1 %3
+  set %BuffBarScanX              . %1 %4
+  set %BuffBarScanY              . %1 %5
+  set %BuffBarScanAdjX           . %1 %6
+  set %BuffBarScanAdjY           . %1 %7
+  set %BuffBarAdjX               . %1 %8
+  set %BuffBarAdjY               . %1 %9
+  set %BuffBarButtonNewDirection . %1 %10
+  set %BuffBarButtonColor1       . %1 %11
+  set %BuffBarButtonColor2       . %1 %12
+return
+
+Sub AddIcon ; Category Name  Col1 Col2
+  if %BuffBarIconsCount = N/A
+    set %BuffBarIconsCount 0
+  set %BuffBarIconsCount  %BuffBarIconsCount + 1
+
+  set %BuffBarIconCol1_     . %BuffBarIconsCount %3
+  set %BuffBarIconCol1Low_  . %BuffBarIconsCount %3 - %BuffBarColorRange
+  set %BuffBarIconCol1High_ . %BuffBarIconsCount %3 + %BuffBarColorRange
+
+  set %BuffBarIconCol2_     . %BuffBarIconsCount %4
+  set %BuffBarIconCol2Low_  . %BuffBarIconsCount %4 - %BuffBarColorRange
+  set %BuffBarIconCol2High_ . %BuffBarIconsCount %4 + %BuffBarColorRange
+  set %BuffBarIconCol_      . %BuffBarIconsCount %3  , ~ , %4
+  set %BuffBarIconType_     . %BuffBarIconsCount %1
+  set %BuffBarIconName_     . %BuffBarIconsCount %2
+return
+
+sub BuffBarSaveVars ; %1 - name
+  set %BuffBarCharId      . %1 #charid
+  set %BuffBarCalls       . %1 %BuffBarCalls
+  set %BuffBarOpened      . %1 %BuffBarOpened
+  set %BuffBarX           . %1 %BuffBarX
+  set %BuffBary           . %1 %BuffBary
+  set %BuffBarSize        . %1 %BuffBarSize
+  set %BuffBarSizex       . %1 %BuffBarSizex
+  set %BuffBarSizey       . %1 %BuffBarSizey
+  Set %BuffBarDirection   . %1 %BuffBarDirection
+  set %BuffBarScanX       . %1 %BuffBarScanX
+  set %BuffBarScanY       . %1 %BuffBarScanY
+  set %BuffBarScanAdjX    . %1 %BuffBarScanAdjX
+  set %BuffBarScanAdjY    . %1 %BuffBarScanAdjY
+  set %BuffBarButtonPosX  . %1 %BuffBarButtonPosX
+  set %BuffBarButtonPosY  . %1 %BuffBarButtonPosY
+  set %BuffBarButtonCol1  . %1 %BuffBarButtonCol1
+  set %BuffBarButtonCol2  . %1 %BuffBarButtonCol2
+  set %BuffBarScanMethod  . %1 %BuffBarScanMethod
+
+  set %BuffBarButtonPosX          . %1  %BuffBarButtonPosX
+  set %BuffBarButtonPosY          . %1  %BuffBarButtonPosY
+  set %BuffBarButtonCol1          . %1  %BuffBarButtonCol1
+  set %BuffBarButtonCol1Low       . %1  %BuffBarButtonCol1Low
+  set %BuffBarButtonCol1High      . %1  %BuffBarButtonCol1High
+  set %BuffBarButtonCol2          . %1  %BuffBarButtonCol2
+  set %BuffBarButtonCol2Low       . %1  %BuffBarButtonCol2Low
+  set %BuffBarButtonCol2High      . %1  %BuffBarButtonCol2High
+  set %BuffBarButtonNewDirection  . %1  %BuffBarButtonNewDirection
+  set %BuffBarScanX               . %1  %BuffBarScanX
+  set %BuffBarScanY               . %1  %BuffBarScanY
+  set %BuffBarScanAdjX            . %1  %BuffBarScanAdjX
+  set %BuffBarScanAdjY            . %1  %BuffBarScanAdjY
+return
+
+sub BuffBarLoadVars ; %1 - name
+  set %BuffBarCharId      #charid
+  set %BuffBarCalls       %BuffBarCalls      . %1
+  set %BuffBarOpened      %BuffBarOpened     . %1
+  set %BuffBarX           %BuffBarX          . %1
+  set %BuffBary           %BuffBary          . %1
+  set %BuffBarSize        %BuffBarSize       . %1
+  set %BuffBarSizex       %BuffBarSizex      . %1
+  set %BuffBarSizey       %BuffBarSizey      . %1
+  Set %BuffBarDirection   %BuffBarDirection  . %1
+  set %BuffBarScanX       %BuffBarScanX      . %1
+  set %BuffBarScanY       %BuffBarScanY      . %1
+  set %BuffBarScanAdjX    %BuffBarScanAdjX   . %1
+  set %BuffBarScanAdjY    %BuffBarScanAdjY   . %1
+  set %BuffBarButtonPosX  %BuffBarButtonPosX . %1
+  set %BuffBarButtonPosY  %BuffBarButtonPosY . %1
+  set %BuffBarButtonCol1  %BuffBarButtonCol1 . %1
+  set %BuffBarButtonCol2  %BuffBarButtonCol2 . %1
+  set %BuffBarScanMethod  %BuffBarScanMethod . %1
+
+  set %BuffBarButtonPosX           %BuffBarButtonPosX         . %1
+  set %BuffBarButtonPosY           %BuffBarButtonPosY         . %1
+  set %BuffBarButtonCol1           %BuffBarButtonCol1         . %1
+  set %BuffBarButtonCol1Low        %BuffBarButtonCol1Low      . %1
+  set %BuffBarButtonCol1High       %BuffBarButtonCol1High     . %1
+  set %BuffBarButtonCol2           %BuffBarButtonCol2         . %1
+  set %BuffBarButtonCol2Low        %BuffBarButtonCol2Low      . %1
+  set %BuffBarButtonCol2High       %BuffBarButtonCol2High     . %1
+  set %BuffBarButtonNewDirection   %BuffBarButtonNewDirection . %1
+  set %BuffBarScanX                %BuffBarScanX              . %1
+  set %BuffBarScanY                %BuffBarScanY              . %1
+  set %BuffBarScanAdjX             %BuffBarScanAdjX           . %1
+  set %BuffBarScanAdjY             %BuffBarScanAdjY           . %1
+return
+
+Sub BuffBarInitialize
+  if %BuffBarRecordAllIcons = N/A
+    set %BuffBarRecordAllIcons  NO
+  IF %BuffBarColorRange = N/A
+    set %BuffBarColorRange 1024
+  if %BuffBarPixelScanMemoryLocation = N/A
+    set %BuffBarPixelScanMemoryLocation 916
+  set %BuffBarCalls 0
+  set %BuffBarOpened       NO
+  set %BuffBarX            N/A  ; #Contposx
+  set %BuffBary            N/A  ; #Contposy
+  set %BuffBarSize         N/A  ; #Contsize
+  set %BuffBarSizex        N/A  ; From Contsize
+  set %BuffBarSizey        N/A  ; From Contsize
+  Set %BuffBarDirection    N/A  ; LEFT/RIGHT/UP/DOWN
+  set %BuffBarScanX        0
+  set %BuffBarScanY        0
+  set %BuffBarScanAdjX     0
+  set %BuffBarScanAdjY     0
+  set %BuffBarButtonPosX   0
+  set %BuffBarButtonPosY   0
+  set %BuffBarButtonCol1   0
+  set %BuffBarButtonCol2   0
+  set %BuffBarCharID       #CharID
+  set %BuffBarScanMethod   N/A
+
+  ; direction Buttonx Buttony  ScanX ScanY (adjx Adjy ) newDir ButtonPixCol1 ButtonPixCol2
+;  gosub AddBuffBarDirectionData RIGHT  0 47  5  7 -31   0 1 0 UP
+;  gosub AddBuffBarDirectionData UP    47  0  7  5   0 -31 0 1 DOWN
+  gosub AddBuffBarDirectionData LEFT  10 47 20  7  31   0 0 0 RIGHT  16777215 15707532
+  gosub AddBuffBarDirectionData RIGHT  0 47 10  7  31   0 1 0 UP
+  gosub AddBuffBarDirectionData UP    47  0  7 10   0  31 0 1 DOWN
+  gosub AddBuffBarDirectionData DOWN  10 10 25 25   0  31 0 0 LEFT    8680258  8088410
+
+  ; Scan Pixel Pairs 7:5 24:19
+  Set %BuffBarPixel1X 7
+  set %BuffBarPixel1Y 5
+  Set %BuffBarPixel2X 24
+  set %BuffBarPixel2Y 19
+  gosub AddIcon MageIcon_Lvl5 MagicReflection 2748217 1632041
+  gosub AddIcon Misc Hidden/Stealthing 16764597 2703946
+  gosub AddIcon MageIcon_Lvl1 NightSight 13553374 3270424
+  gosub AddIcon MageIcon_Lvl1 Clumsy 528400 2179641
+  gosub AddIcon MageIcon_Lvl1 Feeblemind 1052911 9747918
+  gosub AddIcon MageIcon_Lvl1 ReactiveArmour 12445638 9217420
+  gosub AddIcon MageIcon_Lvl1 Weaken 1052853 3750366
+  gosub AddIcon MageIcon_Lvl2 Agility 8710011 10270133
+  gosub AddIcon MageIcon_Lvl2 Cunning 7065187 2056
+  gosub AddIcon MageIcon_Lvl2 Protection 7069266 7071562
+  gosub AddIcon MageIcon_Lvl2 Strength 4337977 7574693
+  gosub AddIcon MageIcon_Lvl2 Bless 7065096 6540841
+  gosub AddIcon MageIcon_Lvl3 Poison 526534 1052903
+  gosub AddIcon MageIcon_Lvl4 Curse 2166800 1579255
+  gosub AddIcon MageIcon_Lvl5 Incognito 16751632 5392986
+  gosub AddIcon MageIcon_Lvl5 Paralyze 10855935 4868855
+  gosub AddIcon MageIcon_Lvl6 Invisibility 3792441 3792441
+  gosub AddIcon MageIcon_Lvl7 Polymorph 10853532 7048365
+  gosub AddIcon Misc Meditation 15157793 16777215
+  gosub AddIcon FishPie FishPie 50754 3754586
+  gosub AddIcon SpellWeaving GiftOfRenewal 1625616 2741784
+  gosub AddIcon SpellWeaving Attunement 13035387 5929868
+  gosub AddIcon SpellWeaving GiftOfLife 16777215 15204327
+  gosub AddIcon SpellWeaving ArcaneEmpowerment 3257600 2724897
+  gosub AddIcon SpellWeaving Thunderstorm 11388630 13555406
+  gosub AddIcon SpellWeaving EssenseOfWind 9211135 10274526
+  gosub AddIcon SpellWeaving EtherealVoyage 10870346 7578962
+  gosub AddIcon Gargoyle Flying 11902100 5395026
+  gosub AddIcon Gargoyle Berserk 8107470 5963602
+  gosub AddIcon Chivalry DivineFury 5950984 5951009
+  gosub AddIcon Chivalry EnemyOfOne 9217445 1096960
+  gosub AddIcon Ninjitsu AnimalForm 13546999 8
+  gosub AddIcon Mysticism Sleep 1050747 2173217
+  gosub AddIcon Mysticism StoneForm 10272206 1579041
+  gosub AddIcon Mysticism SpellPlague 13035503 5407900
+  gosub AddIcon Necromancy CorpseSkin 1059327 1579263
+  gosub AddIcon Necromancy EvilOmen 2171375 11908607
+  gosub AddIcon Necromancy MindRot 7046267 16775143
+  gosub AddIcon Necromancy PainSpike 1052870 7566319
+  gosub AddIcon Necromancy Strangle 12434943 11392743
+  gosub AddIcon Necromancy CasterBloodOath 2741776 2217472
+  gosub AddIcon Necromancy CurseBloodOath 2171342 1579230
+  gosub AddIcon SpeacilMoves BleedAttack 1579230 526575
+  gosub AddIcon SpeacilMoves MortalStrike 9211111 1052886
+  gosub AddIcon Bard_Peacemaking Resilience 8103291 9234316
+  gosub AddIcon Bard_Peacemaking Preservance 12447677 11885138
+  gosub AddIcon Bard_Provocation Inspire 2177346 3259681
+  gosub AddIcon Bard_Provocation Invigorate 8714116 11919029
+  gosub AddIcon Bard_Discordance Tribulation 1052820 1052820
+  gosub AddIcon Bard_Discordance Despair 3223890 1052837
+return
+

@@ -1,0 +1,76 @@
+// Author: Gramoz
+//
+// Purpose: Train Hiding from 0 to 100. Train Stealth from 30 (do the teach) to 120
+//
+// Instructions HIDING: Take a boat, go to infinite lane, raise the anchor and say "forward", then start this macro.
+//
+// Instructions STEALTH:
+// 1) Go to a rogue npc and do the teach from 0 to 30+ (you need to have at least 80 hiding).
+// 2) Now find these equips:
+// A - clothes wear (1 pant, 1 shirt, 1 hat, 1 robe, 1 fur boots)
+// B - full studded armor
+// C - full studded armor + close helm
+// 3) Now go to "dress" and create these 3 new suites (use the same name written below):
+// Cloth (add items of the A point)
+// Studded (add items of the B point)
+// Studded2 (add items of the C point)
+// Go in a secure place when you can do 20 steps in the north and 20 steps in the south. Stay in north direction than start the script.
+//
+// Descrizione: Allena hiding da 0 a 100 con la barca su rotta infinita. Una volta raggiunto almeno 80 hiding allena anche stealth da 30+ a 120 (da fare sulla terra ferma)
+// Istruzioni: HIDING Prendete una barca, andate sulla rotta infinita, togliete l'ancora (raise anchor) e dite forward. STEALTH Fino ad almeno 30 fate il teach da un npc ladro (occorre avere almeno 80 hiding), poi procuratevi le seguenti cose:
+//
+//
+// Vestiti di stoffa (1 pant, 1 shirt, 1 hat, 1 robe, 1 fur boots)
+// Armor completa in studded
+// Armor completa in studded + close helm
+//
+//
+// Ora recatevi su "agents -> dress" e create queste tre voci (usate gli stessi nomi che gli ho dato io qui sotto):
+//
+//
+// Cloth (aggiungete gli items del punto A sopra)
+// Studded (aggiungete gli items del punto B sopra)
+// Studded2 (aggiungete gli items del punto C sopra)
+//
+//
+// Andate in un posto sicuro dove potete fare almeno 20 passi verso nord e 20 verso sud. Giratevi verso Nord ed avviate la macro
+//
+//
+// HIDING
+while not hidden
+ useskill "hiding"
+ pause 12000
+endwhile
+//
+//
+// HIDING & STEALTH
+if skill "hiding" >= 80
+ if skill "stealth" > 95
+  dress "Studded2"
+ elseif skill "stealth" > 65
+  dress "Studded"
+ else
+  dress "Cloth"
+ endif
+ useskill "stealth"
+ while hidden
+  for 20
+   walk "north"
+   if not hidden
+    break
+   endif
+   pause 12000
+  endfor
+  for 21
+   walk "south"
+   if not hidden
+    break
+   endif
+   pause 12000
+  endfor
+ endwhile
+ if skill "stealth" == 120
+  sysmsg "120 STEALTH!" 70
+  stop
+ endif
+endif

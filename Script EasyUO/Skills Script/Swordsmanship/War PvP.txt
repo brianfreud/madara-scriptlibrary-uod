@@ -1,0 +1,115 @@
+;POUCH DA SCROLL (fa esplodere il pouch quando parallati, e lo ritrappa se premete il tasto %key)
+
+set #lpc 20
+set %Journal #jindex
+set %safeHp 40
+set %key p
+loop:
+onhotkey %key
+gosub trap
+if #jindex > %Journal
+{
+set %Journal %Journal + 1
+scanjournal %Journal
+if ( The_attack_has_temporarily_paralyzed_you in #journal ) && #jcolor = 946
+{
+set %lpc 200
+gosub pouch
+set %lpc 20
+}
+}
+goto loop
+
+sub trap
+set #lpc 200
+finditem HYL
+set #lobjectid #findid
+event macro 17 0
+finditem LKF _C . #backpackid
+set #ltargetid #findid
+Set #lTargetKind 1
+target 3s
+event macro 22 0
+set #ltargetid %target
+set %Journal #jindex
+set #lpc 20
+return
+
+sub pouch
+finditem LKF _C , #backpackid
+if #hits > %safeHp
+{
+if #findkind = -1 2
+{
+event exmsg #charid 3 30 Nessun pouch!!!
+return
+}
+if #targCurs = 1
+key ESC
+set #lobjectid #findid
+set #ltargetid #lobjectid
+event macro 17 0
+}
+return
+
+TELEPORT (classi teleport fatto da scroll)
+
+
+set %dlpc 30 ; lines per second in wait for key time
+set %flpc 30 ; lines per second in exec time
+set %d 11
+set #lpc %dlpc
+
+loop:
+onhotkey t
+gosub telefar
+;sleep 10
+goto loop
+
+sub telefar
+set #lpc %flpc
+set %ltarget #ltargetid
+set %lkind #LTARGETKIND
+;event macro 15 21
+finditem UTL _C , #backpackid
+if #findkind = -1 2
+{
+event exmsg #charid 3 30 Teleport Finite!!!
+return
+}
+set #lobjectid #findid
+event macro 17 0
+target 30
+set %x #CHARPOSX
+set %y #CHARPOSY
+set %z #CHARPOSZ
+if #CHARDIR = 0 1 ;N
+set %y %y - %d
+if #CHARDIR = 1 2 ;NE
+set %y %y - %d
+set %x %x + %d
+if #CHARDIR = 2 1 ;E
+set %x %x + %d
+if #CHARDIR = 3 2 ;SE
+set %x %x + %d
+set %y %y + %d
+if #CHARDIR = 4 1 ;S
+set %y %y + %d
+if #CHARDIR = 5 2 ;SW
+set %y %y + %d
+set %x %x - %d
+if #CHARDIR = 6 1 ;W
+set %x %x - %d
+if #CHARDIR = 7 2 ;WN
+set %x %x - %d
+set %y %y - %d
+set #ltargetx %x
+set #ltargety %y
+set #ltargetz %z
+set #ltargetkind 2
+event macro 22 0
+_telefarExit:
+set #LTARGETKIND %lkind
+set #ltargetid %ltarget
+set #lpc %dlpc
+return

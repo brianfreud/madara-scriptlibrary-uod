@@ -1,0 +1,897 @@
+;------------------------------------------------------------------------------- 
+; Script Name: Gonzo's Runebook Copier
+; Author: Gonzoateafly 
+; Version: 1.0 
+; Client Tested with: 5.0.7.1
+; EUO version tested with: 1.5 (Build 101)
+; Shard OSI / FS:  OSI 
+; Revision Date: 12/20/06
+; Public Release: 12/20/06
+; Purpose:  Make multiple copies of a single runebook, using recall, gate, or a combination of the two.  
+; Fully automated.
+;-------------------------------------------------------------------------------
+set %lagfactor 0 ;Change this value if you are recieving errors because of the script running too fast.
+
+
+;defaults - it's probably not necessairy to change these, unless you're having problems
+set %dusedefaultnames #FALSE ;use default names instead of names
+set %dusenumberednames #FALSE ;use <word> <number> instead of names
+set %dfillerword Location ;the <word> to use in numberednames
+set %dlocation 1 ;the starting <number>
+set %dcopies 1 ;default number of copies
+
+set %waitwhenusinggate 30 ;how long to wait after returning through gate using the gate method
+set %waitwhenusinggateandrecall 30 ;how long to wait after returning through gate using the gate/recall method
+set %manarecall 15 ;mana cost for recall
+set %managate 25 ;mana cost for gate
+set %manarecallgate 35 ;mana cost for recall and gate
+set %manamark 21 ;mana cost per mark spell
+set %maxmanawait 70 ;maximum marking mana to wait for (if multiple copies)
+
+set %kalocr #curpath , Kalocr_Web_Bod.txt
+;DO NOT EDIT BELOW HERE
+
+
+
+ if %lagfactor < -5
+ {
+ set %lagfactor -5
+ }
+
+;welcome menu
+set #menubutton n/a
+menu clear
+menu show
+menu window title Gonzo's Runebook Copier
+menu text welcome 6 10 Welcome to Gonzo's Runebook Copier!
+menu text welcome 20 40 Special thanks to Kal Ort Por for
+menu text welcome 15 55 his original script and subroutines.
+menu button begin 20 90 200 20 Click here to begin
+menu window size 240 130
+for %_ 1 1
+	{
+	if #menubutton = n/a
+		{
+		wait 1
+		set %_ 0
+		}
+	}
+if #menubutton = begin
+  {
+  goto loop
+  }
+
+
+;begin main loop
+loop:
+set %ymenu 10
+set #menubutton n/a
+set %runebookID 0
+set %copyMethod 0
+set %runeIndex 0
+gosub menu
+gosub menuwatch
+menu delete text1
+gosub getRuneCount
+gosub copyRuneNames
+set #menubutton n/a
+gosub menu
+gosub menuwatch
+wait 5 + %lagfactor
+gosub getBookToCopyInto
+set %wait 10 + %lagfactor
+wait %wait
+set #menubutton zilch
+gosub menuwatch
+gosub copyRunebook , %copyMethod
+gosub menuwatch
+menu hide
+display ok book copied
+goto loop
+
+
+
+
+;build menu
+sub menu
+set %xmenu 10
+set %ymenu 40
+set %xmenusize 240
+
+menu clear
+menu show
+menu window title Gonzo's Runebook Copier
+
+if %runebookID = 0
+{
+gosub status Waiting , #spc , for , #spc , Runebook...
+menu button loadbook 10 60 220 20 Click here to set original
+}
+
+else
+{
+gosub status Set , #spc , your , #spc , options, , #spc , then , #spc , choose , #spc , a , #spc , travel , #spc , method , #spc , to , #spc , begin.
+menu text copyrunes 10 %ymenu Copy Runes:
+for %runeIndex 1 %runeCount
+	{
+	set %ymenu %ymenu + 20
+     if %runeIndex = 9
+       {
+       set %xmenu %xmenu + 190
+       set %xmenusize 380
+       set %ymenu %ymenu - 160
+       }
+  menu check runecheckbox , %runeIndex %xmenu %ymenu 20 20 %runecheckboxdata . %runeIndex #spc
+  set %xmenu %xmenu + 20
+  menu edit runename , %runeIndex %xmenu %ymenu 150 %runenamedata . %runeIndex
+  set %xmenu %xmenu - 20
+	}
+if %runeIndex > 9
+  {
+  set %ymenu %ymenu + ( ( 17 - %runeIndex  ) * 20 )
+  set %xmenu 80
+  }
+set %ymenu %ymenu + 40
+menu text texto %xmenu %ymenu Or, replace rune name with:
+set %ymenu %ymenu + 20
+menu check usedefaultnames %xmenu %ymenu 220 20 %dusedefaultnames default name (no rename)
+set %ymenu %ymenu + 25
+menu check usenumberednames %xmenu %ymenu 15 20 %dusenumberednames
+set %xmenu %xmenu + 20
+menu edit fillerword %xmenu %ymenu 100 %dfillerword
+set %xmenu %xmenu + 110
+menu text texto %xmenu %ymenu start num
+set %xmenu %xmenu + 70
+menu edit startnumber %xmenu %ymenu 20 %dlocation
+set %xmenu %xmenu - 200
+set %ymenu %ymenu + 70
+
+if %copyMethod = 0
+  {
+  ;menu check buymorerunes %xmenu %ymenu 200 20 #true Buy runes from vendor
+  ;set %ymenu %ymenu + 30
+  menu text runebookcopies %xmenu %ymenu Total copies to make:
+  set %xmenu %xmenu + 150
+  menu edit copies %xmenu %ymenu 40 %dcopies
+  set %xmenu %xmenu - 150
+  set %ymenu %ymenu + 30
+  menu button userecall %xmenu %ymenu 70 20 recall
+  set %xmenu %xmenu + 75
+  menu button usegate %xmenu %ymenu 70 20 gate
+  set %xmenu %xmenu + 75
+  menu button usegaterecall %xmenu %ymenu 70 20 gate/recall
+  set %xmenu %xmenu - 150
+  }
+}
+
+set %ymenu %ymenu + 40
+menu button pause %xmenu %ymenu 80 20 pause
+set %xmenu %xmenu + 140
+menu button quit %xmenu %ymenu 80 20 quit
+set %xmenu %xmenu - 140
+set %ypause %ymenu
+set %ymenu %ymenu + 30
+menu window size %xmenusize %ymenu
+
+return
+
+
+
+;watch menu for changes
+sub menuwatch
+for %_ 1 1
+  {
+	if #menubutton = n/a
+	  {
+	  wait 1
+	  set %_ 0
+	  }
+  }
+
+if #menubutton = loadbook
+  {
+  gosub getRunebookID
+  }
+
+if %copyMethod = 0
+  {
+  if #menubutton = userecall
+	  {
+    menu get copies
+    set %copies #menures
+	  set %copyMethod userecall
+	  }
+  if #menubutton = usegate
+	  {
+    menu get copies
+    set %copies #menures
+	  set %copyMethod usegate
+	  }
+  if #menubutton = usegaterecall
+	  {
+    menu get copies
+    set %copies #menures
+	  set %copyMethod usegateandrecall
+	  }
+  }
+
+if #menubutton = pause
+  {
+  gosub pausescript
+	}
+if #menubutton = quit
+	{
+  gosub quit
+	}
+
+menu get usedefaultnames
+set %usedefaultnames #menures
+menu get usenumberednames
+set %usenumberednames #menures
+menu get fillerword
+set %fillerword #menures
+menu get startnumber
+set %location #menures
+
+for %runenum 1 %runeCount
+	{
+  menu get runecheckbox , %runenum
+  set %runecheckboxdata , %runenum  #menures
+  menu get runename , %runenum
+  set %runenamedata , %runenum  #menures
+	}
+
+return
+
+
+
+
+;set status message sub
+sub status
+menu delete status
+menu text status 10 10 %1
+return
+
+
+
+
+
+;unchecks rune after finished
+sub uncheckrune
+gosub status removing , #spc , rune
+menu set runecheckbox , %runeIndex #false
+set runecheckboxdata , %runeIndex #false
+return
+
+
+
+
+;collect the runebook to be copied's id
+sub getRunebookID
+menu clear
+menu window title Gonzo's Runebook Copier
+menu text text1 10 10 Open the runebook you wish to copy
+menu window size 240 40
+if #contsize = 452_236
+	{
+	set %x #contposx + 145
+	set %y #contposy + 55
+	click %x %y r f dmc
+	set %wait 5 + %lagfactor
+	wait %wait
+	}
+for %_ 1 1
+	{
+	if #contsize <> 452_236
+		{
+		wait 1
+		set %_ 0
+		}
+	}
+contpos 30 30
+set %runebookID #lobjectid
+set %runebookX #contposx
+set %runebookY #contposy
+return
+
+
+
+
+
+;get total runes
+sub getRuneCount
+gosub status getting , #spc , total , #spc , runes , #spc , in , #spc , book
+call %kalocr getrunecount %runebookX %runebookY
+set %runeCount %1
+return
+
+
+
+
+
+;collect and store rune names
+sub copyRuneNames
+gosub status getting , #spc , rune , #spc , names
+if #cursorx < 350 && #cursory < 225
+	{
+	click 350 225 n f dmc
+	}
+set %wait 5 + %lagfactor
+wait %wait
+;call %kalocr setcharformat outputmessage
+for %runeIndex 1 %runeCount
+	{
+	call %kalocr getrunename %runeIndex %runebookX %runebookY
+	set %runenamedata . %runeIndex %1
+	set %runecheckboxdata . %runeIndex #true
+	}
+return
+
+
+
+
+
+;check for 0 runes
+sub runeCheck
+gosub getBlankRunes
+if %blankrunes < %copies
+  {
+    display ok You will not have enough runes to mark the next location.  Please purchase more runes, return to your starting place, and click unpause on the menu.
+    gosub pausescript
+  }
+return
+
+
+
+sub runeCheckSingle
+gosub getBlankRunes
+if %blankrunes < 1
+  {
+    display ok You do not have any runes, please go purchase more and return to this location.
+    gosub pausescript
+  }
+return
+
+
+
+;get total number of blank runes (to be used for display later)
+sub getBlankRunes
+finditem qwl c_ , #backpackid
+set %blankrunes #findcnt
+return
+
+
+
+
+
+;get IDs for runebooks to copy to
+sub getBookToCopyInto
+menu hide
+for %r 1 %copies
+  {
+  gosub status waiting , #spc ,  for , #spc , blank , #spc , runebook , #spc , ( , %r , )
+  gosub menuwatch
+  display ok Open , #spc , blank , #spc , runebook , #spc , ( , %r , )
+  if #contsize = 452_236
+	  {
+	  set %x #contposx + 145
+	  set %y #contposy + 55
+	  click %x %y r f dmc
+	  set %wait 20 + %lagfactor
+	  wait %wait
+	  }
+  for %_ 1 1
+	  {
+	  if #contsize <> 452_236
+		  {
+      gosub status open , #spc , blank , #spc , runebook , #spc , ( , %r , )
+      wait 1
+		  set %_ 0
+		  }
+	  }
+  contpos 30 30
+  set %emptybookID . %r #lobjectid
+  set %wait 5 + %lagfactor
+  wait %wait
+  call %kalocr getrunecount 30 30
+  if %1 > 0
+	  {
+	  display yesno this runebook has runes in it would you like them removed?$NOTE: the dropped runes will be used for re-filling the book
+	  if #dispres = yes
+		  {
+		  for %runeIndex %1 1
+			  {
+			  gosub runebook #lobjectid droprune %runeIndex
+			  set %wait 10 + %lagfactor
+			  wait %wait
+			  }
+		  }
+	  }
+  if #contsize = 452_236
+	  {
+	  set %x #contposx + 145
+	  set %y #contposy + 55
+	  click %x %y r f dmc
+	  set %wait 5 + %lagfactor
+	  wait %wait
+	  }
+  }
+menu show
+return
+
+
+
+
+
+
+
+
+
+
+
+
+
+;Copys the runebook using recall
+sub copyRunebookUseRecall
+;gosub moveRunebook %emptyBookID
+for %runeIndex 1 %runeCount
+	{
+  if %runecheckboxdata . %runeIndex = #true
+		{
+		gosub menuwatch
+		gosub runeCheck
+    set %mananeed %copies * %manamark + %manarecall
+    if %mananeed > %maxmanawait
+    {
+    set %mananeed %maxmanawait
+    }
+    gosub status waiting , #spc , for , #spc , mana: , #spc ,  %mananeed
+    gosub waitForMana %mananeed
+		gosub menuwatch
+    gosub recordPosition
+    gosub status recalling , #spc , to , #spc , rune: , #spc ,  %runeIndex
+		gosub runebook %runebookID recall %runeIndex
+		gosub menuwatch
+		gosub waitForTravel
+		gosub menuwatch
+		set %wait 5 + %lagfactor
+		wait %wait
+		gosub menuwatch
+		gosub status marking , #spc , rune , #spc , ...
+		gosub markRune
+		gosub menuwatch
+		gosub uncheckRune
+		}
+	}
+return
+
+
+
+
+
+;Copys runebook using gate
+sub copyRunebookUseGate
+;gosub moveRunebook %emptyBookID
+for %runeIndex 1 %runeCount
+	{
+  if %runecheckboxdata . %runeIndex = #true
+		{
+		gosub menuwatch
+		gosub runeCheck
+    set %mananeed %copies * %manamark + %managate
+    if %mananeed > %maxmanawait
+    {
+    set %mananeed %maxmanawait
+    }
+		gosub status waiting , #spc , for , #spc , mana: , #spc ,  %mananeed
+		gosub waitForMana %mananeed
+		gosub menuwatch
+    gosub recordPosition
+    gosub status gating , #spc , to , #spc , rune: , #spc ,  %runeIndex
+		set %failure 1
+		while %failure = 1
+      {
+      gosub menuwatch
+      gosub runebook %runebookID gatetravel %runeIndex
+      gosub menuwatch
+      gosub waitForMoongate
+      }
+    gosub menuwatch
+    set %wait 10 + %lagfactor
+		wait %wait
+		gosub menuwatch
+		gosub useMoongate
+		gosub menuwatch
+		gosub waitForTravel
+		gosub menuwatch
+		gosub status marking , #spc , rune , #spc , ...
+		gosub markRune
+    gosub uncheckRune
+		gosub menuwatch
+		gosub status returning , #spc , thru , #spc , moongate
+		gosub useMoongate
+		gosub menuwatch
+    set %delay #scnt2 + %waitwhenusinggate
+		gosub waitForTravel
+    wait 10
+		gosub dispelgate
+		gosub menuwatch
+	  gosub status resting...
+		set %delay %delay - #scnt2
+		set %wait %delay + %lagfactor
+		;wait %wait
+		}
+	}
+return
+
+
+sub dispelgate
+dispel:
+finditem otf_jef_KEF g_0
+if #findkind <> -1
+    {
+    event macro 15 33
+    target
+    set #ltargetid #findid
+    set #ltargetkind 1
+    event macro 22 0
+    goto dispel
+    }
+return
+
+
+
+;Copys runebook using gate/recall combo
+sub copyRunebookUseGateAndRecall
+;gosub moveRunebook %emptyBookID
+for %runeIndex 1 %runeCount
+	{
+  if %runecheckboxdata . %runeIndex = #true
+		{
+		gosub menuwatch
+		gosub runeCheck
+    set %mananeed %copies * %manamark + %manarecallgate
+    if %mananeed > %maxmanawait
+    {
+    set %mananeed %maxmanawait
+    }
+		gosub status waiting , #spc , for , #spc , mana: , #spc ,  %mananeed
+		gosub waitForMana %mananeed
+		gosub menuwatch
+		gosub recordPosition
+		gosub status gating , #spc , to , #spc , rune: , #spc ,  %runeIndex
+		set %failure 1
+		while %failure = 1
+      {
+      gosub menuwatch
+		  gosub runebook %runebookID gatetravel %runeIndex
+		  gosub menuwatch
+      gosub waitForMoongate
+      }
+    gosub menuwatch
+    set %wait 10 + %lagfactor
+    wait %wait
+    gosub menuwatch
+    gosub status recalling , #spc , to , #spc , rune: , #spc ,  %runeIndex
+		gosub runebook %runebookID recall %runeIndex
+    gosub menuwatch
+    gosub waitForTravel
+    gosub menuwatch
+    set %wait 5 + %lagfactor
+		wait %wait
+		gosub menuwatch
+		gosub status marking , #spc , rune , #spc , ...
+		gosub markRune
+    gosub uncheckRune
+		gosub menuwatch
+		gosub status returning , #spc , thru , #spc , moongate
+		gosub useMoongate
+		gosub menuwatch
+		set %delay #scnt2 + %waitwhenusinggateandrecall
+		gosub waitForTravel
+		wait 10
+		gosub dispelgate
+		gosub menuwatch
+		gosub status resting...
+		set %delay %delay - #scnt2
+		set %wait %delay + %lagfactor
+		;wait %wait
+		}
+	}
+return
+
+
+
+
+
+;records position for movement checks
+sub recordPosition
+set %charposx #charposx
+set %charposy #charposy
+return
+
+
+
+
+
+;runebook functions
+sub runebook
+if #contsize = 452_236
+	{
+	set %x #contposx + 145
+	set %y #contposy + 55
+	click %x %y r f dmc
+	set %wait 5 + %lagfactor
+	wait %wait
+	}
+set #lobjectid %1
+event macro 17 0
+for %_ 1 1
+	{
+	if #contsize <> 452_236
+		{
+		wait 1
+		set %_ 0
+		}
+	}
+set %contposx #contposx
+set %contposy #contposy
+set %x %contposx + 140 + ( %3 - 1 ) / 2 * 35
+if ( %3 - 1 ) / 2 > 3
+	set %x %x + 30
+set %y %contposy + 195
+click %x %y f dmc
+set %wait 5 + %lagfactor
+wait %wait
+if %2 = setdefault
+	{
+	set %x %contposx + 165 + ( ( %3 - 1 ) % 2 ) * 140
+	set %y %contposy + 25
+	}
+if %2 = droprune
+	{
+	set %x %contposx + 140 + ( ( %3 - 1 ) % 2 ) * 160
+	set %y %contposy + 120
+	}
+if %2 = recall
+	{
+	set %x %contposx + 140 + ( ( %3 - 1 ) % 2 ) * 160
+	set %y %contposy + 145
+	}
+if %2 = gatetravel
+	{
+	set %x %contposx + 140 + ( ( %3 - 1 ) % 2 ) * 160
+	set %y %contposy + 165
+	}
+if %2 = sacredjourney
+	{
+	set %x %contposx + 140 + ( ( %3 - 1 ) % 2 ) * 160
+	set %y %contposy + 180
+	}
+click %x %y f dmc
+return
+
+
+
+
+
+;uses the gate when it appears
+sub useMoongate
+finditem otf_jef_KEF g_0
+set #lobjectid #findid
+event macro 17 0
+set %wait 5 + %lagfactor
+wait %wait
+return
+
+
+
+
+
+;wait for moongate
+sub waitForMoongate
+for %_ 1 15
+	{
+	finditem otf_jef_KEF g_0
+	if #findkind = -1
+		{
+		wait 10
+		}
+	}
+if #findkind = -1
+  {
+  set %failure 1
+  }
+else
+  {
+  set %failure 0
+  }
+return
+
+
+
+
+;checks for movement
+sub waitForTravel
+for %_ 1 1
+	{
+	if #contsize = 420_280
+		{
+		set %x #contposx + 25
+		set %y #contposy + 260
+		click %x %y f dmc
+		set %wait 5 + %lagfactor
+		wait %wait
+		}
+	if #charposx = %charposx && #charposy = %charposy
+		{
+		wait 1
+		set %_ 0
+		}
+	}
+set %charposx #charposx
+set %charposy #charposy
+return
+
+
+
+
+
+
+
+;marks rune
+sub markRune
+for %p 1 %copies
+  {
+  gosub runechecksingle
+  finditem qwl c_ , #backpackid
+  gosub status marking , #spc , rune
+  set #ltargetkind 1
+  set #ltargetid #findid
+  set %darnFizzles 1
+  while %darnFizzles = 1
+  {
+  gosub waitForMana %manamark
+  gosub menuwatch
+    set %curindex #jindex
+    event macro 15 44
+    target 10s
+    gosub menuwatch
+    event macro 22 0
+    set %wait 15 + %lagfactor
+    wait %wait
+    set %a -1
+    scanagain:
+    for %line %curindex #jindex
+    {
+      scanjournal %line
+      if Mark in #journal
+      {
+      set %a 0
+      }
+      if fizzles in #journal
+      {
+      set %a 1
+      }
+    }
+    if %a = -1
+    {
+    goto scanagain
+    }
+    if %a = 1
+    {
+    gosub status fizzle... , #spc , trying , #spc , again
+    set %wait 60 + %lagfactor + %lagfactor
+       wait %wait
+    }
+    if %a = 0
+    {
+         set %darnFizzles 0
+    }
+  ;Thanks to Aganor for saving me time there
+  }
+  if %usedefaultnames = #false
+    {
+    if %usenumberednames = #true
+    {
+      msg $
+      set #lobjectid #findid
+      event macro 17 0
+      set %wait 10 + %lagfactor
+ 	    wait %wait
+ 	    msg %fillerword , #spc , %location , $
+ 	    set %wait 5 + %lagfactor
+ 	    wait %wait
+ 	    gosub menuwatch
+
+    }
+    else
+    {
+      msg $
+      set #lobjectid #findid
+      event macro 17 0
+      set %wait 10 + %lagfactor
+ 	    wait %wait
+ 	    msg %runenamedata . %runeIndex , $
+ 	    set %wait 5 + %lagfactor
+ 	    wait %wait
+ 	    gosub menuwatch
+
+ 	  }
+  }
+
+
+gosub status dropping , #spc , rune , #spc , in , #spc , book
+event drag #findid
+gosub menuwatch
+set %wait 5 + %lagfactor
+wait %wait
+set %tempbookid %emptyBookID . %p
+finditem %tempbookid
+set #findmod 20_10
+click #findx #findy p f dmc
+gosub menuwatch
+set %wait 5 + %lagfactor
+wait %wait
+}
+set %location %location + 1
+return
+
+
+
+
+
+;checks for mana
+sub waitForMana
+set %waitformanavalue %1
+if #maxmana < %waitformanavalue
+	{
+	display ok The mana you need ( , %waitformanavalue , ) exceeds your total, please change defaults
+	halt
+	}
+while #MANA < %waitformanavalue
+	{
+		gosub menuwatch
+		gosub status waiting , #spc , for , #spc , mana: , #spc , #MANA , / , %waitformanavalue
+		wait 1
+  }
+
+return
+
+
+
+
+
+;pauses script
+sub pausescript
+  gosub status script , #spc , paused... , #spc , click , #spc , unpause , #spc , to  , #spc , start , #spc , again.
+  set %pause #TRUE
+  menu button unpause %xmenu %ypause 80 20 unpause
+  for %i 1 10
+   {
+    wait 10
+    set %i 0
+    if #menubutton = unpause
+    {
+    set #menubutton n/a
+    gosub status script , #spc , resuming...
+    set %pause #FALSE
+    menu button pause %xmenu %ypause 80 20 pause
+    set %i 10
+    }
+   }
+return
+
+
+
+
+
+;quits script
+sub quit
+menu clear
+menu window title Gonzo's Runebook Copier
+menu text quit 85 10 Thank you!
+menu window size 240 40
+halt
+return
+

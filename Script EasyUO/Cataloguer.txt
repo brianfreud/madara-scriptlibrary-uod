@@ -1,0 +1,79 @@
+;==================================
+; Script Name: Cataloguer
+; Author: Sorrow
+; Version: 1.0
+; Client Tested with: xxxxx
+; EUO version tested with: 1.42 (0098)
+; Shard OSI / FS: OSI
+;==================================
+
+gosub showResultsmenu
+set %CONTAINERID #CONTID
+finditem * C_ , %CONTAINERID
+set %nCnt #findCnt
+if %CONTAINERID <> N/A
+{
+	for %i %nCnt 1
+		{
+			findItem * %i C_ , %CONTAINERID
+			set %sItemID #findID
+			event property %sItemID
+;			event ExMsg #CHARID 3 0 %CONTAINERID - %sItemID #PROPERTY
+			set %PARAM %CONTAINERID , - , %sItemID , #spc , #PROPERTY
+			menu List add text -------------------------------------------------------------------------
+			set %write %PARAM
+
+write:			
+			if $ in %write
+			{
+				str Len %PARAM
+				set %LenStringPARAM #strres
+				str Len %write
+				set %LenStringwrite #strres
+
+				str pos %PARAM $
+				set %posnow #strres
+
+			   	str left %PARAM #strres
+				str del #strres %posnow 1
+
+				str lower #strres
+				set %PARAM #strres
+				if %posnow <> %LenStringPARAM || %LenStringPARAM <> %LenStringwrite
+				{
+					menu List add text %PARAM
+					set %LenStringStart %posnow + 1
+					str Mid %write %LenStringStart %LenStringwrite
+					set %write #strres
+					str pos %write $
+					set %poswrite #strres
+					
+					str Mid %write 1 %poswrite
+					set %poswrite #strres
+					set %PARAM #strres
+				}	
+				else
+				{
+					menu List add text %PARAM
+					set %write %PARAM
+				}
+				goto write
+			}
+			wait 1s
+		}
+}
+halt
+
+sub showResultsmenu
+menu Clear
+menu Window Title Results
+menu Window Color BtnFace
+menu Window Size 600 270
+menu Font Name MS Sans Serif
+menu Font Size 8
+menu Font Style
+menu Font Color WindowText
+menu Font BGColor Window
+menu List Create text 10 10 580 250
+menu Show 421 270
+return

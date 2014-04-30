@@ -1,0 +1,395 @@
+;==================================
+; Script Name: Panther's Vet Trainer
+; Author: Panther_sn
+; Version: 2.2
+; Client Tested with: 5.0.8.0
+; EUO version tested with: euo 1.5 tv104
+; Shard OSI / FS: Only Tested On FS
+; Revision Date: 13 March 2007
+; Public Release: 1 May 2005
+; Global Variables Used: *pet1, *pet2
+; Purpose: To Train Vet On Freeshards
+;==================================
+; SETUP:
+;GET 2 ANIMALS (i RECCOMEND HORSES) AND STAND IN 1 SPOT
+;MAKE SURE YOU HAVE PLENTY OF BANDIES IN YOUR PACK
+; START SCRIPT
+; DO NOT RUN THIS SCRIPT UNATTENDED YOU NEVER KNOW WHAT WILL HAPPEN
+;==============================================
+; I Recommend being Guilded as Otherwise u will end up a criminal
+; if you aren't guilded and press yes to being guilded be aware you will end up as a criminal.
+; I ACCEPT NO RESPONSIBILITY FOR LOST PETS
+; Now uses pixel scanning to determine when to heal, and should mean Less dead Pets
+;ENJOY
+set %bandies ZLF_TOF
+;=================
+;DON'T EDIT BELOW HERE
+;===================
+gosub setup
+gosub pets_attack
+finditem *pet1 G
+move #findx #findy 1 3s
+
+mainloop:
+gosub check 1 2 *pet1
+gosub display
+gosub check 3 4 *pet2
+gosub display
+wait 1
+goto mainloop
+
+;Check Pixels To see If we Need To Heal
+sub check
+check:
+cmppix %2 f 7
+gosub allstop
+for %i 1 4
+{
+gosub heal %3
+}
+gosub pets_attack
+goto check
+cmppix %1 f 1
+gosub heal %3
+return
+
+
+;Sub For Healing
+sub heal
+set %to #scnt + 6
+finditem %bandies C_ , #backpackid
+if #findstack < 10
+{
+gosub allstop
+menu hide
+display OK You only Have #findstack Bandies Left$ Get More And Restart
+halt
+}
+set #lobjectid #findid
+event macro 17
+healwait:
+wait 1
+if #targcurs <> 1
+{
+if #scnt > %to
+{
+finditem %bandies C_ , #backpackid
+if #findstack < 10
+{
+gosub allstop
+menu hide
+display OK You only Have #findstack Bandies Left$ Get More And Restart
+halt
+}
+set %bandused %bandused + 1
+set %bandleft #findstack
+return
+}
+goto healwait
+}
+set #ltargetid %1
+set #ltargetKind 1
+event macro 22
+gosub scan
+wait 1
+finditem %bandies C_ , #backpackid
+if #findstack < 10
+{
+gosub allstop
+menu hide
+display OK You only Have #findstack Bandies Left$ Get More And Restart
+halt
+}
+set %bandused %bandused + 1
+set %bandleft #findstack
+return
+
+
+;Sub for scanning, menu, health check
+;and to see if we have finished heal
+sub scan
+scanloop:
+if #menubutton = stop || #menubutton = closed
+{
+msg all stop$
+msg all stay$
+menu hide
+halt
+}
+if #hits < #maxhits - 10
+{
+gosub allstop
+event sysmessage Waiting For MY Health to get Back UP
+hits_loop:
+if #hits <> #maxhits
+goto hits_loop
+gosub pets_attack
+return
+}
+if TOO_FAR_AWAY in #sysmsg
+{
+finditem %1 G
+wait 1
+move #findx #findy 1 3s
+wait 10
+return
+}
+if finish_applying in #sysmsg ||
++ heal_what_little in #sysmsg ||
++ barely_help in #sysmsg ||
++ skill_in in #sysmsg
+{
+return
+}
+if that_being_is_not_damaged in #sysmsg
+{
+set %bandused %bandused - 1
+return
+}
+if #scnt > %to
+{
+return
+}
+goto scanloop:
+
+;Sub to adjust Menu Display
+sub display
+if #menubutton = rate_button
+{
+execute http://www.easyuo.com/rate.php?p=155150
+set #menubutton Null
+}
+if #menubutton = closed
+{
+display YesNo Do You want to stop script?
+if #dispres = yes
+{
+msg all stop$
+msg all stay$
+Halt
+}
+if #dispres = no
+{
+menu show 0 0
+set #menubutton Null
+}
+}
+chooseskill vete
+str len #skill
+if #skill <> %veter
+{
+menu delete vet4
+set %veter #skill
+str ins #skill #dot #strRes
+set %vet #strRes
+menu Font Transparent #true
+menu Font Color yellow
+menu Text vet4 104 72 %vet
+wait 10
+menu delete vet4
+menu Font Transparent #true
+menu Font Color red
+menu Font Style
+menu Font Size 10
+menu Text vet4 104 72 %vet
+}
+if #skill > 899 && %Rate <> true
+{
+gosub Rate_button
+set %Rate true
+}
+if #skill = #skillcap
+{
+menu hide
+display yesno CONGRATULATIONS!! $
++ You are at %current_skill , #spc , Vet $
++ $
++ Would you Like to Rate this Script now?
+if #dispres = yes
+{
+execute http://www.easyuo.com/rate.php?p=269254
+}
+if #dispres = no
+{
+display OK Thanks for using Panther's Vet Trainer for Freeshards$
+}
+halt
+}
+if %bandleft <> %oldbandleft || %bandused <> %oldbandused
+{
+menu delete vet5
+menu delete vet6
+menu Font Transparent #true
+menu Font Size 10
+menu Font Style
+menu Font Color Yellow
+menu Text vet5 105 120 %bandleft
+set %oldbandleft %bandleft
+menu Font Color Yellow
+menu Text vet6 105 140 %bandused
+set %oldbandused %bandused
+}
+return
+
+
+;sub to make pets attack each other
+sub pets_attack
+msg all guard me$
+wait 10
+msg all kill$
+waitfortarget1:
+if #targcurs <> 1
+goto waitfortarget1
+set #ltargetid *pet1
+set #ltargetKind 1
+event macro 22
+wait 25
+msg all kill$
+waitfortarget2:
+if #targcurs <> 1
+goto waitfortarget2
+set #ltargetid *pet2
+set #ltargetKind 1
+event macro 22
+wait 10
+return
+
+;sub to make pets stop attacking
+sub allstop
+msg all stop$
+wait 1
+msg all stay$
+wait 1
+return
+
+
+
+;sub to setup pets, and screen
+sub setup
+set %Rate false
+display yesno Do You Have 2 Pets?
+if #dispres = no
+{
+display OK Get 2 Pets and Restart
+halt
+}
+event macro 31
+wait 10
+event macro 8 2
+wait 10
+event macro 10 2
+wait 10
+contpos 623 2
+wait 10
+event macro 8 7
+wait 10
+contpos 758 2
+gosub menu
+;Now for Animal Setup
+set %cont #contid
+display Please Drag your 1st Pet's Healthbar
+l1:
+if %cont = #contid
+goto l1
+wait 10
+l3:
+contpos 25 44
+wait 10
+if #contposx <> 25 || #contposy <> 44
+goto l3
+set *pet1 #contid
+wait 10
+set %cont #contid
+display Please Drag your 2nd Pet's Healthbar
+l2:
+if %cont = #contid
+goto l2
+wait 10
+l4:
+contpos 215 44
+wait 10
+if #contposx <> 215 || #contposy <> 44
+goto l4
+set *pet2 #contid
+wait 10
+savepix 156 87 1
+savepix 126 87 2
+savepix 345 87 3
+savepix 315 85 4
+return
+
+;--------- EasyUO Menu Designer Code Begin ---------
+sub menu
+menu Clear
+menu Window Title Panther's Vet Trainer
+menu Window Color Black
+menu Window Size 195 180
+menu Font Transparent #true
+menu Font Align Left
+chooseskill vete
+if #skill < 300
+{
+display ok You need to buy Vet upto 30.0 first$ Buy and then restart
+menu hide
+halt
+}
+str len #skill
+str ins #skill #dot #strRes
+set %vetstart #strRes
+set %veter #skill
+set %vet #strRes
+finditem %bandies C_ , #backpackid
+if #findkind = -1
+{
+display ok You Have no Bandies$ Stopping now$
+halt
+}
+set %bandleft #findstack
+set %bandused 0
+menu Font Name MS Sans Serif
+menu Font Size 10
+menu Font Style
+menu Font Color White
+menu Font Transparent #false
+menu Font Align Left
+menu Font BGColor Black
+menu Text EUOLabel1 8 52 Vet Started @:
+menu Font Color Red
+menu Text EUOLabel2 104 52 %vetstart
+menu Font Color White
+menu Text EUOLabel3 12 72 Vet Now @:
+menu Font Color Red
+menu Text vet4 104 72 %vet
+menu Shape EUOShape1 4 104 193 9 3 7 1 Black 4 Red
+menu Font Color White
+menu Text EUOLabel4 8 120 Bandies Left:
+menu Font Color Yellow
+menu Text vet5 105 120 %bandleft
+menu Font Color White
+menu Text EUOLabel6 8 140 Bandies Used:
+menu Font Color Yellow
+menu Text vet6 105 140 %bandused
+menu Font Size 12
+menu Font Style b
+menu Font Color White
+menu Font BGColor Red
+menu Button stop 6 4 180 41 Stop Script
+menu Show 800 3
+menu show 800 3
+set #menubutton NULL
+
+return
+
+sub Rate_button
+menu window size 195 220
+menu Font Style u
+menu Font Color White
+menu Text EUOLabel7 7 176 Do YOU find me Usefull?
+wait 10
+menu Text EUOLabel8 60 196 if so
+wait 10
+menu Font Color Red
+menu Font BGColor Silver
+menu Button rate_button 35 220 93 25 Rate Me
+menu window size 195 250
+return

@@ -1,0 +1,23 @@
+// Author: Gramoz
+//
+// Purpose: Train Healing from 0 to 120
+//
+// Descrizione: Allena healing da 0 a 120
+// Istruzioni: Comprate un "Magical wizard's hat" da un npc mago, procuratevi molte bende e mettetele nel vostro backpack, andate su "actions -> dress" create una nuova voce chiamata Hat e addateci il Magical. Prendete una barca, andate sulla rotta infinita, togliete l'ancora (raise anchor) e fate partire la macro
+// Consigli: Con questa macro vi salirà anche anatomy, quindi nel caso non vogliate farla salire bloccatela
+//
+// Instructions: Buy a "Magical wizard's hat" from a Mage npc, take a lot of bands and put them into your backpack. Go to "actions -> dress" and create a new suite called Hat and add the Magical wizard's hat to it. Take a boat, go on infinite lane, raise the anchor and start the macro
+//
+if skill "healing" == 120
+ for 3
+  sysmsg "120 HEALING!" 70
+  pause 500
+ endfor
+ stop
+endif
+msg "forward"
+dress "Hat"
+undress "Hat"
+usetype 0xe21
+waitfortarget 1000
+target! "self"

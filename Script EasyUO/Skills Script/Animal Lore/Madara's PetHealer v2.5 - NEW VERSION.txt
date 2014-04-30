@@ -1,0 +1,1693 @@
+;==================================================
+; Name: Madara's PetHealer 2.5
+; Author: Madara
+; Version: 2.5.2
+; Shard FS: UODreams
+; Client Tested With: 7.0.15 - 7.0.21 - 7.0.22
+; EUO version tested with: 1.5 v.236
+; Public Release: 06/03/2013
+; Last Revision: 20/04/2013
+; Credits: Boydon(Bone-Cutter)
+;==================================================
+; COSA FA LO SCRIPT?
+; - Se la vita del Pet scende sotto una certa Percentuale(%) di HP cura in loop usando le bende.
+; - Se la vita del Pet scende sotto una certa Percentuale(%) di HP cura, in contemporanea con la bendata, con Greather Heal per Magery o Obsu Vulni per Chivalry.
+; - Se il Pet è afflitto da Poison usa Arch Cure in contemporanea con la bendata, curando anche chi sta intorno, o Expor Flamus per Chivalry.
+; - Se il Pet è sotto Mortal Strike, lo script smette di usare Spell di cura/poison e attende che finisca per poi ricominciare immediatamente.
+; - Mostra la vita in Percentuale(%) sopra al vostro Pet.(Rosso=critica - Verde=buona)
+; - Se il Pet sta per morire(< 5%), lo script smette di usare Spell e vi lascia la "libertà" di scappare.
+; - Premendo un tasto, lo script si mette in Follow, seguendo cosi il vostro Pet per curarlo, anche se il mob si allontana/scappa.
+; - In caso di Save, si mette in pausa, in modo da riprendere da dove avete lasciato la Bendata/Spell.
+; - Lo script non si ferma MAI, potete salire/scendere dal pet tranquillamente, se muore ressa usando solo la bendata senza usare le Spell di cura.
+; - Potete anche trascinare una seconda LifeBar del Pet e muoverlo con assoluta tranquillità, non interferisce con lo script. (Metodo AUTOMATICO)
+; - Target check, cosi da non discordarvi il Pet o usare Taming o altre Skill in tranquillità*
+; - Taglia ossa incorporato, Cura, Benda e Taglia! (Il Bone-Cutter è quello del mitico Boydon, con qualche miglioramento)
+; - Discorda o Provoca in automatico alla pressione di un tasto.
+;============= RISOLUZIONE PROBLEMI ===============
+;============== METODO AUTOMATICO =================
+; 1)LA LIFEBAR DEL PET LAMPEGGIA E NON CURA:
+;   a) Provare a premere ESC.
+;   B) Se avete la Risoluzione Colori diversa da
+;      16Bit o 32Bit, lo script potrebbe non
+;      funzionare correttamente.
+;   c) Mettete la LifeBar in un punto dove non ci
+;      sia niente sotto(ScreenGame) o punti dove
+;      possano comparire Gump/Status/Scritte/Magie.
+; 2)LO SCRIPT HA PRESO UN ALTRO TARGET:
+;   Mettersi sotto al Pet oppure farlo venire
+;   verso di voi con All Follow Me, finche la
+;   Lifebar non prende il target giusto.
+; 3)SE USO DISCO/SPELL ALCUNE VOLTE PRENDE IL PET:
+;   Se usi tasti tipo All kill, oppure skill
+;   Peace/Disco/Provo/Taming vi conviene usarli a
+;   distanza di minimo 2 tile dal vostro Pet.
+; IN CASO DI PROBLEMI CON IL MENU DE-COMMENTA QUESTA RIGA:
+; set *first_time N/A
+;============= RISOLUZIONE PROBLEMI ===============
+;============ METODO SEMI-AUTOMATICO ==============
+; 1)PRENDO LA VITA SPINGO IL TASTO MA NIENTE:
+;   Trascina la vita e premi il Tasto sul Menu
+;   "Posiziona StatuBar.." per posizionarla.
+; 2)LO SCRIPT FUNZIONA MA NON CURA:
+;   Se avete la Risoluzione Colori diversa da
+;   16Bit o 32Bit, lo script potrebbe non
+;   funzionare correttamente.
+; 3)LO SCRIPT RIPETE IN LOOP "Trascina la vita..":
+;   Mettete la LifeBar in un punto dove non ci sia
+;   niente sotto(ScreenGame) o punti dove possano
+;   comparire Gump/Status/Scritte/Magie.
+; 4)SE USO DISCO/SPELL ALCUNE VOLTE PRENDE IL PET:
+;   Se usi tasti tipo All kill, oppure skill
+;   Peace/Disco/Provo/Taming vi conviene usarli a
+;   distanza di minimo 2 tile dal vostro Pet.
+; IN CASO DI PROBLEMI CON IL MENU DE-COMMENTA QUESTA RIGA:
+; set *first_time N/A
+;==================================================
+set %version v , #spc , 2.5
+set #sysmsgcol 2050
+set %slow_lpc 500
+set %fast_lpc 1000
+set #menubutton N/A
+set %Bende ZLF
+set %bonetypes LNF_QNF_WNF_PNF_KNF_MNF_JNF_YNF_VNF
+set %bladed FUO_ATF_NPO_JPH_WSF_NMH_VRH_JTF_SOH_BPH_
+           +EDP_YCP_ZCP_JDP_LDP_FDP_HDP_OPO_GMH_HNF_
+           +CNF_
+;==================================================
+initEvent
+set #lpc %fast_lpc
+set %S 0
+if *first_time = N/A
+ gosub menu2
+else
+{
+ menu hideeuo
+ menu hide
+ loop_findp:
+ event sysmessage Seleziona il Pet da curare.
+ gosub GetPet
+ set %Pet #result
+ if %Pet = N/A
+  loop_findp
+ event sysmessage ID Pet: %Pet
+ set %Benda *Benda
+ if *Spell = 1
+  set %Spell #true
+ if *Spell = 2
+  set %Spell #false
+ if *Skill = 1
+  set %Skill Magery
+ if *Skill = 2
+  set %Skill Chiva
+ set %Heal *Heal
+ if *Cure = 1
+  set %Cure #true
+ if *Cure = 2
+  set %Cure #false
+ if *HP = 1
+  set %HP #true
+ if *HP = 2
+  set %HP #false
+ set %Follow *Follow
+ set %StopFollow *StopFollow
+ set %GumpX *GumpX
+ set %GumpY *GumpY
+ if *Metodo = 1
+  set %Metodo #true
+ if *Metodo = 2
+  set %Metodo #false
+ set *first_time #false
+ set #menubutton N/A
+ goto loop_menu3
+}
+set #lpc %fast_lpc
+loop_menu:
+if #menubutton = CLOSED
+ halt
+if #menubutton = TARGETPET
+{
+ gosub GetPet
+ set %Pet #result
+ event sysmessage ID Pet: %Pet
+ set #menubutton N/A
+}
+if #menubutton = START
+{
+ if %Pet = N/A
+ {
+  event sysmessage Devi selezionare un Pet prima.
+  set #menubutton N/A
+  goto loop_menu
+ }
+ menu get Benda
+ set *Benda #menures
+ set %Benda *Benda
+ 
+ menu get Spell
+ set *Spell #menures
+ if *Spell = 1
+  set %Spell #true
+ if *Spell = 2
+  set %Spell #false
+  
+ menu get Skill
+ set *Skill #menures
+ if *Skill = 1
+  set %Skill Magery
+ if *Skill = 2
+  set %Skill Chiva
+  
+ menu get Heal
+ set *Heal #menures
+ set %Heal *Heal
+ 
+ menu get Cure
+ set *Cure #menures
+ if *Cure = 1
+  set %Cure #true
+ if *Cure = 2
+  set %Cure #false
+  
+ menu get HP
+ set *HP #menures
+ if *HP = 1
+  set %HP #true
+ if *HP = 2
+  set %HP #false
+  
+ menu get Follow
+ set *Follow #menures
+ set %Follow *Follow
+ 
+ menu get StopFollow
+ set *StopFollow #menures
+ set %StopFollow *StopFollow
+ 
+ menu get GumpX
+ set *GumpX #menures
+ set %GumpX *GumpX
+ 
+ menu get GumpY
+ set *GumpY #menures
+ set %GumpY *GumpY
+ 
+ menu get Metodo
+ set *Metodo #menures
+ if *Metodo = 1
+  set %Metodo #true
+ if *Metodo = 2
+  set %Metodo #false
+  
+ menu get Bardo
+ set *Bardo #menures
+ if *Bardo = 1
+  set %Bardo N/A
+ if *Bardo = 2
+  set %Bardo Disco
+ if *Bardo = 3
+  set %Bardo Provo
+
+ set *first_time #false
+ set #menubutton N/A
+ goto loop_menu3
+}
+goto loop_menu
+loop_menu3:
+set %hotkey1 #false
+set %hotkey2 #false
+set %hotk1 #true
+set %hotk2 #false
+set %B1 #false
+set %Doom #false
+set %Doom_first #true
+set %Doom_A #true
+set %Doom_B #false
+set %BendeF #true
+set %CureB 0
+set %CureA #false
+set %Lap 0
+set %CureC 1
+set %BleedA #false
+set %Bleed #true
+set %BleedB 0
+set %HPL1 #false
+set %HPL #true
+set %HPL2 0
+set %TimeBardoD 0
+set %TimeBardoP 0
+set %FBardo #false
+gosub menu3
+set #lpc %fast_lpc
+loop_s1:
+if *Bardo = 2
+{
+ ignoreitem reset mob
+ chooseskill Disc
+ set %Dist ( #Skill / 150 )
+ if %Dist = 0
+  set %Dist 8
+ else
+  set %Dist ( %Dist + 8 )
+}
+if *Bardo = 3
+{
+ ignoreitem reset mob
+ chooseskill Disc
+ set %Dist ( #Skill / 150 )
+ if %Dist = 0
+  set %Dist 8
+ else
+  set %Dist ( %Dist + 8 )
+}
+if %Metodo = #true
+{
+ menu delete Status
+ repeat
+  event macro 52 5
+  wait 1
+ until #ltargetid = %Pet
+ if #contsize = 160_60
+ {
+  set #contposx %GumpX
+  set #contposy %GumpY
+ }
+ else
+ {
+  key ESC
+  goto loop_s1
+ }
+ if #menubutton = RESET
+ {
+  gosub menu1
+  goto loop_menu
+  set #menubutton N/A
+ }
+}
+if %Metodo = #false
+ {
+  event sysmessage Prendi la Status del pet poi premi "STATUS"
+  loop_metodo1:
+  if #menubutton = STATUS
+  {
+   if #contid = %Pet
+   {
+    set #contposx %GumpX
+    set #contposy %GumpY
+   }
+   wait 10
+   set #menubutton N/A
+   goto main_loop
+  }
+ goto loop_metodo1
+}
+set #lpc %slow_lpc
+
+main_loop:
+while #CharGhost = YES
+ {
+ }
+if %FBardo = #true
+ gosub Bardo
+if %Doom = #true
+ gosub BoneCut
+if #menubutton = CLOSED
+ halt
+if #menubutton = RESET
+{
+ gosub menu1
+ goto loop_menu
+ set #menubutton N/A
+}
+if #menubutton = BARD
+{
+ if *Bardo = 2 && %FBardo = #true
+  menu set Bard Disco: Disattiva
+ if *Bardo = 3 && %FBardo = #true
+  menu set Bard Provo: Disattiva
+ if *Bardo = 2 && %FBardo = #false
+ {
+  ignoreitem reset mob
+  menu set Bard Disco: Attiva
+ }
+ if *Bardo = 3 && %FBardo = #false
+ {
+  ignoreitem reset mob
+  menu set Bard Provo: Attiva
+  _loopprovot
+  event sysmessage Seleziona il MOB a cui vuoi provocare gli altri.
+  set #TargCurs 1
+  repeat
+   wait 1
+  until #TargCurs = 0
+  if #LTargetId = #CharId
+   goto _loopprovot
+  set %LTarget #LTargetId
+  set #LTargetKind 1
+  ignoreitem %LTarget mob
+  wait 1s
+ }
+ if %FBardo = #false
+ {
+  ;ignoreitem reset mob
+  set %FBardo #true
+ }
+ else
+  set %FBardo #false
+ set #menubutton N/A
+ gosub Bardo
+}
+if #menubutton = PAUSA
+{
+ set #menubutton N/A
+ menu set Pausa RIPRENDI
+ menu set Azioni Script in Pausa
+ while #menubutton <> PAUSA
+ {
+ }
+ menu set Pausa Metti In Pausa
+ set #menubutton N/A
+}
+if %Doom = #true
+ gosub BoneCut
+if #menubutton = CURSE
+{
+ chooseskill Chiv
+ if #skill >= 65 && %life <> red
+ {
+  menu set Azioni Remove Curse
+  event macro 15 209 ; Remove Curse
+  set #ltargetid %Pet
+  set #ltargetkind 1
+  gosub save_clean
+  target 5s
+  event macro 22 ; Target Pet
+  set #menubutton N/A
+  menu set Curse Remove Curse
+ }
+ else
+ {
+  event sysmessage Per usare il Remove Curse devi avere almeno 65 punti Skill!
+  set #menubutton N/A
+ }
+ set #menubutton N/A
+}
+if #menubutton = DOOM
+{
+ if %Doom_A = #true
+ {
+  set %Doom #true
+  menu set m14 Attivato
+  set %Doom_A #false
+  set %Doom_B #true
+  set #menubutton N/A
+  goto _cut
+ }
+ if %Doom_B = #true
+ {
+  set %Doom #false
+  menu set m14 Disattivato
+  set %Doom_A #true
+  set %Doom_B #false
+  set #menubutton N/A
+  goto _cut
+ }
+ _cut:
+ if %Doom_first = #true
+ {
+  ignoreitem reset bones
+  gosub FindBlade
+  set %blade #result
+  set %Doom_first #false
+  set #menubutton N/A
+ }
+ gosub BoneCut
+ set #menubutton N/A
+}
+if %HPL1 = #true
+{
+ if %HPL2 = 6 ; loop show hp
+ {
+  set %HPL #true
+  set %HPL1 #false
+ }
+ else
+ {
+  set %HPL #false
+  set %HPL2 ( %HPL2 + 1 )
+ }
+}
+if %BleedA = #true
+{
+ if %BleedB = 6 ; loop stop bleed
+ {
+  set %Bleed #true
+  set %BleedA #false
+ }
+ else
+ {
+  set %Bleed #false
+  set %BleedB ( %BleedB + 1 )
+ }
+}
+if %CureC = 0
+{
+ if %Lap = 6 ; loop stop cure
+ {
+  set %CureC 1
+  set %Lap 0
+ }
+ else
+ {
+  set %Lap ( %Lap + 1 )
+ }
+}
+gosub save_clean
+finditem %Pet G_
+set #lpc %fast_lpc
+onhotkey %Follow
+ gosub hotkey1
+onhotkey %StopFollow
+ gosub hotkey2
+set #lpc %slow_lpc
+if %hotkey1 = #true && #finddist <> N/A
+{
+ if #charposx <> #findx || #charposy <> #findy
+ {
+  move #findx #findy 1 3s
+ }
+}
+if %hotkey2 = #true
+{
+ set %hotkey1 #false
+ set %hotkey2 #false
+}
+if %Doom = #true
+ gosub BoneCut
+finditem %Pet G_
+if %hits > %Benda && %life = blue || #finddist > 2
+{
+ menu set Azioni StandBy
+ set %HPL #true
+ set %HPL1 #false
+ set %Bleed #true
+ set %BleedA #false
+ set %CureB 0
+ set %Lap 0
+ set %CureC 1
+}
+if #finddist <= 2
+{
+ gosub GetHitBarLife %GumpX %GumpY
+ set %hits #result
+ set %life %1
+ menu set Hits %hits , %
+ menu set Life %life
+ if %HPL = #true
+ {
+  if %hits <= %Heal && %HP = #true
+   event exmsg #findid 0 38 #result , %
+  else
+  {
+   if %hits <= %Benda && %HP = #true
+    event exmsg #findid 0 73 #result , %
+  }
+  set %HPL1 #true
+  set %HPL2 0
+ }
+ if %life <> blue
+ {
+  if %life = red || %life = yellow || %life = green
+   goto exit1
+  loop_s2:
+  if %Doom = #true
+   gosub BoneCut
+  if %Metodo = #true
+  {
+   repeat
+    event macro 52 5
+    wait 1
+   until #ltargetid = %Pet
+   if #contsize = 160_60
+   {
+    set #contposx %GumpX
+    set #contposy %GumpY
+   }
+   else
+   {
+    key ESC
+    goto loop_s2
+   }
+  }
+ }
+  if %Metodo = #false
+  {
+   if #menubutton = STATUS
+   {
+    loop_metodo2:
+    if #contid = %Pet
+    {
+     set #contposx %GumpX
+     set #contposy %GumpY
+     set #menubutton N/A
+     goto exit1
+    }
+    goto loop_metodo2
+   }
+  }
+ exit1:
+ if %Doom = #true
+  gosub BoneCut
+ if %life = yellow && %Bleed = #true
+  {
+   chooseskill Chiv
+   if #skill >= 65 && %life <> red
+   {
+    menu set Azioni Remove Curse
+    event macro 15 209 ; Remove Curse
+    set #ltargetid %Pet
+    set #ltargetkind 1
+    gosub save_clean
+    target 5s
+    event macro 22 ; Target Pet
+    set %BleedA #true
+    set %BleedB 0
+   }
+   else
+    event sysmessage Per usare il Remove Curse devi avere almeno 65 punti Skill!
+  }
+ finditem %Bende C_ , #backpackid
+ set %BendaT #findstack
+ menu set BendaT %BendaT
+ if %hits <= %Benda || %life = green
+ {
+  finditem %Bende C_ , #backpackid
+  set %BendaT #findstack
+  menu set BendaT %BendaT
+  if #findstack = 50 || #findstack = 40 || #findstack = 30 || #findstack = 20 || #findstack = 10
+   event sysmessage Bende Rimaste: #findstack
+  if #findid = X && %B1 = #false
+  {
+   if %BendeF = #true
+   {
+    event sysmessage Bende Finite!
+    set %BendeF #false
+   }
+   goto bende_finite
+  }
+  if %hotkey1 = #true && #finddist <> N/A
+  {
+   finditem %Pet G_
+   if #charposx <> #findx || #charposy <> #findy
+   {
+    ;menu set Azioni Follow Pet...
+    move #findx #findy 1 3s
+   }
+  }
+  set %Targ ( #scnt + 5 )
+  if #targcurs <> 0
+  {
+   repeat
+    if #scnt >= %Targ
+     set #targcurs 0
+   until #targcurs = 0
+  }
+  if %life <> blue
+  {
+   if %life = red || %life = yellow || %life = green
+    goto exit2
+   loop_s3:
+   if %Doom = #true
+    gosub BoneCut
+   while #CharGhost = YES
+   {
+   }
+   if %Metodo = #true
+   {
+    repeat
+     event macro 52 5
+     wait 1
+    until #ltargetid = %Pet
+    if #contsize = 160_60
+    {
+     set #contposx %GumpX
+     set #contposy %GumpY
+    }
+    else
+    {
+     key ESC
+     goto loop_s3
+    }
+   }
+  }
+   if %Metodo = #false
+   {
+    if #menubutton = STATUS
+    {
+     loop_metodo3:
+     if #contid = %Pet
+     {
+      set #contposx %GumpX
+      set #contposy %GumpY
+      set #menubutton N/A
+      goto exit2
+     }
+     goto loop_metodo3
+    }
+   }
+  exit2:
+  if %Doom = #true
+   gosub BoneCut
+  gosub GetHitBarLife %GumpX %GumpY
+  set %hits #result
+  set %life %1
+  menu set Hits %hits , %
+  menu set Life %life
+  gosub save_clean
+  finditem %Bende C_ , #backpackid
+  if %hits <= %Benda && %life <> yellow && #findid <> X
+  {
+   while #CharGhost = YES
+   {
+   }
+   while A in #CharStatus
+   {
+   }
+   set %Targ ( #scnt + 5 )
+   if #targcurs <> 0
+   {
+    repeat
+     if #scnt >= %Targ
+      set #targcurs 0
+    until #targcurs = 0
+   }
+   if %Doom = #true
+    gosub BoneCut
+   menu set Azioni Benda
+   finditem %Bende C_ , #backpackid
+   set #lobjectid #findid
+   set #ltargetkind 1
+   event macro 17 ; Target Bende
+   gosub save_clean
+   set #ltargetid %Pet
+   set #ltargetkind 1
+   target 5s
+   gosub save_clean
+   event macro 22 ; Target Pet
+   set #lpc %fast_lpc
+   onhotkey %Follow
+    gosub hotkey1
+   onhotkey %StopFollow
+    gosub hotkey2
+   set #lpc %slow_lpc
+   set %time_bandage ( #scnt2 + 21 )
+   gosub save_clean
+   if #menubutton = CURSE
+   {
+    chooseskill Chiv
+    if #skill >= 65 && %life <> red
+     menu set Curse Attendi...
+   }
+   if #menubutton = BARD
+   {
+    menu set Bard Attendi...
+   }
+  }
+  bende_finite:
+  if %Doom = #true
+   gosub BoneCut
+  gosub save_clean
+  if %hits <= %Heal && %life <> red && %life <> yellow && %life <> green && #mana > 11 && %Spell = #true && %Skill = Magery
+  {
+   while #CharGhost = YES
+   {
+   }
+   if %hotkey1 = #true && #finddist <> N/A
+   {
+    finditem %Pet G_
+    if #charposx <> #findx || #charposy <> #findy
+    {
+     ;menu set Azioni Follow Pet...
+     move #findx #findy 1 3s
+    }
+   }
+   while A in #CharStatus
+   {
+   }
+   set %Targ ( #scnt + 5 )
+   if #targcurs <> 0
+   {
+    repeat
+     if #scnt >= %Targ
+      set #targcurs 0
+    until #targcurs = 0
+   }
+   if %Doom = #true
+    gosub BoneCut
+   menu set Azioni Greater Heal
+   event macro 15 28 ; GHeal
+   gosub save_clean
+   set #ltargetid %Pet
+   set #ltargetkind 1
+   target 5s
+   gosub save_clean
+   event macro 22 ; Target Pet
+   set #lpc %fast_lpc
+   onhotkey %Follow
+    gosub hotkey1
+   onhotkey %StopFollow
+    gosub hotkey2
+   set #lpc %slow_lpc
+   gosub save_clean
+   if #menubutton = CURSE
+   {
+    chooseskill Chiv
+    if #skill >= 65 && %life <> red
+     menu set Curse Attendi...
+   }
+   if #menubutton = BARD
+   {
+    menu set Bard Attendi...
+   }
+  }
+  gosub save_clean
+  if %Doom = #true
+   gosub BoneCut
+  if %hits <= %Heal && %life <> red && %life <> yellow && %life <> green && #mana > 10 && %Spell = #true && %Skill = Chiva
+  {
+   while #CharGhost = YES
+   {
+   }
+   if %hotkey1 = #true && #finddist <> N/A
+   {
+    finditem %Pet G_
+    if #charposx <> #findx || #charposy <> #findy
+    {
+     ;menu set Azioni Follow Pet...
+     move #findx #findy 1 3s
+    }
+   }
+   while A in #CharStatus
+   {
+   }
+   set %Targ ( #scnt + 5 )
+   if #targcurs <> 0
+   {
+    repeat
+     if #scnt >= %Targ
+      set #targcurs 0
+    until #targcurs = 0
+   }
+   if %Doom = #true
+    gosub BoneCut
+   menu set Azioni Obsu Vulni
+   event macro 15 202 ; Obsu Vulni
+   gosub save_clean
+   set #ltargetid %Pet
+   set #ltargetkind 1
+   target 5s
+   gosub save_clean
+   event macro 22 ; Target Pet
+   set #lpc %fast_lpc
+   onhotkey %Follow
+    gosub hotkey1
+   onhotkey %StopFollow
+    gosub hotkey2
+   set #lpc %slow_lpc
+   gosub save_clean
+   if #menubutton = CURSE
+   {
+    chooseskill Chiv
+    if #skill >= 65 && %life <> red
+     menu set Curse Attendi...
+   }
+   if #menubutton = BARD
+   {
+    menu set Bard Attendi...
+   }
+  }
+  if %life <> blue
+  {
+   if %life = red || %life = yellow || %life = green
+    goto exit3
+   loop_s4:
+   if %Doom = #true
+    gosub BoneCut
+   while #CharGhost = YES
+   {
+   }
+   if %Metodo = #true
+   {
+    repeat
+     event macro 52 5
+     wait 1
+    until #ltargetid = %Pet
+    if #contsize = 160_60
+    {
+     set #contposx %GumpX
+     set #contposy %GumpY
+    }
+    else
+    {
+     key ESC
+     goto loop_s4
+    }
+   }
+  }
+   if %Metodo = #false
+   {
+
+    if #menubutton = STATUS
+    {
+     loop_metodo4:
+     if #contid = %Pet
+     {
+      set #contposx %GumpX
+      set #contposy %GumpY
+      set #menubutton N/A
+      goto exit3
+     }
+     goto loop_metodo4
+    }
+   }
+  exit3:
+  if %Doom = #true
+   gosub BoneCut
+  gosub GetHitBarLife %GumpX %GumpY
+  set %hits #result
+  set %life %1
+  menu set Hits %hits , %
+  menu set Life %life
+  gosub save_clean
+  if %life = green && %Cure = #true && #mana > 11 && %Spell = #true && %Skill = Magery && %Lap = 0
+  {
+   while #CharGhost = YES
+   {
+   }
+   set %CureC 0
+   if %hotkey1 = #true && #finddist <> N/A
+   {
+    finditem %Pet G_
+    if #charposx <> #findx || #charposy <> #findy
+    {
+     ;menu set Azioni Follow Pet...
+     move #findx #findy 1 3s
+    }
+   }
+   while A in #CharStatus
+   {
+   }
+   set %Targ ( #scnt + 5 )
+   if #targcurs <> 0
+   {
+    repeat
+     if #scnt >= %Targ
+      set #targcurs 0
+    until #targcurs = 0
+   }
+   if %Doom = #true
+    gosub BoneCut
+   if %CureB = 1 ; loop enter arch cure
+    set %CureA #true
+   else
+    set %CureA #false
+   if %CureA = #false
+   {
+    menu set Azioni Cure
+    event macro 15 10 ; Cure
+    gosub save_clean
+    set #ltargetid %Pet
+    set #ltargetkind 1
+    target 5s
+    gosub save_clean
+    event macro 22 ; Target Pet
+    set #lpc %fast_lpc
+    onhotkey %Follow
+     gosub hotkey1
+    onhotkey %StopFollow
+     gosub hotkey2
+    set #lpc %slow_lpc
+    set %CureB ( %CureB + 1 )
+   }
+   if %CureA = #true
+   {
+    menu set Azioni Cure
+    event macro 15 24 ; Arch Cure
+    gosub save_clean
+    set #ltargetid %Pet
+    set #ltargetkind 1
+    target 5s
+    gosub save_clean
+    event macro 22 ; Target Pet
+    set #lpc %fast_lpc
+    onhotkey %Follow
+     gosub hotkey1
+    onhotkey %StopFollow
+     gosub hotkey2
+    set #lpc %slow_lpc
+    set %CureB 0
+   }
+   gosub save_clean
+   if #menubutton = CURSE
+   {
+    chooseskill Chiv
+    if #skill >= 65 && %life <> red
+     menu set Curse Attendi...
+   }
+   if #menubutton = BARD
+   {
+    menu set Bard Attendi...
+   }
+  }
+  gosub save_clean
+  if %Doom = #true
+   gosub BoneCut
+  if %life = green && %Cure = #true && #mana > 11 && %Spell = #true && %Skill = Chiva && %Lap = 0
+  {
+   while #CharGhost = YES
+   {
+   }
+   set %CureC 0
+   if %hotkey1 = #true && #finddist <> N/A
+   {
+    finditem %Pet G_
+    if #charposx <> #findx || #charposy <> #findy
+    {
+     ;menu set Azioni Follow Pet...
+     move #findx #findy 1 3s
+    }
+   }
+   while A in #CharStatus
+   {
+   }
+   set %Targ ( #scnt + 5 )
+   if #targcurs <> 0
+   {
+    repeat
+     if #scnt >= %Targ
+      set #targcurs 0
+    until #targcurs = 0
+   }
+   if %Doom = #true
+    gosub BoneCut
+   menu set Azioni Expor Flamus
+   event macro 15 201 ; Expor Flamus
+   gosub save_clean
+   set #ltargetid %Pet
+   set #ltargetkind 1
+   target 5s
+   gosub save_clean
+   event macro 22 ; Target Pet
+   set #lpc %fast_lpc
+   onhotkey %Follow
+    gosub hotkey1
+   onhotkey %StopFollow
+    gosub hotkey2
+   set #lpc %slow_lpc
+   gosub save_clean
+   if #menubutton = CURSE
+   {
+    chooseskill Chiv
+    if #skill >= 65 && %life <> red
+     menu set Curse Attendi...
+   }
+   if #menubutton = BARD
+   {
+    menu set Bard Attendi...
+   }
+  }
+  gosub save_clean
+  finditem %Bende C_ , #backpackid
+  if %hits <= %Benda && %life <> yellow && #findid <> X
+  {
+   set %AntiBlock ( #scnt + 3 )
+   deletejournal
+   loop_bendata:
+   while #CharGhost = YES
+   {
+   }
+   if #menubutton = CURSE
+   {
+    chooseskill Chiv
+    if #skill >= 65 && %life <> red
+     menu set Curse Attendi...
+   }
+   if #menubutton = BARD
+   {
+    menu set Bard Attendi...
+   }
+   if %Doom = #true
+    gosub BoneCut
+   gosub save_clean
+   scanjournal 1
+   set #lpc %fast_lpc
+   onhotkey %Follow
+    gosub hotkey1
+   onhotkey %StopFollow
+    gosub hotkey2
+   set #lpc %slow_lpc
+   if %hotkey1 = #true
+   {
+    finditem %Pet G_
+    if #charposx <> #findx || #charposy <> #findy
+    {
+     ;menu set Azioni Follow Pet...
+     move #findx #findy 1 3s
+    }
+   }
+   if You_finish_applying in #journal || You_have_cured in #journal || You_are_able in #journal || That_is_too_far_away in #journal || That_is_too_far_away in #sysmsg || #scnt2 >= %time_bandage || #scnt >= %AntiBlock
+   {
+    ;if #scnt2 >= %time_bandage && #targcurs = 1 || #scnt >= %AntiBlock && #targcurs = 1
+    ;{
+    ; key ESC
+    ;}
+    continue
+   }
+   else
+    goto loop_bendata
+  }
+ }
+}
+goto main_loop
+
+sub GetHitBarLife ; By Kal In Ex
+;menu set Azioni Check Status Pet
+set #lpc %fast_lpc
+namespace push
+namespace local GetHitBarLife
+set !ParamCount %0
+set !HitBarX %1
+set !HitBarY %2
+set !MaxHealth %3
+set !ScanX !HitBarX + 37
+set !ScanY !HitBarY + 43
+set !ScanXMax !HitBarX + 136
+set !RedNess _6502655_5912831_3746047_3223733_3223700_3221652_2695300_2695291_2695283_2695316_2695333_2695324_2171012_2170995_3217581_3741902_3219621_3219588_3743925_3743917_3217556_2693252_3217564_3219629_3741885_2693309_1579156_1583219_1581163_2173051_2173043_2170979_2170970_1579090_1052746_1052754_1577075_1577083_1579140_1577059_1577042_1577050_2166924_3215525_1052762_1577067_2166916_2691220_2691228_2166899_2166907_2691212_2166949_2166957_2166965_1052795_1054827_1056875_1054819_1577034_1579131_2168931_6502911_5913087_3746303_3223989_3223956_3221908_3221908_2695556_2695547_2695539_2695539_2695539_2695572_2695589_2695589_2695589_2695580_2695580_2171268_2695539_2171251_2695547_3219877_2695539_3219844_3219877_3744181_3744181_3744181_3744173_2695547_2695556_3219885_1583475_1581419_2173307_2173299_2171235_2171226_1057131_
+savepix !ScanX !ScanY 1
+if _ , #pixcol , _ notin _16229962_16229706_4390763_6502655_6502911_4894463_4894207_
+set %1 n/a
+if _ , #pixcol , _ in _16229962_16229706_ ; blue
+set %1 blue
+if _ , #pixcol , _ in _4390763_ ; green
+set %1 green
+if _ , #pixcol , _ in _6502655_6502911_ ; red
+set %1 red
+if _ , #pixcol , _ in _4894463_4894207_ ; yellow (mortal strike)
+set %1 yellow
+set !ScanX !ScanX + 50
+savepix !ScanX !ScanY 1
+if _ , #pixcol , _ in !RedNess
+set !ScanX !ScanX - 50
+set !ScanX !ScanX + 25
+savepix !ScanX !ScanY 1
+if _ , #pixcol , _ in !RedNess
+set !ScanX !ScanX - 25
+set !ScanX !ScanX + 13
+savepix !ScanX !ScanY 1
+if _ , #pixcol , _ in !RedNess
+set !ScanX !ScanX - 13
+set !ScanX !ScanX + 6
+savepix !ScanX !ScanY 1
+if _ , #pixcol , _ in !RedNess
+set !ScanX !ScanX - 6
+set !ScanX !ScanX + 3
+savepix !ScanX !ScanY 1
+if _ , #pixcol , _ in !RedNess
+set !ScanX !ScanX - 3
+set !ScanX !ScanX + 2
+savepix !ScanX !ScanY 1
+if _ , #pixcol , _ in !RedNess
+set !ScanX !ScanX - 2
+set !ScanX !ScanX + 1
+savepix !ScanX !ScanY 1
+if _ , #pixcol , _ in !RedNess
+set !ScanX !ScanX - 1
+set #result !ScanX - !HitBarX - 37
+if !ParamCount > 2
+set #result #result * !MaxHealth / 100
+namespace clear
+namespace pop
+set #lpc %slow_lpc
+return #result
+
+sub save_clean
+if %Doom = #true
+ gosub BoneCut
+ set #lpc %fast_lpc
+  {
+  scanjournal 1
+  if World_save in #journal && #jcolor = 53
+   {
+   set #lpc %slow_lpc
+   return
+   }
+  if saving in #journal && #jcolor = 53
+   {
+   menu set Azioni Save...
+   while 1 = 1
+    {
+    if World_save in #sysmsg
+     {
+     set #lpc %slow_lpc
+     return
+     }
+    }
+   }
+  if Cleaning in #journal && #jcolor = 53
+   {
+   menu set Azioni Clean...
+   while 1 = 1
+    {
+    if Cleaned in #sysmsg
+     {
+     set #lpc %slow_lpc
+     return
+     }
+    }
+   }
+  if Cleaned in #journal && #jcolor = 53
+   {
+   set #lpc %slow_lpc
+   return
+   }
+ set #lpc %slow_lpc
+return
+
+sub Bardo
+if *Bardo = 2 && %FBardo = #true
+{
+ if #scnt >= %TimeBardoD
+ {
+  set %Targ ( #scnt + 5 )
+   if #targcurs <> 0
+   {
+    repeat
+     if #scnt >= %Targ
+      set #targcurs 0
+    until #targcurs = 0
+   }
+  event macro 26
+  finditem #LTargetId G_
+  {
+   if #FindRep = 3 && #FindDist <= %Dist
+   {
+    menu set Azioni Discord
+    deletejournal
+    event macro 13 15
+    target 2s
+    event macro 22
+    set %TimeBardoD2 ( #scnt + 5 )
+    _loopjournal:
+     if #scnt >= %TimeBardoD2
+      return
+     scanjournal 1
+     if You_play_jarring_music,_suppressing_your_target's_strength. in #journal
+     {
+      ignoreitem #FindId mob
+      set %TimeBardoD ( #scnt + 7 )
+      return
+     }
+     if You_attempt_to_disrupt_your_target,_but_fail. in #journal
+     {
+      set %TimeBardoD ( #scnt + 7 )
+      return
+     }
+     if That_creature_is_already_in_discord. in #journal ||
+      + A_song_of_discord_would_have_no_effect_on_that. in #journal
+     {
+      ignoreitem #FindId mob
+      set %TimeBardoD ( #scnt + 1 )
+      return
+     }
+     if You_must_wait_a_few_moments_to_use_another_skill. in #journal
+     {
+      set %TimeBardoD ( #scnt + 1 )
+      return
+     }
+    goto _loopjournal
+   }
+  }
+ }
+}
+if *Bardo = 3 && %FBardo = #true
+{
+ if #scnt >= %TimeBardoD
+ {
+  set %Targ ( #scnt + 5 )
+   if #targcurs <> 0
+   {
+    repeat
+     if #scnt >= %Targ
+      set #targcurs 0
+    until #targcurs = 0
+   }
+  event macro 26
+  finditem #LTargetId G_
+  {
+   if #FindRep = 3 && #FindDist <= %Dist
+   {
+    deletejournal
+    event macro 13 22
+    target 2s
+    event macro 22
+    set #LTargetId %LTarget
+    set #LTargetKind 1
+    repeat
+     wait 1
+     event macro 22
+    until #TargCurs = 0
+    set %TimeBardoD2 ( #scnt + 5 )
+    _loopjournal2:
+     if #scnt >= %TimeBardoD2
+      return
+     scanjournal 1
+     if Your_music_succeeds,_as_you_start_a_fight. in #journal
+     {
+      ignoreitem #FindId mob
+      set %TimeBardoD ( #scnt + 7 )
+      return
+     }
+     if Your_music_fails_to_incite_enough_anger. in #journal
+     {
+      set %TimeBardoD ( #scnt + 7 )
+      return
+     }
+     if You_must_wait_a_few_moments_to_use_another_skill. in #journal ||
+      + The_creatures_you_are_trying_to_provoke_are_too_far_away_from_each_
+       +other_for_your_music_to_have_an_effect. in #journal
+     {
+      set %TimeBardoD ( #scnt + 2 )
+      return
+     }
+     if You_can't_tell_someone_to_attack_themselves! in #journal ||
+      + You_can't_incite_that! in #journal
+     {
+      ignoreitem #FindId mob
+      set %TimeBardoD ( #scnt + 2 )
+      return
+     }
+    goto _loopjournal2
+   }
+  }
+ }
+}
+return
+
+sub hotkey1
+if %hotk1 = #true
+{
+ set %hotkey1 #true
+ wait 1
+ event sysmessage Now Following!
+ set %hotk1 #false
+ set %hotk2 #true
+ deletejournal
+ event macro 32
+ scanjournal 1
+ if Always_run_is_now_off in #journal
+  event macro 32
+}
+return
+
+sub hotkey2
+if %hotk2 = #true
+{
+ set %hotkey2 #true
+ wait 1
+ event sysmessage Stop Following!
+ set %hotk2 #false
+ set %hotk1 #true
+ event macro 32
+}
+return
+
+sub GetPet
+	set #targcurs 1
+  while #targcurs = 1
+  {
+  }
+	finditem #ltargetid G_
+return #ltargetid
+
+sub BoneCut ; By Boydon
+for %l 1 10
+{
+ finditem %bonetypes G_2
+ if #findkind <> -1
+ {
+  menu set Azioni Taglio Ossa
+  set #lobjectid %blade
+  set #ltargetkind 1
+  event macro 17 0
+  set #ltargetid #findid
+  set #ltargetkind 1
+  target 2s
+  set %jstart #jindex
+  event macro 22 0
+  for %i %jstart #jindex
+  {
+   scanjournal %i
+   wait 1
+   if You_can't_use_a_bladed in #sysmsg ||
+    + You_see_nothing_useful_to_carve in #sysmsg ||
+    + You_may_not_carve in #sysmsg ||
+    + You_can't_use_a_bladed in #journal ||
+    + You_see_nothing_useful_to_carve in #journal ||
+    + You_may_not_carve in #journal
+   {
+    ignoreitem #findid bones
+    return
+   }
+  }
+ }
+}
+return
+
+sub FindBlade ; By Boydon
+	finditem %bladed C
+	if #findkind = -1
+	{
+  	choose:
+  	set #ltargetid XXXXXX
+  	set #targcurs 1
+  	display OK Impossibile trovare un'arma con cui tagliare$
+  							+Sceglierne una...
+		targLoop:
+		wait 1
+  	if #ltargetid = XXXXXX
+    	goto targLoop
+    finditem #ltargetid C
+    if #findkind = -1
+    {
+    	display ok Impossibile trovare l'arma selezionata$
+    						+Assicurarsi che il container nel quale è contenuta sia aperto e riprovare!
+    	goto choose
+    }
+	  return #ltargetid
+	}
+return #findid
+
+sub menu1
+set #lpc %fast_lpc
+menu hideeuo
+menu clear
+menu show 50 100
+for %i 0 450
+{
+ if %S < 300
+ {
+  set %S ( %S + 1 )
+ }
+ menu window Size %S %i
+}
+set %S 0
+menu window title Madara's PetHealer %version
+menu Font BGColor Black
+menu window color Black
+menu font color White
+menu Font Style i
+menu Font Size 8
+;menu text t1 173 1 Madara's PetHealer %version
+menu Font Size 15
+menu Font Style i
+menu font color Yellow
+menu text t2 40 10 Impostazioni
+menu Font Size 9
+menu Font Style
+menu font color White
+menu text maa 5 60 ___________________________
+menu text mbb 5 30 ___________________________
+menu text mmm 5 90 ___________________________
+menu text mcc 5 180 ___________________________
+menu text mdd 5 210 ___________________________
+menu text mee 5 270 ___________________________
+menu text mff 5 300 ___________________________
+menu text mgg 5 330 ___________________________
+menu text mhh 5 360 ___________________________
+menu text mhh 5 390 ___________________________
+menu text m1 5 50 1) Inizia la bendata al di sotto del:
+menu text m12 255 50 %
+menu text m2 5 80 2) Vuoi curarlo anche con Magie?
+menu font color Silver
+menu text m3 20 110 - Che skill vuoi usare?
+menu text m4 20 140 - Inizia a curarlo al di sotto del:
+menu text m41 255 140 %
+menu text m5 20 170 - Vuoi curarlo anche dal Poison?
+menu font color White
+menu text m6 5 200 3) Mostra % HP sopra al Pet?
+menu font color Silver
+menu text m7 20 230 - Tasto "Segui" Pet
+menu text m8 20 260 - Tasto "Stop Segui" Pet
+menu font color White
+menu text m9 5 290 4) Posizione orizzontale Status Pet
+menu text mA1 255 290 X
+menu text mB1 5 320 5) Posizione verticale Status Pet
+menu text mC1 255 320 Y
+menu text mD1 5 350 6) Scegli il Metodo che vuoi usare
+menu text mE1 5 380 7) Sei Bardo? Che Skill vuoi usare?
+
+menu Font Size 9
+menu Font Style
+menu font color Yellow
+menu edit Benda 210 45 40 95 ; *Benda
+menu combo create Spell 210 75 60
+menu combo add Spell Yes
+menu combo add Spell No
+menu combo select Spell 2 ; *Spell
+menu combo create Skill 210 105 80
+menu combo add Skill Magery
+menu combo add Skill Chiva
+menu combo select Skill 1 ; *Skill
+menu edit Heal 210 135 40 65 ; *Heal
+menu combo create Cure 210 165 60
+menu combo add Cure Yes
+menu combo add Cure No
+menu combo select Cure 2 ; *Cure
+menu combo create HP 210 195 60
+menu combo add HP Yes
+menu combo add HP No
+menu combo select HP 1 ; *HP
+menu edit Follow 210 225 40 N/A ; *Follow
+menu edit StopFollow 210 255 40 N/A ; *StopFollow
+menu edit GumpX 210 285 40 *GumpX
+menu edit GumpY 210 315 40 *GumpY
+menu combo create Metodo 210 345 80
+menu combo add Metodo Automatico
+menu combo add Metodo Semi-Automatico
+menu combo select Metodo *Metodo
+menu combo create Bardo 210 375 80
+menu combo add Bardo Nessuna
+menu combo add Bardo Discordance
+menu combo add Bardo Provocation
+menu combo select Bardo *Bardo
+
+menu Font Style b
+menu font color White
+menu Font Size 12
+menu button Start 5 415 75 30 Inizia
+menu Font Style b
+menu Font Size 12
+menu font color Yellow
+menu button TargetPet 85 415 210 30 Seleziona il Pet da Curare
+
+set #lpc %slow_lpc
+return
+
+sub menu2
+set #lpc %fast_lpc
+menu hideeuo
+menu clear
+menu show 50 100
+for %i 0 450
+{
+ if %S < 300
+ {
+  set %S ( %S + 1 )
+ }
+ menu window Size %S %i
+}
+set %S 0
+menu window title Madara's PetHealer %version
+menu Font BGColor Black
+menu window color Black
+menu font color White
+menu Font Style i
+menu Font Size 8
+;menu text t1 173 1 Madara's PetHealer %version
+menu Font Size 15
+menu Font Style i
+menu font color Yellow
+menu text t2 40 10 Impostazioni
+menu Font Size 9
+menu Font Style
+menu font color White
+menu text maa 5 60 ___________________________
+menu text mbb 5 30 ___________________________
+menu text mmm 5 90 ___________________________
+menu text mcc 5 180 ___________________________
+menu text mdd 5 210 ___________________________
+menu text mee 5 270 ___________________________
+menu text mff 5 300 ___________________________
+menu text mgg 5 330 ___________________________
+menu text mhh 5 360 ___________________________
+menu text mhh 5 390 ___________________________
+menu text m1 5 50 1) Inizia la bendata al di sotto del:
+menu text m12 255 50 %
+menu text m2 5 80 2) Vuoi curarlo anche con Magie?
+menu font color Silver
+menu text m3 20 110 - Che skill vuoi usare?
+menu text m4 20 140 - Inizia a curarlo al di sotto del:
+menu text m41 255 140 %
+menu text m5 20 170 - Vuoi curarlo anche dal Poison?
+menu font color White
+menu text m6 5 200 3) Mostra % HP sopra al Pet?
+menu font color Silver
+menu text m7 20 230 - Tasto "Segui" Pet
+menu text m8 20 260 - Tasto "Stop Segui" Pet
+menu font color White
+menu text m9 5 290 4) Posizione orizzontale Status Pet
+menu text mA1 255 290 X
+menu text mB1 5 320 5) Posizione verticale Status Pet
+menu text mC1 255 320 Y
+menu text mD1 5 350 6) Scegli il Metodo che vuoi usare
+menu text mE1 5 380 7) Sei Bardo? Che Skill vuoi usare?
+
+menu Font Size 9
+menu Font Style
+menu font color Yellow
+menu edit Benda 210 45 40 95 ; *Benda
+menu combo create Spell 210 75 60
+menu combo add Spell Yes
+menu combo add Spell No
+menu combo select Spell 2 ; *Spell
+menu combo create Skill 210 105 80
+menu combo add Skill Magery
+menu combo add Skill Chiva
+menu combo select Skill 1 ; *Skill
+menu edit Heal 210 135 40 65 ; *Heal
+menu combo create Cure 210 165 60
+menu combo add Cure Yes
+menu combo add Cure No
+menu combo select Cure 2 ; *Cure
+menu combo create HP 210 195 60
+menu combo add HP Yes
+menu combo add HP No
+menu combo select HP 1 ; *HP
+menu edit Follow 210 225 40 N/A ; *Follow
+menu edit StopFollow 210 255 40 N/A ; *StopFollow
+menu edit GumpX 210 285 40 5 ; *GumpX
+menu edit GumpY 210 315 40 30 ; *GumpY
+menu combo create Metodo 210 345 80
+menu combo add Metodo Automatico
+menu combo add Metodo Semi-Automatico
+menu combo select Metodo 2 ; *Metodo
+menu combo create Bardo 210 375 80
+menu combo add Bardo Nessuna
+menu combo add Bardo Discordance
+menu combo add Bardo Provocation
+menu combo select Bardo 1 ; *Bardo
+
+menu Font Style b
+menu font color White
+menu Font Size 12
+menu button Start 5 415 75 30 Inizia
+menu Font Style b
+menu Font Size 12
+menu font color Yellow
+menu button TargetPet 85 415 210 30 Seleziona il Pet da Curare
+
+set #lpc %slow_lpc
+return
+
+sub menu3
+set #lpc %fast_lpc
+menu hideeuo
+menu clear
+menu show 50 100
+for %i 0 300
+{
+ if %S < 210
+ {
+  set %S ( %S + 1 )
+ }
+ menu window Size %i %S
+}
+set %S 0
+menu window title Madara's PetHealer %version
+menu Font BGColor Black
+menu window color Black
+menu Font Size 15
+menu Font Style i
+menu font color Yellow
+menu text t2 60 10 Status
+menu Font Size 9
+menu Font Style
+menu font color White
+menu text m0 67 35 ________________________________
+menu text m00 5 65 _________________________________________
+menu text m000 5 95 _________________________________________
+menu text m1 5 40 Pet Status
+menu text m2 5 85 Bende:
+menu text m3 100 85 Taglia Ossa:
+menu font color Silver
+menu text m5 20 55 ID:
+menu text m6 90 55 Hits:
+menu text m7 180 55 StatusBar:
+menu Font Size 9
+menu Font Style
+menu font color White
+menu text m9 5 125 Script:
+menu font color White
+menu Font Style i
+menu Font Size 8
+menu text t1 167 30 Madara's PetHealer %version
+
+menu Font Style
+menu Font Size 10
+menu font color Yellow
+menu text Pet 40 55 %Pet
+menu text Hits 120 55 N/A
+menu text Life 240 55 N/A
+menu text BendaT 50 85 N/A
+menu text m14 175 85 Disattivato
+menu Font Size 12
+menu font color Lime
+menu Font Style b
+menu text Azioni 45 122 N/A
+
+menu Font Style b
+menu font color White
+menu Font Size 12
+menu button Start 5 180 153 25 Metti In Pausa
+menu button Reset 161 180 132 25 IMPOSTAZIONI
+menu Font Style b
+menu font color Yellow
+menu Font Size 12
+menu button Curse 161 155 132 20 Remove Curse
+menu Font Style b
+menu Font Size 12
+menu font color White
+menu button Status 161 115 132 35 S T A T U S
+menu Font Style b
+menu Font Size 12
+menu font color Yellow
+menu button Doom 167 5 125 20 DOOM
+if *Bardo = 2
+{
+ menu Font Style b
+ menu Font Size 12
+ menu font color Yellow
+ menu button Bard 5 155 153 20 Disco: Disattiva
+}
+if *Bardo = 3
+{
+ menu Font Style b
+ menu Font Size 12
+ menu font color Yellow
+ menu button Bard 5 155 153 20 Provo: Disattiva
+}
+
+set #lpc %slow_lpc
+return
+
+; end
+halt

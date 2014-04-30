@@ -1,0 +1,54 @@
+; NECESSARIO POUCH NELLO ZAINO CON MAGIC TRAP SOPRA
+=============================================
+; Script Name: Anti-Paralyze PvP
+; Author: Melikan
+; Version: 1.1
+; Client Tested with: 4.0.5b
+; EUO Version tested with: V1.42 (Build 009B)
+; Shard OSI / FS: OSI
+; Public Release: 10/29/04
+; Revised On: 10/30/04
+; Purpose: Trips a trapped crate whenever character is frozen.
+; The only setup that is needed is to place a trapped crate in your backpack
+; in the correct orientation. The only change needed to the script is to change
+; healme to either chivalry or magery, or if you dont want it to heal you when
+; the box takes your health below 80, then just put "none."
+=============================================
+
+set %healme chiv ; valid values are chiv, mage, or none.
+set #ltargetid XXX
+set %string1 you_cannot_move!
+set %string2 the_attack_has_temporarily
+display OK Please target your crate.
+set #targcurs 1
+targLoop:
+if #ltargetid = XXX
+goto targLoop
+set %crate #ltargetid
+
+scan:
+set %sysmsg _ , #sysmsg , _
+if %string1 in %sysmsg || %string2 in %sysmsg
+{
+set #LOBJECTID %crate
+event macro 17 0
+if #hits < 80
+{
+gosub %healme
+target
+event macro 23 0
+}
+}
+wait 0
+goto scan
+
+sub mage
+event macro 15 3
+return
+
+sub chiv
+event macro 15 202
+return
+
+sub none
+goto scan

@@ -1,0 +1,212 @@
+;===Aegis' Uber Tamer ============
+;===Ver 2.0=======================
+;===Author: Aegis=================
+;===Modified by: Kiuzzo===========
+set %MyPetID HEHN
+
+;===30/01/06======================
+;================================
+set %killMode 3
+set %HealMethod 5
+chooseskill anim
+set %TameBase #SKILL
+set *501 N/A
+set %Tamed 0
+set %Ignored 0
+gosub CreateMenu
+set %TempFollowers #FOLLOWERS
+event property #CHARID
+if [ notin #property
+Display Ok Warning: Aegis'tamer might not work properly if you're not in a Guild.
+gosub CommandRail start
+event ExMsg #CHARID 3 50 Waitin' for the rail..
+wait 7s
+event ExMsg #CHARID 3 50 3..
+wait 1s
+event ExMsg #CHARID 3 50 2..
+wait 1s
+event ExMsg #CHARID 3 50 1..
+wait 1s
+event ExMsg #CHARID 3 50 ..go!
+set %tamTimer #SCNT
+;============================================
+;=====Loop Principale=========================
+;============================================
+MainTameLoop:
+finditem *AegisTamerPlist G_ , %MaxFindRange
+if #FINDKIND <> -1
+    {
+    set %charX #CHARPOSX
+    set %charY #CHARPOSY
+    set %charZ #CHARPOSZ
+    gosub TameControl #FINDID
+    if %pback = -1
+        {
+        set %tamTimer #SCNT
+        while ( #SCNT < %tamTimer + 20 ) && ( ( %charX <> #CHARPOSX ) || ( %charY <> #CHARPOSY ) )
+            {
+            event pathfind %charX %charY %charZ
+            ;event ExMsg #CHARID 3 50  <Pathfinding back to StandBy>
+            wait 2s
+            }
+        ;event ExMsg #CHARID 3 50  <Resuming...>
+        }
+    wait 1s
+    chooseskill anim
+    if %TameBase <> #SKILL 2
+        menu delete gained
+        menu text gained 160 20 ( #SKILL - %TameBase )
+
+    menu delete Rail
+    menu text Rail 160 80 Running
+    gosub CommandRail resume
+    }
+
+if *500 = done
+    {
+    wait 3s
+    gosub CommandRail start
+    }
+
+if %HealMethod <> 6 && #HITS < #MAXHITS
+    gosub HealSelf %HealMethod
+
+wait 1
+goto MainTameLoop
+
+;************************************************
+;==%%%%========###############============%%%%===
+;===========&&&==#SUBROUTINES#==&&&==============
+;==%%%%========###############============%%%%===
+;************************************************
+sub TameControl
+set %MobToTame %1
+event property %MobToTame
+if tame in #PROPERTY
+    {
+    ignoreitem %MobToTame
+    ;event ExMsg #CHARID 3 50  <Ignoring Target>
+    set %Ignored %Ignored + 1
+    menu delete Ignored
+    menu text Ignored 160 60 %Ignored
+    return
+    }
+finditem %MobToTame G_
+if #FINDCOL = 1281
+    {
+    ;event ExMsg #CHARID 3 50  <Paragon Found: Proceeding to kill>
+    gosub CommandRail pause
+    gosub KillMob %MobToTame
+    gosub CommandRail resume
+    return
+    }
+
+menu delete Rail
+menu text Rail 160 80 Paused
+gosub CommandRail pause
+;event ExMsg %MobToTame 3 50  Tame me! Tame me!
+set %TempFollowers #FOLLOWERS
+set %tamTimer #SCNT
+
+tameloop:
+finditem %MobToTame G_
+event property %MobToTame
+if ( tame in #PROPERTY ) && ( %TempFollowers = #FOLLOWERS )
+    {
+    ignoreitem %MobToTame
+    ;event ExMsg #CHARID 3 50  <Tamed by someone else: Ignoring Target>
+    set %Ignored %Ignored + 1
+    menu delete Ignored
+    menu text Ignored 160 60 %Ignored
+    return
+    }
+
+
+if ( get_there in #SYSMSG ) || ( #SCNT > %tamTimer + 20 ) || ( #FINDKIND = -1 )
+    {
+    ;event ExMsg #CHARID 3 50  <Ignoring Target>
+    ignoreitem %MobToTame
+    set %Ignored %Ignored + 1
+    menu delete Ignored
+    menu text Ignored 160 60 %Ignored
+    return
+    }
+if #FINDDIST > 2
+    {
+    event pathfind #FINDX #FINDY #FINDZ
+    wait 1s
+    goto tameloop
+    }
+
+set %tamTimer #SCNT
+event macro 13 35
+target 1s
+set #lTargetID %MobToTame
+set #lTargetKind 1
+event Macro 22
+
+if %TempFollowers <> #FOLLOWERS
+{
+    gosub KillMob %MobToTame
+    menu delete Tamed
+    set %Tamed %Tamed + 1
+    menu text Tamed 160 40 %Tamed
+    return
+}
+
+goto tameloop
+return
+;==============%1 il Target Da Segare==============
+sub KillMob
+msg all guard me$
+if %killMode = 3 2
+gosub KIllWMount %1
+return
+
+if %killMode = 2 2
+gosub SummonEarth %1
+return
+
+msg all guard me$
+wait 1s
+repeat
+set #LTargetID %1
+event macro 27
+wait 1s
+finditem %1
+until #FINDKIND = -1
+
+return
+;===Sega con il mount==============================
+;====%1 Il Target da segare=========================
+sub KIllWMount
+repeat
+set #lObjectID #CHARID
+event macro 17
+wait 5
+finditem %MyPetID
+until #FINDKIND <> -1
+
+WaitDeathMo:
+msg all kill $
+target 3s
+set #lTargetID %1
+set #lTargetKind 1
+event Macro 22
+wait 5s
+msg all guard me$
+wait 3s
+finditem %1 G_15
+if #FINDKIND <> -1
+goto WaitDeathMo
+
+monta:
+msg all follow me$
+set #lObjectID %MyPetID
+event macro 17
+wait 5
+finditem %MyPetID
+if #FINDKIND <> -1
+goto monta
+
+return

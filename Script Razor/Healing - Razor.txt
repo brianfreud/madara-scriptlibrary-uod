@@ -1,0 +1,19 @@
+// Chiamate la macro "Healing"
+
+!Loop
+Assistant.Macros.IfAction|3|-1|0
+Assistant.Macros.HotKeyAction|3002021|
+Assistant.Macros.PauseAction|00:00:00.1000000
+Assistant.Macros.IfAction|4|0|your concentration is disturbed, thus ruining thy spell.
+Assistant.Macros.HotKeyAction|0|Play: Healing
+Assistant.Macros.EndIfAction
+Assistant.Macros.PauseAction|00:00:00.1100000
+Assistant.Macros.IfAction|4|0|your concentration is disturbed, thus ruining thy spell.
+Assistant.Macros.HotKeyAction|0|Play: Healing
+Assistant.Macros.EndIfAction
+Assistant.Macros.HotKeyAction|1059|
+Assistant.Macros.ElseAction
+Assistant.Macros.HotKeyAction|3002014|
+Assistant.Macros.PauseAction|00:00:00.0700000
+Assistant.Macros.HotKeyAction|1059|
+Assistant.Macros.EndIfAction

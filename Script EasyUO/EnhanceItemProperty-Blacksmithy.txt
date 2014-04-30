@@ -1,0 +1,931 @@
+;================================== 
+; Script Name: RoadkillsUltraEnhancer.txt
+; Author: Roadkill
+; Version: 1.7 
+; Client Tested with: 4.0.5b
+; EUO version tested with: build 009b
+; Shard OSI / FS: OSI
+; Revision Date: 9Nov04
+; Public Release: 7Mar04
+; Global Variables Used: 
+; Purpose: Calculate all enhancements at once (metal/leather), for armor or weapons, 
+;	enhancement success and breakage chances, and perform one-click 
+;	actual enhancement of the item
+;==================================
+;16Feb04
+;notes: Props go to Excite for his original armour enhancer script,
+;	which calculated one enhancement at a time.  The core parser framework started as his.
+;-ver 1.1 added adjustments for skills > GM and ASM
+; Instructions: 
+;   	1. Press the "select item" button and target an item to enhance
+;	2. Read all the info and decide what you want to do
+;	3. Press the button above what you wnat to enhance with.  You must have the
+;		correct materials in your main pack, and enough!
+;	4. Tailorables, armor, weapons, shields all calculate correctly
+;    
+; Additional Info: 
+;    Enable/Disable Hotkey is just like using the Select Item button but 
+;    you can use a defined hotkey to perform the action, like Shift + Z. 
+; ================== USER VARIABLES (no action needed if you use the button)== 
+; Recommend: Just load it and hit play!
+; Enable Hotkey #true/#false
+Set %HKEnabled #false 
+; HotKey to select bring up selection cursor (if enabled) 
+Set %HotKey A 
+; Additional Keypress 
+Set %HotKeyMod CTRL 
+; 
+; ============ DO NOT EDIT BEYOND THIS POINT ============ 
+; 
+InitEvents 
+Set %Version v1.7 
+Set %Property1 Physical , #spc , Resist 
+Set %Property2 Fire , #spc , Resist 
+Set %Property3 Cold , #spc , Resist 
+Set %Property4 Poison , #spc , Resist 
+Set %Property5 Energy , #spc , Resist 
+Set %Property6 Lower , #spc , Requirements 
+Set %Property7 Durability 
+Set %Property8 Luck 
+;---rkadds--
+set %Property9 Strength , #spc , Requirement
+set %TotalProps 9
+;-----------
+Set %R1 Dull_6_0_0_0_0_20_50_0_ 
+Set %R2 Shadow_2_1_0_0_5_0_100_0_ 
+Set %R3 Copper_1_1_0_5_2_0_0_0_ 
+Set %R4 Bronze_3_0_5_1_1_0_0_0_ 
+Set %R5 Golden_1_1_2_0_2_30_0_40_ 
+Set %R6 Agapite_2_3_2_2_2_0_0_0_ 
+Set %R7 Verite_3_3_2_3_1_0_0_0_ 
+Set %R8 Valorite_4_0_3_3_3_0_40_0_ 
+Set %R9 Spined_5_0_0_0_0_0_0_40_ 
+Set %R10 Horned_2_3_2_2_2_0_0_0_ 
+Set %R11 Barbed_2_1_2_3_4_0_0_0_ 
+Set %PBefore 
+Set %PAfter 
+For %i 1 %TotalProps 
+{ 
+   Set %PB . %i 0 
+   Set %PA . %i 0 
+   Set %PBefore %PBefore , $ , %PB . %i 
+   Set %PAfter %PAfter , $ , %PA . %i 
+} 
+Set %TBefore 0 
+Set %TAfter 0 
+;---uose add, not in order--
+	set %uoseplatetypes dcp_wbp_fwo_dwo_zbp_ecp_lwo_qwo_
+	set %uosestuddedtypes _mwo_fcp_nwo_pcp_tbp_
+	set %uoseleathertypes _ubp_gwo_gcp_rwo_ccp_lcp_ncp_mcp_ocp_
+	set %uosechaintypes _ewo_
+;armor piece order is helmet__gorgot__tunic__arms__gloves__leggings
+;  with double between parts, single between similar pieces (say 2 arm types)
+set %bonearmortypes _zph_yph____wph_pph__bqh_qph__vph_aqh__xph_cqh_
+set %leatherarmortypes _njl_qjl__jkh__qkh_dlh__hkh_pkh__skh_kkh__vkh_elh_
+set %studdedarmortypes __alh_ulh_llh__ykh_glh__xkh_flh__rlh_mlh_TSK
+set %otherLeatherarmortypes _atk_zsk_osk_nsk_usk_ssk_rsk_qsk_psk_ysk_
+set %tailorableTypes %bonearmortypes , %leatherarmortypes , %studdedarmortypes , 
+	+ %otherLeatherarmortypes , %uosestuddedtypes , %uoseleathertypes
+set %uosewpntypes _hdp_ddp_fdp_zcp_ycp_xcp_idp_adp_ldp_jdp_kdp_edp_
+set %weapontypes _FMH_GFF_EPH_LPH_BPH_CUO_TSF_LPO_JPH_ZTH_MPF_RMH_SOH_ 
++FUO_WSF_ATF_OMH_XPO_QPO_NMH_WOH_BNF_LTF_VPO_TOH_WTH_VRH_KTF_LMH_ 
++OLH_FFF_ZSF_YTH_BUO_ASF_ISF_BSF_QPF_KPH_CUH_NPO_MPH_UOH_TRH_XRH_CSF_ 
++KPO_POH_RRH_WPO_EMH_MSF_OPO_BUH_GUO_MMH_VTH_BFF_QMH_YSF_NSF_LSF_ 
++GMH_JTF_SRH_CNF_FBG_HNF_ZPF_GBG_OSF_INF_HSF_AUO_ZTO_FSF_WRH_MTF_JPO_ 
++RPF_HFF_XSF_YPO_JSF_DMH_XTH_PPO_QOH_URH_CQF_CFF_PMH_AUH_SPO_CPH_AQF_ 
++MPO_YRH_USF_JOH_KSF_ZRF_IFF_ , %uosewpntypes  
+set %shieldtypes _LIK_MIK_CLK_AIK_CIK_LYD_GIK_NIK_ZHK_HLK_BLK_FIK_BIK_OIK_
+set %bowtypes _WOH_TOH_QPO_SPO_
+set %xbowtypes _JSF_USF_LMH_MMH_PPO_RPO_
+set %no_enhancetypes tlh_ , %bowtypes , %xbowtypes
+if *no_enhancetypes = n/a
+	set *no_enhancetypes %no_enhancetypes
+event Macro 8 2
+wait 1s
+if #backpackid <> n/a
+	set %mainpack #backpackid
+else
+{
+	event macro 8 7
+	wait 1s
+	set %mainpack #contid
+}
+;--------end constants and var initialization--------
+GoSub BuildMenu
+Set #MenuButton 0 
+MainLoop:
+	wait 3
+	IF %HKEnabled
+	{
+		OnHotKey %HotKey %HotKeyMod 
+    	  	Set #MenuButton SelectItem
+	}
+	IF #MenuButton <> 0
+	{
+		if #menubutton in SelectItem_Closed_ToggleHotkey_Advice
+		{
+			GoSub #menubutton 
+			set #menubutton 0
+			goto Mainloop
+		}
+		gosub EnhanceItem %ItemToEnhance #menubutton %mainpack
+		set #menubutton 0
+	}
+GoTo MainLoop 
+;--------------------------------
+sub ToggleHotkey
+	if %HKEnabled
+	{
+		Set %HKEnabled #false
+		menu set ToggleHotKey Turn Hotkey' %hotkeymod %hotkey 'on
+	}
+	else
+	{
+		Set %HKEnabled #true
+		menu set ToggleHotKey Turn Hotkey' %hotkeymod %hotkey 'off	
+	}
+return
+;=========================
+sub closed
+	Menu hide 
+	Halt
+return
+;==============================
+sub SelectItem
+  	Set #MenuButton 0 
+   	Set #TargCurs 1 
+   	Wait 5 
+   TargetLoop:
+   	wait 3
+   	IF #TargCurs = 1 
+      		GoTo TargetLoop 
+	set %ItemToEnhance #ltargetid
+	gosub setEnhanceProps %ItemToEnhance tailorable enhanceable
+	if ! %enhanceable
+		return
+   	Event Property %ItemToEnhance
+   	;-----item prop display add------
+   	gosub writeproperty
+  	;force pbefore to be a string to fix the physdmg wierdness, instead of hex
+   	set %PBefore z
+   	Set %TBefore 0
+   	;cycle through the defined properties (now %totalprops)
+   	set #lpc 2000
+   	For %i 1 %TotalProps 
+   	{ 
+      		GoSub ScanProperties %Property . %i #Property %i
+      		;concatenate into vertical string for print
+      		set !pbi %PB . %i
+      		if %PBefore = z
+      			set %PBefore !pbi
+      		else
+      			Set %PBefore %PBefore , $ , !pbi
+      		;Set %PBefore %PBefore , $ , %PB . %i 
+      		IF %i < 6 
+         		Set %TBefore %TBefore + %PB . %i 
+   	} 
+
+   	Menu delete PAfter 
+   	Menu delete TAfter
+   	for !_m 1 11
+   	{
+   		menu delete Rprop . !_m
+   	}
+   	menu font color aqua
+   	Menu delete PBefore 
+   	Menu text PBefore 120 70 %PBefore 
+   	Menu delete TBefore 
+   	Menu text TBefore 120 203 %TBefore
+   	menu font color white
+   	set %j 1
+   	set %k 8
+   	if %tailorable
+   	{
+   		set %j 9
+   		set %k 11
+   	}
+   	For %i %j %k 
+   	{
+   		GoSub Calculate %R . %i %i
+	}
+	set #lpc 10
+	menu Shape EUOShape1 1 139 750 4 3 7 1 Black 7 white
+return
+;=========================
+Sub ScanProperties 
+; %1 = property to scan for
+; %2 = the #property string
+; %3 = what prop index this is
+	set !slash /
+	Set %Delimiter % 
+	IF %1 = Luck || %1 = Durability || Strength IN %1
+   		Set %Delimiter $
+_durabilityfix:
+	Str len %1 
+	Set %VarLength #StrRes + 1 
+	Str Pos %2 %1 
+	IF #StrRes = 0
+	{
+   		Set %PB . %3 0
+   		;Set %PB . %3 #StrRes 
+   		Return
+   	}
+   	;strres holds the pos of the propstring in #property now
+	Set %Temp #StrRes - 1 
+	Str del %2 1 %Temp 
+	Set %2 #StrRes 
+	Str pos %2 %Delimiter 
+	Set %Temp #StrRes - 1 
+	Str left %2 %Temp
+	set !ztemp #strres
+	str pos #strres !slash
+	if %1 = Durability && #strres = 0
+	{
+		str len !ztemp
+		set !zlen #strres + 1
+		str del %2 1 !zlen
+		set %2 #strres
+		goto _durabilityfix
+	}
+	Set %2 !ztemp 
+	IF %1 = Durability
+	{
+   		Str Pos %2 /
+   		if #strres <> 0
+   			Set %VarLength ( ( #StrRes + 1 ) - %VarLength ) + %VarLength
+   	}
+	Str del %2 1 %VarLength 
+	Set %PB . %3 #StrRes 
+Return 
+;==================================
+Sub Calculate 
+;%1= the R1 etc enhancement string
+;%2= the '1' enhancement index etc
+set !string %1
+set !i %2
+Str pos !string _ 
+Str del !string 1 #StrRes 
+Set !string #StrRes 
+Set %PAfter 0$ 
+Set %TAfter . !i 0 
+set !successchanceInit #false
+set !physdmg_adj 0
+set !ePropstring
+;cycle through the defined properties
+For %ii 1 %TotalProps 
+{ 
+   Str pos !string _ 
+   Set %Temp #StrRes - 1 
+   Str left !string %Temp 
+   Set %PA . %ii %PB . %ii + #StrRes
+   ;---22Sep04 make strings displaying delta-props for display
+   ;!eprop is the individual enhance prop for this matrl, this resist
+   ;!ePropstring is the whole string of that matrl
+   set !eprop #strres
+   if #strres = 0
+   	set !eprop
+   if %ii <= 8
+   	set !ePropstring !ePropstring , !eprop , $
+   ;----adjust for weapons dropping physical damage < 0
+   if %ii = 1 && %PA1 < 0
+   {
+   	set !physdmg_adj abs ( %PA1 )
+   	set %pa1 0
+   }
+   if !physdmg_adj > 0 && %ii > 1
+   {
+   	if #strres <= !physdmg_adj
+   	{
+   		set %PA . %ii %PB . %ii
+   		set !physdmg_adj !physdmg_adj - #strres
+   	}
+   	else
+   	{
+   		set %PA . %ii %PA . %ii - !physdmg_adj
+   		set !physdmg_adj 0
+   	}
+   }
+   ;---end of negative phys damage adjustment--------
+   gosub SuccessChance %ii #strres success breakage %tailorable
+   ;*****for the str req value, if dull or gold, calc new str
+   ;note!! must use sep calcs as below, as EUO interprets 8 / 10 as 0!!! Integer only!
+   ;displayedStrReq = %PB9
+   ;calculated Str Req = %PA9
+   ;if %PB6 <> 0, then there is a lower req and the displayed str req isn't true
+   ;%PA6 is the TOTAL lower requirements percent to apply to the true str required
+   ;   for armour, gold is -30% dull=-20%, for wpns both are -50%
+   ;   not correct for weapons yet, need to filter for them
+   ;20Aug04--it's NOT a % after all, it's a straight 20/30/50, same with durability/luclk
+   if %ii = 9 && %PA6 <> %PB6
+   {
+ 	set !fix1 %pb9 * ( 100 - %pa6 )
+ 	set !fix2 %pb9 * ( 100 - %pb6 )
+ 	set %pa9 %pb9 * !fix1 / !fix2
+    }
+    
+   ;***********************************
+   Set %PAfter %PAfter , $ , %PA . %ii 
+   Set %Temp %Temp + 1 
+   Str del !string 1 %Temp + 1 
+   Set !string #StrRes 
+   IF %ii < 6 
+      Set %TAfter . !i %Tafter . !i + %PA . %ii 
+} 
+;-----print results
+;menu set Rprop , !i !ePropstring
+Str del %PAfter 1 3 
+Set %PAfter . !i #StrRes 
+set !x ( 50 * !i ) + 160
+Menu delete PAfter . !i
+Menu text PAfter !x 70 %PAfter . !i
+Menu delete TAfter . !i
+Menu text TAfter !x 203 %TAfter . !i
+;--add for material enhance amount strings
+;Menu font size 6 
+Menu font style n
+menu font color yellow
+;menu delete RProp . !i
+set !xx !x - 18
+menu text RProp . !i !xx 70 !ePropstring
+;Menu font size 8 
+Menu font style B
+menu font color white
+;--end----
+set !txt failtext , !i
+menu delete !txt
+menu font color lime
+menu text !txt !x 15 %success
+menu font color red
+menu text !txt !x 30 %breakage
+menu font color white
+;Menu font style B 
+Return 
+;===============================
+;* @name SuccessChance
+;* @author Roadkill
+;* @ver 1.2 22Sep 04
+;* @purpose calculate the chance of breakage and failure for enhancing
+;* @params %1 is the index of current property
+;* 	%2 is the amount to be added to the property (only matters that it's > 0)
+;*	@%3 is the return variable holding successchance
+;*	@%4 is the return var holding breakage chance
+;*	%5 is #t/f, whether it's tailorable or not, used to decide what skill to inspect
+;* @notes amount to be added doesn't matter, only original value and # of props
+;*	%breakage is 10% less than %failure
+;* - All Resistances (1-5): Failiure % = 20 + Current Resistance
+;* - Lower Requirements (6): Failure % = 20 + ( Current Lower Requirements% / 4 )
+;* - Durability (7): Failure % = 20 + ( Current Max. Durability / 40 )
+;* - Luck (8): Failiure % = 30 + ( Current Luck / 2 )
+;*  Drop all decimals from the calculations.
+;* The chance of breaking an item is about 10% < failiure chance for each property that is enhanced
+;* From Hans/Dev: GM reduces failure by 1%, 2% for 110skill, 3% 120skill, ASM lowers it 1%
+;*	for each 10skill > 120
+sub SuccessChance
+	if %1 = 9
+		return
+	if %1 <= 5
+		set !fail ( %pb . %1 ) + 20
+	if %1 = 6
+		set !fail ( %pb . %1 ) / 4 + 20
+	if %1 = 7
+		set !fail ( %pb . %1 ) / 40 + 20
+	if %1 = 8 
+		set !fail ( %pb . %1 ) / 2 + 30
+	;---ver 1.1, adjust for skill>= 100 and ASM in hand----
+	chooseskill black
+	if %5
+		chooseskill tailor
+	;hans/dev team says skill only affects it at >=GM
+	if #skill >= 1000
+	{
+		set !failadj ( #skill - 900 ) / 100
+		set !fail !fail - !failadj
+	}
+	;----------------
+	set !break !fail - 10
+	set !success 100 - !fail
+	set !unbroken 100 - !break
+	;only apply if you are attempting to add to the prop
+	if %2 > 0
+	{
+		if !successchanceInit = #false
+		{		
+			set !tfail !fail
+			set !tbreak !break
+			set !tsuccess !success
+			set !tunbroken !unbroken
+			set !successchanceInit #true
+			set !divisor 1
+			goto _exitSuccessChance
+		}
+		set !tbreak !tbreak * !break
+		set !tsuccess !tsuccess * !success
+		set !tunbroken !tunbroken * !unbroken
+		set !divisor !divisor * 100
+	}	
+_exitSuccessChance:
+	if %1 = 8
+	{
+		set % . %3 !tsuccess / !divisor
+		set % . %4 100 - ( !tunbroken / !divisor )
+	}
+return
+;=======================
+Sub BuildMenu 
+Menu clear 
+;Menu hideeuo 
+menu show 10 520
+Menu window size 750 245 
+Menu window title Roadkill's UltraEnhancer ver. %version
+Menu window color black 
+Menu font bgcolor black 
+Menu font name Arial 
+Menu font size 8 
+Menu font style B 
+menu Shape EUOShape1 75 48 5 171 3 7 1 Black 7 Lime
+menu Shape EUOShape1 156 48 5 171 3 7 1 Black 7 Lime
+menu Shape EUOShape1 1 48 750 4 3 7 1 Black 7 Lime
+menu Shape EUOShape1 1 66 750 4 3 7 1 Black 7 Lime
+menu Shape EUOShape1 1 198 750 4 3 7 1 Black 7 Lime
+menu Shape EUOShape1 1 218 750 4 3 7 1 Black 7 Lime
+
+Menu font color yellow 
+Menu text 2 14 51 Property 
+Menu text 3 100 51 Before 
+Menu text 4 190 51 Dull 
+menu text 4 230 51 Shadow
+menu text 4 280 51 Copper
+menu text 4 330 51 Bronze
+menu text 4 380 51 Gold
+menu text 4 430 51 Agapite
+menu text 4 480 51 Verite
+menu text 4 530 51 Valorite
+menu text 4 580 51 Spined
+menu text 4 630 51 Horned
+menu text 4 680 51 Barbed
+Menu font color yellow 
+Menu text 1 5 1 Press to Enhance With:
+menu font color lime
+menu text 1 5 15 Chance to Succeed (> is good):
+menu font color red
+menu text 1 5 30 Chance to Break (< is good):
+Menu font align center 
+Menu text 5 8 70 Physical$Fire$Cold$Poison$Energy$Lower Req$Durability$Luck$Str Req
+Menu text 6 5 203 Resist Total 
+menu Shape EUOShape1 1 139 750 4 3 7 1 Black 7 white
+Menu font style 
+Menu font color aqua
+menu text itemprop1 230 221 Additiomal Item Properties are shown here--the "before" column will
+menu text itemprop2 230 233 show resists/damage, durability, luck, and strength requirements.
+Menu font size 7
+Menu button advice 718 1 32 15 advice
+Menu font size 8 
+Menu font color white 
+Menu font align right 
+Menu font style B
+menu font bgcolor green
+Menu button SelectItem 143 225 72 20 Select Item
+menu font bgcolor black
+Menu button ToggleHotkey 4 225 140 20
+IF %HKEnabled 
+   Menu set ToggleHotkey Turn Hotkey' %hotkeymod %hotkey 'Off 
+IF ! %HKEnabled 
+   Menu set ToggleHotkey Turn Hotkey' %hotkeymod %hotkey 'On 
+Menu button Dull 170 1 48 15 Dull 
+Menu button Shadow 220 1 48 15 Shadow 
+Menu button Copper 270 1 48 15 Copper 
+Menu button Bronze 320 1 48 15 Bronze 
+Menu button Gold 370 1 48 15 Gold 
+Menu button Agapite 420 1 48 15 Agapite 
+Menu button Verite 470 1 48 15 Verite 
+Menu button Valorite 520 1 48 15 Valorite 
+Menu button Spined 570 1 48 15 Spined 
+Menu button Horned 620 1 48 15 Horned 
+Menu button Barbed 670 1 48 15 Barbed
+Menu font size 8 
+menu show 0 495
+Return
+;===============================
+;* @name EnhanceItem
+;* @author Roadkill
+;* @ver 1.2 9Nov 04
+;* @purpose enhance an item with a particular ore/leather
+;* @params %1 is the itemID (required)
+;* 	%2 is what to enhance with (dull, shadow, copper, gold, agapite, verite, valorite
+;*		spined, horned, barbed (required)
+;*	%3 is your mainpack ID, required (too much chance of bogus tools in open packs)
+;*	@%4 
+;* @notes look for an ASM in the paperdoll first and use it if able, the equipped ASM
+;*	will automatically be reflected in increased skill.
+sub EnhanceItem
+	set !EnhanceItem %1
+	set !Ematerial %2
+	set !3
+	set !smithtools obg_fbg_tlh
+	set !sewingkit hag
+_EnhanceItemStart:
+	finditem !EnhanceItem C
+	if #findkind = -1
+		goto _exitEnhanceItem
+	;move item to mainpack if not there
+	set !fb #findbagid
+	if #findbagid = !3
+		goto _Eitem_in_mainpack
+	gosub FindPaperdollnMainpackXY %mainpack paperdollx paperdolly mainpackx mainpacky		
+	event drag !EnhanceItem
+	wait 1s
+	click %mainpackx %mainpacky p
+	wait 1s	
+	gosub EnsureMainpackOpen 750 400 %mainpack
+
+_chkEnItemFound:	
+	finditem !EnhanceItem C_ , %mainpack
+	if #findkind = -1
+	{
+		set #lobjectid !fb
+		event macro 17 0
+		wait 20
+		goto _EnhanceItemStart
+	}
+_Eitem_in_mainpack:	
+	set !enhancetool !smithtools
+	if !Ematerial in spined_horned_barbed
+		set !enhancetool !sewingkit
+_findEnhanceTool:
+	finditem !enhancetool C_ , #charid
+	if #findkind = 0
+		goto _EnhanceToolinHand:
+	finditem !enhancetool C_ , %mainpack
+	if #findkind = -1
+	{
+		display OK I can't find a tool to use in your MAINPACK.$
+		+Please ensure mainpack open, sewing kit or smith tool inside,& hit play. If$
+		+you want to use an Ancient Smithy Hammer, be sure it is EQUIPPED!
+		pause
+		goto _findEnhanceTool
+	}
+_EnhanceToolinHand:
+	set #lobjectid #findid
+	event macro 17
+	wait 1s
+	if generic notin #contname || #contsize <> 530_437
+		goto _findEnhanceTool
+	;click to set the material used
+	click 80 420 f
+	if !Ematerial = dull || !Ematerial = spined
+		set !oreclickY 140
+	if !Ematerial = shadow || !Ematerial = horned
+		set !oreclickY 160	
+	if !Ematerial = copper || !Ematerial = barbed
+		set !oreclickY 180
+	if !Ematerial = bronze
+		set !oreclickY 200
+	if !Ematerial = gold
+		set !oreclickY 220
+	if !Ematerial = agapite
+		set !oreclickY 240			
+	if !Ematerial = verite
+		set !oreclickY 260
+	if !Ematerial = valorite
+		set !oreclickY 280	
+	wait 10
+	click 285 !oreclickY
+	wait 15
+	set #ltargetid !EnhanceItem
+	set !Eattempts 0
+_attemptEnhance:
+	if generic notin #contname || #contsize <> 530_437
+		goto _findEnhanceTool
+	;click the enhance item button
+	click 330 440 f
+	target
+	event macro 22 0
+	wait 15
+	set !Eattempts !Eattempts + 1
+	finditem !EnhanceItem c_ , %mainpack
+	if #findkind = -1
+	{
+		menu set itemprop2 ----DESTROYED!!!---
+		goto _exitEnhanceItem
+	}
+	event property !EnhanceItem
+	wait 10
+	if !Ematerial in #property
+	{
+		menu set itemprop2 ///SUCCESS!!!///
+		goto _exitEnhanceItem
+	}
+	if !Eattempts >= 10
+	{
+		menu set itemprop1 Type #findtype seems un-enhanceable, adding to list
+		menu set itemprop2 If I'm wrong please do by hand,tell me the type on forums.
+		display yesno Type #findtype seems un-enhanceable, but it may be a new$
+		+ type or I'm using tailor/smith wrong.$YES=it CAN be enhanced, I'll do
+		+ it by hand and send you the info on www.easyuo.com$NO=not enhanceable,
+		+add it to the list
+		if #dispres = no && #findtype notin *no_enhancetypes
+			set *no_enhancetypes *no_enhancetypes , _ , #findtype
+		
+		goto _exitEnhanceItem
+	}
+	goto _attemptEnhance
+_exitEnhanceItem:
+	click 250 150 r
+return
+;===============================
+;* @name SetEnhanceProps
+;* @author Roadkill
+;* @ver 1.0 28 Feb 04
+;* @purpose setup the strings of material properties depending on if item is wpn or armor
+;* @params %1 is the itemID (required)
+;* 	%2 varname for returning whether it's tailorable or not (suggest 'tailorable')
+;*	%3 varname for returning whether it's enhanceable or not
+;* @returns @%2 #true/#false whether item is tailorable or not, @%3
+;* @notes this treats the enhancement strings and %tailorabletypes as globals :(
+sub setEnhanceProps
+	set % . %3 #true
+	finditem %1
+	if #findkind = -1
+		return #false
+	if #findtype in *no_enhancetypes
+	{
+		set % . %3 #false
+		menu set itemprop1 this item is NOT ENHANCEABLE
+		menu set itemprop2 -
+		return
+	}
+	set % . %2 #false
+	Set %Property1 Physical , #spc , Resist 
+	Set %Property2 Fire , #spc , Resist 
+	Set %Property3 Cold , #spc , Resist 
+	Set %Property4 Poison , #spc , Resist 
+	Set %Property5 Energy , #spc , Resist 
+	Set %R1 Dull_6_0_0_0_0_20_50_0_ 
+	Set %R2 Shadow_2_1_0_0_5_0_100_0_ 
+	Set %R3 Copper_1_1_0_5_2_0_0_0_ 
+	Set %R4 Bronze_3_0_5_1_1_0_0_0_ 
+	Set %R5 Golden_1_1_2_0_2_30_0_40_ 
+	Set %R6 Agapite_2_3_2_2_2_0_0_0_ 
+	Set %R7 Verite_3_3_2_3_1_0_0_0_ 
+	Set %R8 Valorite_4_0_3_3_3_0_40_0_ 
+	Set %R9 Spined_5_0_0_0_0_0_0_40_ 
+	Set %R10 Horned_2_3_2_2_2_0_0_0_ 
+	Set %R11 Barbed_2_1_2_3_4_0_0_0_ 
+	if #findtype IN %weapontypes
+	{
+		Set %Property1 Physical , #spc , Damage 
+		Set %Property2 Fire , #spc , Damage 
+		Set %Property3 Cold , #spc , Damage 
+		Set %Property4 Poison , #spc , Damage 
+		Set %Property5 Energy , #spc , Damage 
+		Set %R1 Dull_0_0_0_0_0_50_100_0_ 
+		Set %R2 Shadow_-20_0_20_0_0_0_50_0_ 
+		Set %R3 Copper_-30_0_0_10_20_0_0_0_ 
+		Set %R4 Bronze_-40_40_0_0_0_0_0_0_ 
+		Set %R5 Golden_0_0_0_0_0_50_0_40_ 
+		Set %R6 Agapite_-50_0_30_0_20_0_0_0_ 
+		Set %R7 Verite_-60_0_0_40_20_0_0_0_ 
+		Set %R8 Valorite_-60_10_20_10_20_0_0_0_ 	
+	}
+	if #findtype IN %tailorabletypes
+		set % . %2 #true
+return
+;----------
+;#property already exists, as does %property1
+sub writeproperty
+	menu set itemprop1 -
+	menu set itemprop2 -
+	set !wpproperty1 $ , %property1
+  	str pos #property !wpproperty1
+   	if #strres <> 0
+   		set !wppos #strres - 1
+   	else
+   	{
+   		str len #property
+   		set !wppos #strres
+   	}
+   	if !wppos > 90
+		str left #property 90
+		else
+		str left #property !wppos
+   	str lower #strres
+     	menu set itemprop1 #strres
+     	if !wppos > 90
+     	{
+     		set !line2len !wppos - 90
+     		if !line2len > 90
+     			set !line2len 90
+     		str mid #property 91 !line2len
+     		str lower #strres
+     		menu set itemprop2 #strres
+     	}
+return
+;========================
+;** 
+;* Name: FindPaperdollnMainpackXY
+;* Finds the XY for your paperdoll AND mainpack for dropping WITHOUT causing subpacks to close
+;*	if paperdoll not open,it will open it.  Requires known mainpackID, can be gotten with
+;*	my FindMainPack
+;* @ver 1.1 14Jun04
+;* @author  Roadkill 
+;* @purpose Finds the XY for your paperdoll AND mainpack for dropping WITHOUT causing subpacks to close
+;* @param   %1  ID of your mainpack (backpack)     req use my FindMainPack to get this 
+;*          %2  @return varname for paperdollx     req 
+;*          %3  @return varname for paperdolly     req 
+;*          %4  @return varname for mainpackx      req 
+;*          %5  @return varname for mainpacky      req
+;* @return  the varnames passed in as %2-%5 are loaded and returned
+;* @example call rksubs.txt FindPaperdollnMainpackXY %mainpack paperdollx paperdolly mainpackx mainpacky
+;* @status: tested
+Sub FindPaperdollnMainpackXY
+_FPMXY:
+	finditem %1
+	if #findkind = -1
+	{
+		event macro 8 1
+		wait 1s
+		display ok please move your paperdoll where you want it, you have 4 seconds
+		wait 4s
+		goto _FPMXY
+	}
+	set % . %2 #findx
+	set % . %3 #findy
+	set % . %4 #findx + 140
+	set % . %5 #findy + 220
+return
+;==================
+;=============================
+;** 
+;* @Name EnsureMainpackOpen
+;* make sure your main backpack is open at position %1 %2
+;* @ver 1.0 29Jul04 
+;* @author  Roadkill 
+;* @purpose make sure your mainpack is open at position %1 %2
+;* @param   %1  X-coord for mainpack, required
+;*          %2  Y-coord for mainpack, required
+;*	    %3 mainpackid (#backpackid), req, recommend using a set var in case
+;*		the status bar gets closed (#backpackid goes to n/a)
+;* @example call rksubs.txt EnsureMainpackOpen %mainpackx %mainpacky %mainpack
+SUB EnsureMainpackOpen
+	if %3 = n/a
+	{
+		event macro 8 2
+		wait 10
+	}
+	finditem * C_ , %3
+	if #findkind = -1
+	{
+		event macro 8 7
+		wait 20
+		contpos %1 %2
+		wait 20
+	}
+RETURN
+;=============
+;** 
+;* @Name Advice
+;* give rough advice on enhancing
+;* @ver 1.0 12Oct04 
+;* @author  Roadkill 
+;* @purpose give rough advice on enhancing
+;* @param  
+;* @example
+sub Advice
+;%tailorable %Tbefore %Tafter8 %Tafter11 %success %breakage
+	set !better #false
+	;set !GMdiff ( 43 - %Tbefore ) abs
+	If %tailorable && %Tafter11 >= 43
+		set !better #true
+	if ! %tailorable && %Tafter8 >= 43
+		set !better #true
+	set !advice the-standard:GM-smith/tailor_makes__pieces_with_43_TotalResist.This_results_in$ ,
+	+ a_52_all_resists_suit.Each_10pts_less_on_any_piece_means_2resist_less_in_suit.$ ,
+	+ You_need_11.6_avg.per_resist(58total_per_piece)_to_make_an_all_70's_suit.$ ,
+	+ --------------------------------------------------------------------
+	if !better
+	{
+		set !advice !advice , $You_can_enhance_this_to_better_than_GM_ ,
+		+ so_it_is_a_good_resist_piece!$Is_it_worth_risking_the_props_ ,
+		+ in_the_bottom_box?$Look@the_success&breakage_nums!$ ,
+		+ --------------------------------------------------------------------
+	}
+	if ! !better
+	{
+		set !advice !advice , $You_can_not_enhance_this_to_equal_GM_stuff ,
+		+ so_it_is_crap_unless_the_props_are_good!$Is_it_worth_risking_the_props ,
+		+ _in_the_bottom_box?$ ,
+		+ --------------------------------------------------------------------
+	}
+	;luck is %pb8
+	if %pb8 >= 40
+	{
+		set !advice !advice , $Luck:_max_value_is_1200total,you_need_120_luck_ ,
+		+ avg._on_armor/jewelry/wpn/shield_for_this(10pieces).$I_would_enhance_ ,
+		+ this_item_with_gold/spined_(anything_with_luck>40_unless_other_props_better).$ ,
+		+ observe_"luck-bump"chances:$ , 80luck/piece=800luck=41%chance,_100luck/pc ,
+		+ =1000luck=46.4%chance,120luck/pc=1200luck=51%$ ,
+		+ --------------------------------------------------------------------
+	}
+
+	if lower , #spc , mana in #property
+	{
+		set !advice !advice , $Lower_mana_cost:_max_value_is_8%,suits_with_ok$ ,
+		+ resists_can_still_be_used.$ ,
+		+ --------------------------------------------------------------------
+	}
+	if mana , #spc , regeneration in #property
+	{
+		set !advice !advice , $mana-regen:_max_value_is_2,suits_with_poor$ ,
+		+ resists_can_still_be_used_for_inscription_or_mages,_good_resists_for_paladins.$ ,
+		+ 1mana-regen=10med=20focus!$ ,
+		+ --------------------------------------------------------------------
+	}
+	if lower , #spc , reagent in #property
+	{
+		set !advice !advice , $Lower_Reagent_cost:_max_value_is_20%,you_need_12.5_LRC$ ,
+		+ avg._per_piece_to_make_a_100%LRC_suit.Meddable_is_better.$ ,
+		+ --------------------------------------------------------------------
+	}
+	if mana , #spc , increase in #property || stamina , #spc , increase in #property || 
+	+ hit , #spc , point , #spc , increase in #property
+	{
+		set !advice !advice , $hitpoint/mana/stamina-increase:_max_value_is_8,suits_with_poor$ ,
+		+ resists_can_still_be_used_for_inscription_or_mages_with_mana_increase.$ ,
+		+ or_to_carry_more_weight_for_mules.$I_look_for_+10stats_total_to_keep_piece_for_this.$ ,
+		+ --------------------------------------------------------------------
+	}
+	if stamina , #spc , regeneration in #property
+	{
+		set !advice !advice , $stamina-regen:_max_value_is_3,this_is_important_for_paladins$ ,
+		+ who_need_to_keep_swing_speed_up._1stamina-regen=same_regen_as_10focus$ ,
+		+ However_you_need_good_resists_on_piece,>=30,_yours_is: , %Tbefore ,
+		+ $--------------------------------------------------------------------
+	}
+	str lower !advice
+	display OK #strres
+return
+;============
+;-------------------------
+;revision history and info:
+;ver 1.4 11Aug04 -modded %mainpack routine, now open status and use #backpackid so
+;	subpacks of mainpack aren't closed.
+;	-combined enablehotkey/disablehotkey into ToggleHotkey
+;	-made 'select' button green
+;	-fixed the bug when two "durability" show in property (durability 20% crap).
+;ver 1.5 20Aug04 -added item property listing on bottom
+;	-made original props and prop listing blue
+;	-added wait 3 in mainloop to slow cpu cycles down
+;	-fixed wierd display of initial $ , number where $ was being converted to some #
+;	-checks for tool/ASM in hand first, then mainpack
+;	-redid EnhanceItem sub so it doesn't make subpacks close.
+;	-added rksubs EnsureMainPackOpen and GetPaperdollNMainpackXY for item movement
+;	-fixed sub successChance to properly calc increased success with >=gm skill or asm
+;	-added a check for "not enhanceable" types and a message
+;	-made it only attempt to enhance items 10 times then it assumes "unenhanceable" and adds
+;		to *no_enhancetypes list for later inclusion in %no_enhancetypes
+;	-added destroyed/success messages to bottom line.
+;	-tested my weapon calc algorithm when applied to wpns that already have < 100%
+;		physical damage, and it is CORRECT! Elem. damage is NOT done sequentially,
+;		rather if the remaining phys dmg is < required increase, the next elem is
+;		attempted, and perfect conversions are preferred.
+;	-modded success calc so < gm skill doesn't affect success rates...so they say
+;ver 1.6 9Sep04 -added AQH bone gloves
+;	-modded sub successchance, replaced % with / (bug calc)
+;	-modded %mainpack detection to work on freeshards (w/o #backpackid)
+;	-added a listing below each material of what enhancement bonuses will be added
+;		for that item (wpn or armor) in yellow, for reference.
+;ver 1.7 12Oct04 -added advice button and advice for 10situations or so
+;	-fixed tab in shadow enhance
+;	-changed generic_gump to generic notin #contname
+;	-added TSK studded bustier
+;	9Nov04
+;	-added most UOSE weapon and armor types
+;	-tweaked the enhance sub to give option to do by hand or add to bad list
+; todo: -look at successchance for wpns, does damage respond the same as resist?
+;	-look at the durability and strength % vs. absolute in sub calculate, it's absolute not %
+;	-fill out $no_enhancetypes
+;-----useful itemtype info:--------------
+;set %suitpart1 Helmet 
+;	SET %ITEMTYPES_MED1 _YVI_GZH_HZH_NJL_BWI_KWI_IWI_EWI_QJL_JWI_XVI_CZH_HWI_JJN_ 
+;	+NZH_BZH_TDI_OZH_VSH_WVI_VVI_QSH_KZH_PZH_DZH        
+;	SET %ITEMTYPES_NONMED1 _DSH_ASH_TSH_ESH_YPH_GSH_OSH_ZPH_ZRH_IWL_ 
+;	+CSH_BSH_FSH_DPH_LKO_NWL_MKH        
+;set %suitpart2 Gorget 	    
+;	SET %ITEMTYPES_MED2 _JKH_RJG_SJG_FJG_MWL        
+;	SET %ITEMTYPES_NONMED2 _NSH_ALH        
+;set %suitpart3 Arms	      
+;	SET %ITEMTYPES_MED3 _HKH_PKH        
+;	SET %ITEMTYPES_NONMED3 _BQH_JSH_XLH_GLH_MSH_YLH_QPH_YKH_DLO        
+;set %suitpart4 Tunic 	      
+;	SET %ITEMTYPES_MED4 _QKH_DLH        
+;	SET %ITEMTYPES_NONMED4 _HSH_ULH_LLH_ZOH_IKH_VLH_KSH_WLH_WPH_PKO_PPH_RSK  
+;	SET %FEMALE_MED4 _ATK_ZSK_OSK_NSK        
+;	SET %FEMALE_NONMED4 _USK_SSK_MSK_TSK_LSK  
+;set %suitpart5 Gloves 	      
+;	SET %ITEMTYPES_MED5 _KKH_SKH_WTO        
+;	SET %ITEMTYPES_NONMED5 _VPH_ISH_AQH_BMH_USH_XKH_FLH_KMH_RKO        
+;set %suitpart6 Leggings 	      
+;	SET %ITEMTYPES_MED6 _VKH_ELH        
+;	SET %ITEMTYPES_NONMED6 _HMH_LSH_IMH_CQH_WSH_APH_MLH_RLH_NKH_XPH_NKO 
+;	SET %FEMALE_MED6 _QSK_YSK_PSK 
+;set %tailorableArmor qkh_hkh_kkh_

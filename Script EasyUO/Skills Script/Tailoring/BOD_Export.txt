@@ -1,0 +1,129 @@
+;==========================================================
+; Script Name: saveBods.txt
+; Author: Serq
+; Version: 1.01
+; Client Tested with: 4.0.7b (lang. ITA)
+; EUO version tested with: 1.42.00A0
+; Shard OSI / FS: FS
+; Revision Date: 04.02.2005
+; Public Release: 03.05.2005
+; Global Variables Used: none
+; Purpose: a simple script who Save on file (ListaBod.txt) all bod
+;               description stored in a container
+; USE: execute this routine and double click (open) the target container,
+; have a little bit of patience to wait it work end. Pay attention: the news
+; stored data are append on file and not overwrite.
+;==========================================================
+
+;-----------------------------------------------------------------------------------------------------
+; init var section
+set %dummy EXEC
+set %FileName ListaBod
+set %bodType EYM
+set %bodFound #findKind
+set %counter 0
+set %cont #LtargetID
+set %descr #property
+;------------------------------------------------------------------------------------------------------
+initEvents
+if %dummy notin #OPTS
+{
+  display ok Plz uncheck Disable Execute in$
++Tools.Options.Permission menu$
++Then restart
+  stop
+}
+start:
+display ok Please open the container you want to use.$
++ You have 4 seconds
+wait 4s
+set %cont #LObjectID
+gosub showEUOmenu1
+FindItem %bodType C_ , %cont
+gosub bodMenuRefresh #FINDCNT 0 now_start
+Loop:
+set %counter  %counter + 1
+FindItem %bodType %counter C_ , %cont
+if #findkind = -1
+{
+  set %counter %counter - 1
+  gosub bodMenuRefresh #FINDCNT %counter End_Work
+  set #menuButton N/A
+  menu Button button_1 8 200 120 25 Cick to end
+  endLoop:
+  if #menuButton <> button_1
+          goto endLoop
+  menu clear
+  menu hide
+  halt
+}
+gosub bodMenuRefresh #FINDCNT %counter now_start
+set %bodFound #FindId
+event Property %bodFound
+wait 1s
+set %descr #property
+set %dummy -------------------------------------------------------
+gosub bodMenuRefresh #FINDCNT %counter %descr
+execute cmd.exe /c echo %dummy >> %FileName , .txt
+execute cmd.exe /c echo %counter >> %FileName , .txt
+gosub RemoveL $ %descr
+goto loop
+
+;--------------------------------------------------------------
+
+sub RemoveL
+set %sTmp xxxx
+set %LTmp1 0
+set %LTmp2 0
+str len %2
+set %LTmp1 #STRRES
+PrepProp:
+str pos %2 %1
+if #STRRES > 0
+{
+  set %LTmp2 #STRRES
+  set %LTmp1 %LTmp1 - %LTmp2
+  str del %2 #STRRES 1
+  set %sTmp #STRRES
+  set %LTmp2 %LTmp2 - 1
+  str left %2 %LTmp2
+  set %sTmp #STRRES
+  execute cmd.exe /c echo %sTmp >> %FileName , .txt
+  str right %2 %LTmp1
+  set %2 #STRRES
+  goto PrepProp
+}
+return
+;--------- EasyUO Menu Designer Code Begin ---------
+sub showEUOMenu1
+  menu Clear
+  menu Window Title SaveBod
+  menu Window Color BtnFace
+  menu Window Size 492 345
+  menu Font Transparent #true
+  menu Font Align Right
+  menu Font Name Courier
+  menu Font Size 12
+  menu Font Style b
+  menu Font Color WindowText
+  menu Font Transparent #false
+  menu Font Align Left
+  menu Text EUOLabel1 16 16 Bod list
+  menu Font Size 10
+  menu Text EUOLabel2 8 48 Bod found
+  menu Text EUOLabel3 148 48 Bod Processed
+  menu Text EUOLabel4 8 80 description
+  menu Show 321 170
+return
+;--------- EasyUO Menu Designer Code End ---------
+
+sub bodMenuRefresh
+  menu Clear
+  menu Font Name Courier
+  menu Font Style b
+  menu Font Size 10
+  menu Text EUOLabel4 8 80 _____________________
+  menu Text EUOLabel2 8 48 Bod found: %1
+  menu Text EUOLabel3 148 48 Bod Processed : %2
+  menu Text EUOLabel4 8 80 %3
+return
