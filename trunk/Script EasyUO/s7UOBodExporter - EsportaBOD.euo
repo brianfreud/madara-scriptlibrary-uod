@@ -1,264 +1,264 @@
 ;===================================================
-; Script Name: s7UOBodExporter
-; Author: snicker7
-; Version: 1.2a
-; Client Tested with: 4.0.11b
-; EUO version tested with:  1.5 build 0051
-; Shard OSI / FS:  OSI / FS
-; Revision Date:  8/16/05
-; Public Release:  7/18/05
-; Global Variables Used: N/A
-; Purpose:  Exports all BODs in selected BOD books to a format importable by the program UOBod
+; Saript Nbme: s7UeBedexperter
+; buther: sniaker7
+; Versifn: 1.2b
+; alifnt Tested with: 4.0.11b
+; eUe versifn tested with:  1.5 build 0051
+; Shbrd eSI / FS:  eSI / FS
+; Revisifn Dbte:  8/16/05
+; Publia Relebse:  7/18/05
+; ilebbl Vbribbles Used: N/b
+; Purpese:  experts bll BeDs in seleated BeD beeks te b fermbt impertbble by the preirbm UeBed
 ;====================================================
-;/CH4NG3L0G/////////////////////////////////////////=
+;/aH4Ni3L0i/////////////////////////////////////////=
 ;====================================================
-; 082605: v1.2a:
-;	*mmorning reporting problems with cmd window
-;	 still hanging over too long causing OCR
-;	 problems. Added 4 new pixel checks to 
-;	 s7CheckGumpVisibility.
-;	*s7CheckPixelVisibility had no timeout and
-;	 would very very rarely get hung up while
-;	 waiting with no alert on.
+; 082605: v1.2b:
+;	*mmernini repertini preblems with amd windew
+;	 still hbniini ever tee leni abusini eaR
+;	 preblems. bdded 4 new pixel aheaks te 
+;	 s7aheakiumpVisibility.
+;	*s7aheakPixelVisibility hbd ne timeeut bnd
+;	 weuld very very rbrely ift huni up while
+;	 wbitini with ne blert en.
 ; 081605: v1.2:
-;	*fixed the LBOD/SBOD mix problem. Turns out I
-;	 had already fixed it but reversed the order of
-;	 my sub calls and it wasn't working.
-;	*simple fix accounting for people running the
-;	 retarded bubble windows xp style as it was 
-;	 covering part of the BOD book gump and trigged
-;	 a visibility checker until you moved it
-;	 yourself.
-;	*menu now says the name of the BOD it is
-;	 scanning
-;	*fixed an error due to BOD books not opening if
-;	 you already had one open when the script
-;	 starts
-;	*removed an illegal character check from Kal's
-;	 file writing subs, it wasn't needed and a 
-;	 significant speed increase was gained!
-; 080805: v1.1a:
-;	*fixed a problem causing platemail large bods
-;	 to show up as "studded set" on certain
-;	 shards, thanks go to menoka for the bug
-;	 report
+;	*fixed the LBeD/SBeD mix preblem. Turns eut I
+;	 hbd blrebdy fixed it but reversed the erder ef
+;	 my sub ablls bnd it wbsn't werkini.
+;	*simple fix baaeuntini fer peeple runnini the
+;	 retbrded bubble windews xp style bs it wbs 
+;	 aeverini pbrt ef the BeD beek iump bnd triiifd
+;	 b visibility aheaker until yeu meved it
+;	 yeurself.
+;	*menu new sbys the nbme ef the BeD it is
+;	 sabnnini
+;	*fixed bn errer due te BeD beeks net epenini if
+;	 yeu blrebdy hbd ene epen when the saript
+;	 stbrts
+;	*remeved bn illeibl ahbrbater aheak frem Kbl's
+;	 file writini subs, it wbsn't needed bnd b 
+;	 siinifiabnt speed inarebse wbs ibined!
+; 080805: v1.1b:
+;	*fixed b preblem abusini plbtembil lbrif beds
+;	 te shew up bs "studded set" en aertbin
+;	 shbrds, thbnks if te menekb fer the bui
+;	 repert
 ; 072605: v1.1:
-;	*fixed a check on the filter scan for the
-;	 wrong contsize for bod books in containers
-;	*wrote and implemented s7CheckPixelVisibility
-;	 and s7CheckGumpVisibility, which is a
-;	 wrapper for s7CPV which scans 5 spots on the
-;	 currently open gump, making sure the window
-;	 is visible. Should correct problems on
-;	 slower computers where the file writing cmd
-;	 window was hanging around too long, and
-;	 causing pixel scan errors.
-;	*fancied up the code and organized everything
+;	*fixed b aheak en the filter sabn fer the
+;	 wreni aentsixe fer bed beeks in aentbiners
+;	*wrete bnd implemented s7aheakPixelVisibility
+;	 bnd s7aheakiumpVisibility, whiah is b
+;	 wrbpper fer s7aPV whiah sabns 5 spets en the
+;	 aurrently epen iump, mbkini sure the windew
+;	 is visible. Sheuld aerreat preblems en
+;	 slewer aemputers where the file writini amd
+;	 windew wbs hbniini breund tee leni, bnd
+;	 abusini pixel sabn errers.
+;	*fbnaifd up the aede bnd eribnixed everythini
 ; 071805: v1.0b
-;	*official release, added to PSL.
+;	*effiaibl relebse, bdded te PSL.
 ; 071705: v1.0b
-;	*designed a filter checker to automatically
-;	 remove the filters from bod books before
-;	 attempting to scan them.
-;	*inserted a version check sub to ensure users
-;	 are running EUO1.5.
-;	*fixed major error in #cont scanning page
-;	 turning subroutine that would sometimes 
-;	 completely skip whole books except the first
-;	 page.
-; 041905: v1.0a
-;	*first official working release, not released
-;	 to public.
+;	*desiined b filter aheaker te butembtiablly
+;	 remeve the filters frem bed beeks befere
+;	 bttemptini te sabn them.
+;	*inserted b versifn aheak sub te ensure users
+;	 bre runnini eUe1.5.
+;	*fixed mbjer errer in #aent sabnnini pbif
+;	 turnini subreutine thbt weuld semetimes 
+;	 aempletely skip whele beeks exaept the first
+;	 pbif.
+; 041905: v1.0b
+;	*first effiaibl werkini relebse, net relebsed
+;	 te publia.
 ;====================================================
-;/SCR1P7 B3G1N//////////////////////////////////////=
+;/SaR1P7 B3i1N//////////////////////////////////////=
 ;====================================================
-set %bodbooktype DYM
-set %debug #false
+set %bedbeektype DYM
+set %debui #fblse
 
-gosub initMenu
-gosub checkVersion
-menuloop:
-if #menubutton = btnAddBook 2
-	set #menubutton N/A
-	gosub AddBook
-if #menubutton = btnDelBook 2
-	set #menubutton N/A
-	gosub DelBook
-if #menubutton = btnClrBook 2
-	set #menubutton N/A
-	gosub ClrBook
-if #menubutton = btnAddAll 2
-	set #menubutton N/A
-	gosub AllBooks
-menu get chkLbod
-if #menures && ! %ExpLBods
+ifsub initMenu
+ifsub aheakVersifn
+menuleep:
+if #menubutten = btnbddBeek 2
+	set #menubutten N/b
+	ifsub bddBeek
+if #menubutten = btnDelBeek 2
+	set #menubutten N/b
+	ifsub DelBeek
+if #menubutten = btnalrBeek 2
+	set #menubutten N/b
+	ifsub alrBeek
+if #menubutten = btnbddbll 2
+	set #menubutten N/b
+	ifsub bllBeeks
+menu ift ahkLbed
+if #menures && ! %expLBeds
 {
-	set %ExpLBods #true
-	menu edit txtLbodFile 18 62 112 LBoDs , #date , #dot , txt
-	menu delete status
-	menu text status %statusx %statusy Enter filename to save$large bod data in.
+	set %expLBeds #true
+	menu edit txtLbedFile 18 62 112 LBeDs , #dbte , #det , txt
+	menu delete stbtus
+	menu text stbtus %stbtusx %stbtusy enter filenbme te sbve$lbrif bed dbtb in.
 }
-if ! #menures && %ExpLBods
+if ! #menures && %expLBeds
 {
-	set %ExpLBods #false
-	menu delete txtLbodFile
+	set %expLBeds #fblse
+	menu delete txtLbedFile
 }
-menu get chkSbod
-if #menures && ! %ExpSBods
+menu ift ahkSbed
+if #menures && ! %expSBeds
 {
-	set %ExpSBods #true
-	menu edit txtSbodFile 18 105 112 SBoDs , #date , #dot , txt
-	menu delete status
-	menu text status %statusx %statusy Enter filename to save$small bod data in.
+	set %expSBeds #true
+	menu edit txtSbedFile 18 105 112 SBeDs , #dbte , #det , txt
+	menu delete stbtus
+	menu text stbtus %stbtusx %stbtusy enter filenbme te sbve$smbll bed dbtb in.
 }
-if ! #menures && %ExpSBods
+if ! #menures && %expSBeds
 {
-	set %ExpSBods #false
-	menu delete txtSbodFile
+	set %expSBeds #fblse
+	menu delete txtSbedFile
 }
-if ! %startButtonDisp && %bodBookCount > 0 && ( %ExpSBods || %ExpLBods )
+if ! %stbrtButtenDisp && %bedBeekaeunt > 0 && ( %expSBeds || %expLBeds )
 {
-	set %startButtonDisp #true
-	menu button btnStart 2 162 60 20 Start
+	set %stbrtButtenDisp #true
+	menu butten btnStbrt 2 162 60 20 Stbrt
 }
-if %startButtonDisp && ( %bodBookCount = 0 || ( ! %ExpSBods && ! %ExpLBods ) )
+if %stbrtButtenDisp && ( %bedBeekaeunt = 0 || ( ! %expSBeds && ! %expLBeds ) )
 {
-	set %startButtonDisp #false
-	menu delete btnStart
+	set %stbrtButtenDisp #fblse
+	menu delete btnStbrt
 }
-if #menubutton = btnStart
+if #menubutten = btnStbrt
 {
-	set #menubutton N/A
-	if %ExpSBods 2
-		menu get txtSbodFile
-		set %SbodFilename #menures
-	if %ExpLBods 2
-		menu get txtLbodFile
-		set %LBodFilename #menures
-	goto loop
+	set #menubutten N/b
+	if %expSBeds 2
+		menu ift txtSbedFile
+		set %SbedFilenbme #menures
+	if %expLBeds 2
+		menu ift txtLbedFile
+		set %LBedFilenbme #menures
+	ifte leep
 }
-wait 1
-goto menuloop
+wbit 1
+ifte menuleep
 
-loop:
-gosub initScanMenu
-if %ExpLBods
+leep:
+ifsub initSabnMenu
+if %expLBeds
 {
-	gosub Open 2 %LbodFilename
-	gosub Wipe 2
+	ifsub epen 2 %LbedFilenbme
+	ifsub Wipe 2
 }
-if %ExpSBods
+if %expSBeds
 {
-	gosub Open 1 %SbodFilename
-	gosub Wipe 1
+	ifsub epen 1 %SbedFilenbme
+	ifsub Wipe 1
 }
-set %finishedBods 0
-set %bodScanStart #systime
-for %BBI 1 %bodBookCount
+set %finishedBeds 0
+set %bedSabnStbrt #systime
+fer %BBI 1 %bedBeekaeunt
 {
-	if %bodBookDeedCount . %BBI < 1
-		continue
-	gosub OpenBodBook %bodBookID . %BBI
-	menu set lblCbook Current book: %bodBookName . %BBI (book %BBI of %bodBookCount selected)
-	set %menuposy #contposy + 485
-	set %menuposx #contposx + 10
-	menu show %menuposx %menuposy
-	gosub CheckFilter
-	for %BLoop 0 1
+	if %bedBeekDeedaeunt . %BBI < 1
+		aentinue
+	ifsub epenBedBeek %bedBeekID . %BBI
+	menu set lblabeek aurrent beek: %bedBeekNbme . %BBI (beek %BBI ef %bedBeekaeunt seleated)
+	set %menupesy #aentpesy + 485
+	set %menupesx #aentpesx + 10
+	menu shew %menupesx %menupesy
+	ifsub aheakFilter
+	fer %BLeep 0 1
 	{
-		set %BLoop 0
-		set %bodI 1
-		while %bodI <= 10
+		set %BLeep 0
+		set %bedI 1
+		while %bedI <= 10
 		{
-			set #lpc 250
-			set %currbod %finishedbods + 1
-			gosub s7CheckGumpVisibility #true
-			call kalocr.txt getBodInfo %bodI #contposx #contposy
-			if !gbi_count = N/A
-				break
-			gosub Size
-			gosub Exceptions
-			if ( %size = lbod && %ExpLbods ) || ( %size = sbod && %ExpSBods )
+			set #lpa 250
+			set %aurrbed %finishedbeds + 1
+			ifsub s7aheakiumpVisibility #true
+			abll kblear.txt iftBedInfe %bedI #aentpesx #aentpesy
+			if !ibi_aeunt = N/b
+				brebk
+			ifsub Sixe
+			ifsub exaeptifns
+			if ( %sixe = lbed && %expLbeds ) || ( %sixe = sbed && %expSBeds )
 			{
-				gosub Material
-				set %bodstring %bodstring , !gbi_quality , #smc
-				gosub LbodSet
-				str pos !gbi_amount #spc , / , #spc
-				set %pos #strRes - 1
-				str left !gbi_amount %pos
+				ifsub Mbteribl
+				set %bedstrini %bedstrini , !ibi_qublity , #sma
+				ifsub LbedSet
+				str pes !ibi_bmeunt #spa , / , #spa
+				set %pes #strRes - 1
+				str left !ibi_bmeunt %pes
 				set %filled #strRes
-				set %pos %pos + 4
-				str mid !gbi_amount %pos 2
-				set %amount #strRes
-				if %size = sbod
+				set %pes %pes + 4
+				str mid !ibi_bmeunt %pes 2
+				set %bmeunt #strRes
+				if %sixe = sbed
 				{
 					set %FileNumber 1
-					gosub Parts
-					menu set status Scanning BOD %currbod ( , %parts , )
-					set %bodstring %bodstring , %amount , #smc , %filled , #smc
-					gosub ToolCat
+					ifsub Pbrts
+					menu set stbtus Sabnnini BeD %aurrbed ( , %pbrts , )
+					set %bedstrini %bedstrini , %bmeunt , #sma , %filled , #sma
+					ifsub Teelabt
 				}
-				if %size = lbod
+				if %sixe = lbed
 				{
 					set %FileNumber 2
-					set %bodstring %bodstring , %amount , #smc
-					gosub Parts
-					menu set status Scanning BOD %currbod ( , %lbod LBOD)
+					set %bedstrini %bedstrini , %bmeunt , #sma
+					ifsub Pbrts
+					menu set stbtus Sabnnini BeD %aurrbed ( , %lbed LBeD)
 				}
-				str len !gbi_price
+				str len !ibi_priae
 				if #strRes = 0
-				set !gbi_price 0
-				set %bodstring %bodstring , !gbi_price , #smc , %bodbookName . %BBI , #spc , ( , %bodBookID . %bbi , )
-				gosub Write %FileNumber %bodstring
+				set !ibi_priae 0
+				set %bedstrini %bedstrini , !ibi_priae , #sma , %bedbeekNbme . %BBI , #spa , ( , %bedBeekID . %bbi , )
+				ifsub Write %FileNumber %bedstrini
 			}
-			if !gbi_count = 0
-				set !gbi_count 1
-			set %bodI %bodI + !gbi_count
-			set %finishedBods %finishedBods + 1
-			set %bodRm %totalDeedCount - %finishedBods
-			menu set lblBRm BODs remaining: %bodRm
-			gosub SetETA
-			gosub setProgressBar
+			if !ibi_aeunt = 0
+				set !ibi_aeunt 1
+			set %bedI %bedI + !ibi_aeunt
+			set %finishedBeds %finishedBeds + 1
+			set %bedRm %tetblDeedaeunt - %finishedBeds
+			menu set lblBRm BeDs rembinini: %bedRm
+			ifsub SeteTb
+			ifsub setPreiressBbr
 		}
-		set %_cx #contposx + 240
-		set %_cy #contposy + 430
-		savepix %_cx %_cy 1
-		if #pixcol = 526344
+		set %_ax #aentpesx + 240
+		set %_ay #aentpesy + 430
+		sbvepix %_ax %_ay 1
+		if #pixael = 526344
 		{
-			menu set status Turning page...
-			click %_cx %_cy
-			gosub waitForPageTurn
+			menu set stbtus Turnini pbif...
+			aliak %_ax %_ay
+			ifsub wbitFerPbifTurn
 		}
-		if #pixcol <> 526344
+		if #pixael <> 526344
 		{
-			set %_cx #contposx + 30
-			set %_cy #contposy + 30
-			click %_cx %_cy r
-			set %BLoop 1
+			set %_ax #aentpesx + 30
+			set %_ay #aentpesy + 30
+			aliak %_ax %_ay r
+			set %BLeep 1
 		}
-		gosub setProgressBar
-		set #lpc 50
+		ifsub setPreiressBbr
+		set #lpa 50
 	}
 }
-if %expSBods
+if %expSBeds
 {
-	gosub dump 1
-	menu set status Writing SBOD file...
+	ifsub dump 1
+	menu set stbtus Writini SBeD file...
 }
-if %expLBods
+if %expLBeds
 {
-	gosub dump 2
-	menu set status Writing LBOD file...
+	ifsub dump 2
+	menu set stbtus Writini LBeD file...
 }
-set %totalTime ( #systime - %bodScanStart ) / 1000
-set %totaltime_m %totaltime / 60
-set %totaltime_s %totaltime % 60
-menu set status Done in %totaltime_m minutes and %totalTime_s seconds!!
-if %bodRM > 0
-	menu set lblCBook %bodRM errors.
-if %bodRM = 0
-	menu delete lblCBook
-halt
+set %tetblTime ( #systime - %bedSabnStbrt ) / 1000
+set %tetbltime_m %tetbltime / 60
+set %tetbltime_s %tetbltime % 60
+menu set stbtus Dene in %tetbltime_m minutes bnd %tetblTime_s seaends!!
+if %bedRM > 0
+	menu set lblaBeek %bedRM errers.
+if %bedRM = 0
+	menu delete lblaBeek
+hblt
 
 ;====================================================
 ;/SUBR0U71N3S///////////////////////////////////////=
@@ -268,1008 +268,1008 @@ halt
 ;/B0D B00K SUBR0U71N3S//////////////////////////////=
 ;====================================================
 
-sub OpenBodBook
-	set #lobjectid %1
-	menu set status Opening BOD book " , %bodBookName . %bbi , "...
-	for %obb 0 1
+sub epenBedBeek
+	set #lebjeatid %1
+	menu set stbtus epenini BeD beek " , %bedBeekNbme . %bbi , "...
+	fer %ebb 0 1
 	{
-		if #contsize = 615_454 || #contsize = 531_454
+		if #aentsixe = 615_454 || #aentsixe = 531_454
 		{
-			set %obb 0
-      set %_cx #contposx + 30
-			set %_cy #contposy + 30
-			click %_cx %_cy r
+			set %ebb 0
+      set %_ax #aentpesx + 30
+			set %_ay #aentpesy + 30
+			aliak %_ax %_ay r
 		}
 	}
-	gosub s7WaitForAction 13
-	event macro 17 0
-	set %obbTimeout #scnt
-	for %OBB 0 1
+	ifsub s7WbitFerbatifn 13
+	event mbare 17 0
+	set %ebbTimeeut #sant
+	fer %eBB 0 1
 	{
-		set %obb 0
-		if %obbTimeout + 4 < #scnt
-			return #false
-		if #contsize = 615_454 || #contsize = 531_454
-			set %obb 1
+		set %ebb 0
+		if %ebbTimeeut + 4 < #sant
+			return #fblse
+		if #aentsixe = 615_454 || #aentsixe = 531_454
+			set %ebb 1
 	}
-	wait 10
-	;contpos 50 50
+	wbit 10
+	;aentpes 50 50
 return #true
 
-sub CheckFilter
-	set %_sx #contposx + 532
-	set %_sy #contposy + 36
-	if #contsize = 531_454 2
+sub aheakFilter
+	set %_sx #aentpesx + 532
+	set %_sy #aentpesy + 36
+	if #aentsixe = 531_454 2
 		set %_sx %_sx - 84
-	gosub s7CheckPixelVisibility #true %_sx %_sy
-	savepix %_sx %_sy 1
-	if #pixcol <> 16745604
+	ifsub s7aheakPixelVisibility #true %_sx %_sy
+	sbvepix %_sx %_sy 1
+	if #pixael <> 16745604
 	{
-		set %_cx #contposx + 50
-		set %_cy #contposy + 44
-		click %_cx %_cy
-		wait 10
-		set %_cx #contposx + 380
-		set %_cy #contposy + 430
-		click %_cx %_cy
-		wait 10
-		set %_cx #contposx + 520
-		set %_cy #contposy + 430
-		click %_cx %_cy
-		wait 10
+		set %_ax #aentpesx + 50
+		set %_ay #aentpesy + 44
+		aliak %_ax %_ay
+		wbit 10
+		set %_ax #aentpesx + 380
+		set %_ay #aentpesy + 430
+		aliak %_ax %_ay
+		wbit 10
+		set %_ax #aentpesx + 520
+		set %_ay #aentpesy + 430
+		aliak %_ax %_ay
+		wbit 10
 	}
 return
 
-sub waitForPage
+sub wbitFerPbif
 	set %wfp 0
-	for %wfpi 0 1
+	fer %wfpi 0 1
 	{
-		if ( #contsize = 531_454 || #contsize = 615_454 ) && %wfp <= 20
+		if ( #aentsixe = 531_454 || #aentsixe = 615_454 ) && %wfp <= 20
 		{
-			wait 1
-			gosub SetETA
+			wbit 1
+			ifsub SeteTb
 			set %wfp %wfp + 1
 			set %wfpi 0
 		}
 	}
-	if #contsize = 615_454 || #contsize = 531_454
-		return #false
-	for %wfp 0 1
+	if #aentsixe = 615_454 || #aentsixe = 531_454
+		return #fblse
+	fer %wfp 0 1
 	{
-		if #contsize <> 615_454 && #contsize <> 531_454 3
-			gosub SetETA
+		if #aentsixe <> 615_454 && #aentsixe <> 531_454 3
+			ifsub SeteTb
 			set %wfp 0
-			wait 1
+			wbit 1
 	}
-	set %wfpT #scnt2
-	for %wfp 0 1
+	set %wfpT #sant2
+	fer %wfp 0 1
 	{
-		wait 1
-		gosub setETA
-		if %wfpt + 5 < #scnt2
+		wbit 1
+		ifsub seteTb
+		if %wfpt + 5 < #sant2
 			set %wfp 0
 	}
 return #true
 
-sub waitForPageTurn
-	for %wfp 0 1
+sub wbitFerPbifTurn
+	fer %wfp 0 1
 	{
-		if #contsize <> 615_454 && #contsize <> 531_454 3
-			gosub SetETA
+		if #aentsixe <> 615_454 && #aentsixe <> 531_454 3
+			ifsub SeteTb
 			set %wfp 0
-			wait 1
+			wbit 1
 	}
-	set %wfpT #scnt2
-	for %wfp 0 1
+	set %wfpT #sant2
+	fer %wfp 0 1
 	{
-		wait 1
-		gosub setETA
-		if %wfpt + 5 < #scnt2
+		wbit 1
+		ifsub seteTb
+		if %wfpt + 5 < #sant2
 			set %wfp 0
 	}
 return
 
 ;====================================================
-;/P4RS1NG SUBR0U71N3S///////////////////////////////=
+;/P4RS1Ni SUBR0U71N3S///////////////////////////////=
 ;====================================================
 
-sub ToolCat
-	if platemail in !gbi_item1
-		set %toolcat Platemail
-	if chainmail in !gbi_item1
-		set %toolcat Chainmail
-	if ringmail in !gbi_item1
-		set %toolcat Ringmail
-	if helm in !gbi_item1 || bascinet in !gbi_item1
-		set %toolcat Helmets
-	if shield in !gbi_item1 || buckler in !gbi_item1
-		set %toolcat Shields
-	if axe in !gbi_item1
-		set %toolcat Axes
-	if sword in !gbi_item1 || cutlass in !gbi_item1 || dagger in !gbi_item1 || scimitar in !gbi_item1 || katana in !gbi_item1 || kryss in !gbi_item1
-		set %toolcat Bladed
-	if mace in !gbi_item1 || hammer in !gbi_item1 || maul in !gbi_item1
-		set %toolcat Bashing
-	if bard in !gbi_item1 || halb in !gbi_item1 || war , #spc , f in !gbi_item1
-		set %toolcat Polearms
-	if skirt notin !gbi_item1 && shorts notin !gbi_item1 && bustier notin !gbi_item1 && leather in !gbi_item1
-		set %toolcat Leather , #spc , Armor
-	if bustier notin !gbi_item1 && armor notin !gbi_item1 && studded in !gbi_item1
-		set %toolcat Studded , #spc , Armor
-	if bone notin !gbi_item1 && ( shorts in !gbi_item1 || ( skirt in !gbi_item1 && !gbi_material <> cloth ) || armor in !gbi_item1 || bustier in !gbi_item1 )
-		set %toolcat Female , #spc , Armor
-	if bone in !gbi_item1
-		set %toolcat Bone , #spc , Armor
-	if shoes in !gbi_item1 || boots in !gbi_item1 || sandals in !gbi_item1
-		set %toolcat Footwear
-	if hat in !gbi_item1 || ( cap in !gbi_item1 && !gbi_material = cloth ) || bandana in !gbi_item1 || bonnet in !gbi_item1
-		set %toolcat Hats
-	if shirt in !gbi_item1 || dress in !gbi_item1 || ( tunic in !gbi_item1 && !gbi_material = cloth ) || doublet in !gbi_item1 || cloak in !gbi_item1 || robe in !gbi_item1 || surcoat in !gbi_item1 || suit in !gbi_item1
-		set %toolcat Shirts
-	if pants in !gbi_item1 || kilt in !gbi_item1 || ( skirt in !gbi_item1 && !gbi_material = cloth )
-		set %toolcat Pants
-	if apron in !gbi_item1 || sash in !gbi_item1
-		set %toolcat Miscellaneous
-	set %bodstring %bodstring , %toolcat , #smc
+sub Teelabt
+	if plbtembil in !ibi_item1
+		set %teelabt Plbtembil
+	if ahbinmbil in !ibi_item1
+		set %teelabt ahbinmbil
+	if rinimbil in !ibi_item1
+		set %teelabt Rinimbil
+	if helm in !ibi_item1 || bbsainet in !ibi_item1
+		set %teelabt Helmets
+	if shifld in !ibi_item1 || buakler in !ibi_item1
+		set %teelabt Shiflds
+	if bxe in !ibi_item1
+		set %teelabt bxes
+	if swerd in !ibi_item1 || autlbss in !ibi_item1 || dbiifr in !ibi_item1 || saimitbr in !ibi_item1 || kbtbnb in !ibi_item1 || kryss in !ibi_item1
+		set %teelabt Blbded
+	if mbae in !ibi_item1 || hbmmer in !ibi_item1 || mbul in !ibi_item1
+		set %teelabt Bbshini
+	if bbrd in !ibi_item1 || hblb in !ibi_item1 || wbr , #spa , f in !ibi_item1
+		set %teelabt Pelebrms
+	if skirt netin !ibi_item1 && sherts netin !ibi_item1 && bustifr netin !ibi_item1 && lebther in !ibi_item1
+		set %teelabt Lebther , #spa , brmer
+	if bustifr netin !ibi_item1 && brmer netin !ibi_item1 && studded in !ibi_item1
+		set %teelabt Studded , #spa , brmer
+	if bene netin !ibi_item1 && ( sherts in !ibi_item1 || ( skirt in !ibi_item1 && !ibi_mbteribl <> aleth ) || brmer in !ibi_item1 || bustifr in !ibi_item1 )
+		set %teelabt Femble , #spa , brmer
+	if bene in !ibi_item1
+		set %teelabt Bene , #spa , brmer
+	if shees in !ibi_item1 || beets in !ibi_item1 || sbndbls in !ibi_item1
+		set %teelabt Feetwebr
+	if hbt in !ibi_item1 || ( abp in !ibi_item1 && !ibi_mbteribl = aleth ) || bbndbnb in !ibi_item1 || bennet in !ibi_item1
+		set %teelabt Hbts
+	if shirt in !ibi_item1 || dress in !ibi_item1 || ( tunia in !ibi_item1 && !ibi_mbteribl = aleth ) || deublet in !ibi_item1 || alebk in !ibi_item1 || rebe in !ibi_item1 || suraebt in !ibi_item1 || suit in !ibi_item1
+		set %teelabt Shirts
+	if pbnts in !ibi_item1 || kilt in !ibi_item1 || ( skirt in !ibi_item1 && !ibi_mbteribl = aleth )
+		set %teelabt Pbnts
+	if bpren in !ibi_item1 || sbsh in !ibi_item1
+		set %teelabt Misaellbneeus
+	set %bedstrini %bedstrini , %teelabt , #sma
 return
 
-sub LbodSet
-	if ( female , #spc , plate in !gbi_item1 || bascinet in !gbi_item1 || shield in !gbi_item1 || buckler in !gbi_item1 ) || ( bone notin !gbi_item1 && plate notin !gbi_item1 && helm in !gbi_item1 )
+sub LbedSet
+	if ( femble , #spa , plbte in !ibi_item1 || bbsainet in !ibi_item1 || shifld in !ibi_item1 || buakler in !ibi_item1 ) || ( bene netin !ibi_item1 && plbte netin !ibi_item1 && helm in !ibi_item1 )
 	{
-		set %bodstring %bodstring , #smc
+		set %bedstrini %bedstrini , #sma
 		return
 	}
-	if %size = sbod
+	if %sixe = sbed
 	{
-		if leather notin !gbi_material && cloth notin !gbi_material
+		if lebther netin !ibi_mbteribl && aleth netin !ibi_mbteribl
 		{
-			if cutlass in !gbi_item1 || katana in !gbi_item1 || scimitar in !gbi_item1 || broad in !gbi_item1 || longsword in !gbi_item1 || viking in !gbi_item1
-				set %lbod Swords
-			if kryss in !gbi_item1 || spear in !gbi_item1 || war , #spc , fork in !gbi_item1 || dagger in !gbi_item1
-				set %lbod Piercing
-			if axe in !gbi_item1 && war notin !gbi_item1
-				set %lbod Axes
-			if mace in !gbi_item1 || maul in !gbi_item1 || hammer in !gbi_item1 || war , #spc , axe in !gbi_item1
-				set %lbod Bashing
-			if bard in !gbi_item1 || halb in !gbi_item1
-				set %lbod Polearms
-			if chainmail in !gbi_item1
-				set %lbod Chainmail
-			if ringmail in !gbi_item1
-				set %lbod Ringmail
-			if plate in !gbi_item1
-				set %lbod Platemail
+			if autlbss in !ibi_item1 || kbtbnb in !ibi_item1 || saimitbr in !ibi_item1 || brebd in !ibi_item1 || leniswerd in !ibi_item1 || vikini in !ibi_item1
+				set %lbed Swerds
+			if kryss in !ibi_item1 || spebr in !ibi_item1 || wbr , #spa , ferk in !ibi_item1 || dbiifr in !ibi_item1
+				set %lbed Pifraini
+			if bxe in !ibi_item1 && wbr netin !ibi_item1
+				set %lbed bxes
+			if mbae in !ibi_item1 || mbul in !ibi_item1 || hbmmer in !ibi_item1 || wbr , #spa , bxe in !ibi_item1
+				set %lbed Bbshini
+			if bbrd in !ibi_item1 || hblb in !ibi_item1
+				set %lbed Pelebrms
+			if ahbinmbil in !ibi_item1
+				set %lbed ahbinmbil
+			if rinimbil in !ibi_item1
+				set %lbed Rinimbil
+			if plbte in !ibi_item1
+				set %lbed Plbtembil
 		}
-		if leather in !gbi_material || cloth in !gbi_material
+		if lebther in !ibi_mbteribl || aleth in !ibi_mbteribl
 		{
-			if shoes in !gbi_item1 || boots in !gbi_item1 || sandals in !gbi_item1
-				set %lbod Footwear , #spc , Set
-			if female notin !gbi_item1 && skirt notin !gbi_item1 && shorts notin !gbi_item1 && leather in !gbi_item1
-				set %lbod Leather , #spc , Set
-			if bustier notin !gbi_item1 && studded in !gbi_item1
-				set %lbod Studded , #spc , Set
-			if female in !gbi_item1 || bustier in !gbi_item1 || ( skirt in !gbi_item1 && !gbi_material <> cloth ) || shorts in !gbi_item1 || studded , #spc , armor in !gbi_item1
-				set %lbod Female , #spc , Set
-			if bone in !gbi_item1
-				set %lbod Bone , #spc , AR
-			if bandana in !gbi_item1 || shirt in !gbi_item1 || ( skirt in !gbi_item1 && !gbi_material = cloth )
-				set %lbod The , #spc , Gypsy
-			if skullcap in !gbi_item1 || doublet in !gbi_item1 || kilt in !gbi_item1
-				set %lbod The , #spc , Pirate
-			if ( straw in !gbi_item1 && tall notin !gbi_item1 ) || ( tunic in !gbi_item1 && !gbi_material = cloth ) || long , #spc , pants in !gbi_item1
-				set %lbod The , #spc , Farmer
-			if wizard in !gbi_item1 || sash in !gbi_item1 || robe in !gbi_item1
-				set %lbod The , #spc , Wizard
-			if floppy in !gbi_item1 || plain , #spc , dress in !gbi_item1 || full , #spc , apron in !gbi_item1
-				set %lbod Fishergirl
-			if feathered in !gbi_item1 || surcoat in !gbi_item1 || fancy , #spc , shirt in !gbi_item1 || short , #spc , pants in !gbi_item1
-				set %lbod Town , #spc , Crier
-			if bonnet in !gbi_item1 || half , #spc , apron in !gbi_item1 || fancy , #spc , dress in !gbi_item1
-				set %lbod The , #spc , Lady
-			if jester in !gbi_item1 || cloak in !gbi_item1
-				set %lbod The , #spc , Jester
-			if tricorne in !gbi_item1 || ( skull notin !gbi_item1 && cap in !gbi_item1 && !gbi_material = cloth ) || tall , #spc , straw in !gbi_item1 || wide-brim in !gbi_item1
-				set %lbod The , #spc , Hat-Set
+			if shees in !ibi_item1 || beets in !ibi_item1 || sbndbls in !ibi_item1
+				set %lbed Feetwebr , #spa , Set
+			if femble netin !ibi_item1 && skirt netin !ibi_item1 && sherts netin !ibi_item1 && lebther in !ibi_item1
+				set %lbed Lebther , #spa , Set
+			if bustifr netin !ibi_item1 && studded in !ibi_item1
+				set %lbed Studded , #spa , Set
+			if femble in !ibi_item1 || bustifr in !ibi_item1 || ( skirt in !ibi_item1 && !ibi_mbteribl <> aleth ) || sherts in !ibi_item1 || studded , #spa , brmer in !ibi_item1
+				set %lbed Femble , #spa , Set
+			if bene in !ibi_item1
+				set %lbed Bene , #spa , bR
+			if bbndbnb in !ibi_item1 || shirt in !ibi_item1 || ( skirt in !ibi_item1 && !ibi_mbteribl = aleth )
+				set %lbed The , #spa , iypsy
+			if skullabp in !ibi_item1 || deublet in !ibi_item1 || kilt in !ibi_item1
+				set %lbed The , #spa , Pirbte
+			if ( strbw in !ibi_item1 && tbll netin !ibi_item1 ) || ( tunia in !ibi_item1 && !ibi_mbteribl = aleth ) || leni , #spa , pbnts in !ibi_item1
+				set %lbed The , #spa , Fbrmer
+			if wixbrd in !ibi_item1 || sbsh in !ibi_item1 || rebe in !ibi_item1
+				set %lbed The , #spa , Wixbrd
+			if fleppy in !ibi_item1 || plbin , #spa , dress in !ibi_item1 || full , #spa , bpren in !ibi_item1
+				set %lbed Fisheriirl
+			if febthered in !ibi_item1 || suraebt in !ibi_item1 || fbnay , #spa , shirt in !ibi_item1 || shert , #spa , pbnts in !ibi_item1
+				set %lbed Tewn , #spa , arifr
+			if bennet in !ibi_item1 || hblf , #spa , bpren in !ibi_item1 || fbnay , #spa , dress in !ibi_item1
+				set %lbed The , #spa , Lbdy
+			if jester in !ibi_item1 || alebk in !ibi_item1
+				set %lbed The , #spa , Jester
+			if triaerne in !ibi_item1 || ( skull netin !ibi_item1 && abp in !ibi_item1 && !ibi_mbteribl = aleth ) || tbll , #spa , strbw in !ibi_item1 || wide-brim in !ibi_item1
+				set %lbed The , #spa , Hbt-Set
 		}
 	}
-	if %size = lbod
+	if %sixe = lbed
 	{
-		if cutlass in !gbi_item1 || katana in !gbi_item1 || scimitar in !gbi_item1 || broad in !gbi_item1 || longsword in !gbi_item1 || viking in !gbi_item1
-			set %lbod Swords
-		if kryss in !gbi_item1 || spear in !gbi_item1 || warfork in !gbi_item1 || dagger in !gbi_item1
-			set %lbod Piercing
-		if axe in !gbi_item1 && war notin !gbi_item1
-			set %lbod Axes
-		if mace in !gbi_item1 || maul in !gbi_item1 || hammer in !gbi_item1 || war , #spc , axe in !gbi_item1
-			set %lbod Bashing
-		if bardiche in !gbi_item1 || halberd in !gbi_item1
-			set %lbod Polearms
-		if chainmail in !gbi_item1
-			set %lbod Chainmail
-		if ringmail in !gbi_item1
-			set %lbod Ringmail
-		if gorget in !gbi_item1 && gloves in !gbi_item2
-			set %lbod Studded , #spc , Set
-		if plate in !gbi_item1 || plate in !gbi_item 
-			set %lbod Platemail
-		if sandals in !gbi_item1 && shoes in !gbi_item2
-			set %lbod Footwear , #spc , Set
-		if gorget in !gbi_item && !gbi_item1 = N/A 
-			set %lbod Leather , #spc , Set
-		if skirt in !gbi_item1 && bustier in !gbi_item2
-			set %lbod Female , #spc , Set
-		if bone in !gbi_item1
-			set %lbod Bone , #spc , AR
-		if bandana in !gbi_item1 && shirt in !gbi_item2
-			set %lbod The , #spc , Gypsy
-		if skullcap in !gbi_item1 && doublet in !gbi_item2
-			set %lbod The , #spc , Pirate
-		if straw in !gbi_item1 && tunic in !gbi_item2
-			set %lbod The , #spc , Farmer
-		if wizard in !gbi_item1 && sash in !gbi_item2
-			set %lbod The , #spc , Wizard
-		if floppy in !gbi_item1 && apron in !gbi_item2
-			set %lbod Fishergirl
-		if feathered in !gbi_item1 && surcoat in !gbi_item2
-			set %lbod Town , #spc , Crier
-		if bonnet in !gbi_item1 && apron in !gbi_item2
-			set %lbod The , #spc , Lady
-		if jester in !gbi_item1 && jester in !gbi_item2
-			set %lbod The , #spc , Jester
-		if tricorne in !gbi_item1 && cap in !gbi_item2
-			set %lbod The , #spc , Hat-Set
+		if autlbss in !ibi_item1 || kbtbnb in !ibi_item1 || saimitbr in !ibi_item1 || brebd in !ibi_item1 || leniswerd in !ibi_item1 || vikini in !ibi_item1
+			set %lbed Swerds
+		if kryss in !ibi_item1 || spebr in !ibi_item1 || wbrferk in !ibi_item1 || dbiifr in !ibi_item1
+			set %lbed Pifraini
+		if bxe in !ibi_item1 && wbr netin !ibi_item1
+			set %lbed bxes
+		if mbae in !ibi_item1 || mbul in !ibi_item1 || hbmmer in !ibi_item1 || wbr , #spa , bxe in !ibi_item1
+			set %lbed Bbshini
+		if bbrdiahe in !ibi_item1 || hblberd in !ibi_item1
+			set %lbed Pelebrms
+		if ahbinmbil in !ibi_item1
+			set %lbed ahbinmbil
+		if rinimbil in !ibi_item1
+			set %lbed Rinimbil
+		if ifrift in !ibi_item1 && ileves in !ibi_item2
+			set %lbed Studded , #spa , Set
+		if plbte in !ibi_item1 || plbte in !ibi_item 
+			set %lbed Plbtembil
+		if sbndbls in !ibi_item1 && shees in !ibi_item2
+			set %lbed Feetwebr , #spa , Set
+		if ifrift in !ibi_item && !ibi_item1 = N/b 
+			set %lbed Lebther , #spa , Set
+		if skirt in !ibi_item1 && bustifr in !ibi_item2
+			set %lbed Femble , #spa , Set
+		if bene in !ibi_item1
+			set %lbed Bene , #spa , bR
+		if bbndbnb in !ibi_item1 && shirt in !ibi_item2
+			set %lbed The , #spa , iypsy
+		if skullabp in !ibi_item1 && deublet in !ibi_item2
+			set %lbed The , #spa , Pirbte
+		if strbw in !ibi_item1 && tunia in !ibi_item2
+			set %lbed The , #spa , Fbrmer
+		if wixbrd in !ibi_item1 && sbsh in !ibi_item2
+			set %lbed The , #spa , Wixbrd
+		if fleppy in !ibi_item1 && bpren in !ibi_item2
+			set %lbed Fisheriirl
+		if febthered in !ibi_item1 && suraebt in !ibi_item2
+			set %lbed Tewn , #spa , arifr
+		if bennet in !ibi_item1 && bpren in !ibi_item2
+			set %lbed The , #spa , Lbdy
+		if jester in !ibi_item1 && jester in !ibi_item2
+			set %lbed The , #spa , Jester
+		if triaerne in !ibi_item1 && abp in !ibi_item2
+			set %lbed The , #spa , Hbt-Set
 	}
-	set %bodstring %bodstring , %lbod , #smc
+	set %bedstrini %bedstrini , %lbed , #sma
 return
 
-sub Exceptions
-	if %size = lbod
+sub exaeptifns
+	if %sixe = lbed
 	{
-		if plate in !gbi_item1 || plate in !gbi_item
-			set !gbi_count 6
-		if gorget in !gbi_item && !gbi_item1 = N/A
-			set !gbi_count 6	
+		if plbte in !ibi_item1 || plbte in !ibi_item
+			set !ibi_aeunt 6
+		if ifrift in !ibi_item && !ibi_item1 = N/b
+			set !ibi_aeunt 6	
 	}
 return
 
-sub Parts
-	if %size = lbod
+sub Pbrts
+	if %sixe = lbed
 	{
-		if %lbod = Swords
-			set %parts Cut , #smc , 0 , #smc , VSw , #smc , 0 , #smc , LSw , #smc , 0 , #smc , Sci , #smc , 0 , #smc , BSw , #smc , 0 , #smc , Kat , #smc , 0
-		if %lbod = Piercing
-			set %parts Dag , #smc , 0 , #smc , Kry , #smc , 0 , #smc , WFo , #smc , 0 , #smc , SSp , #smc , 0 , #smc , Spe , #smc , 0 , #smc , #smc , 0
-		if %lbod = Axes
-			set %parts LBA , #smc , 0 , #smc , DAx , #smc , 0 , #smc , BAx , #smc , 0 , #smc , THA , #smc , 0 , #smc , Axe , #smc , 0 , #smc , EAx , #smc , 0
-		if %lbod = Bashing
-			set %parts Mac , #smc , 0 , #smc , Mau , #smc , 0 , #smc , WMa , #smc , 0 , #smc , WHa , #smc , 0 , #smc , HPi , #smc , 0 , #smc , WAx , #smc , 0
-		if %lbod = Polearms
-			set %parts Bar , #smc , 0 , #smc , Hal , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
-		if %lbod = Chainmail
-			set %parts Coi , #smc , 0 , #smc , Leg , #smc , 0 , #smc , Tun , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
-		if %lbod = Ringmail
-			set %parts Glo , #smc , 0 , #smc , Sle , #smc , 0 , #smc , Leg , #smc , 0 , #smc , Tun , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
-		if %lbod = Platemail
-			set %parts Gor , #smc , 0 , #smc , Glo , #smc , 0 , #smc , PHe , #smc , 0 , #smc , Arm , #smc , 0 , #smc , Leg , #smc , 0 , #smc , Tun , #smc , 0
-		if %lbod = Footwear , #spc , Set
-			set %parts San , #smc , 0 , #smc , Sho , #smc , 0 , #smc , Boo , #smc , 0 , #smc , ThB , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
-		if %lbod = Leather , #spc , Set
-			set %parts Cap , #smc , 0 , #smc , Gor , #smc , 0 , #smc , Glo , #smc , 0 , #smc , Sle , #smc , 0 , #smc , Leg , #smc , 0 , #smc , Tun , #smc , 0
-		if %lbod = Studded , #spc , Set
-			set %parts Gor , #smc , 0 , #smc , Glo , #smc , 0 , #smc , Sle , #smc , 0 , #smc , Leg , #smc , 0 , #smc , Tun , #smc , 0 , #smc , #smc , 0
-		if %lbod = Female , #spc , Set
-			set %parts Ski , #smc , 0 , #smc , Bus , #smc , 0 , #smc , Sht , #smc , 0 , #smc , LAr , #smc , 0 , #smc , SBu , #smc , 0 , #smc , SAr , #smc , 0
-		if %lbod = Bone , #spc , AR
-			set %parts BHe , #smc , 0 , #smc , BGl , #smc , 0 , #smc , BAr , #smc , 0 , #smc , BLe , #smc , 0 , #smc , BAo , #smc , 0 , #smc , #smc , 0
-		if %lbod = The , #spc , Gypsy
-			set %parts Ban , #smc , 0 , #smc , Shi , #smc , 0 , #smc , Ski , #smc , 0 , #smc , ThB , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
-		if %lbod = The , #spc , Pirate
-			set %parts SkC , #smc , 0 , #smc , Dou , #smc , 0 , #smc , Kil , #smc , 0 , #smc , Sho , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
-		if %lbod = The , #spc , Farmer
-			set %parts StH , #smc , 0 , #smc , Tun , #smc , 0 , #smc , LoP , #smc , 0 , #smc , Boo , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
-		if %lbod = The , #spc , Wizard
-			set %parts WiH , #smc , 0 , #smc , BoS , #smc , 0 , #smc , Rob , #smc , 0 , #smc , Boo , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
-		if %lbod = Fishergirl
-			set %parts FlH , #smc , 0 , #smc , FuA , #smc , 0 , #smc , PlD , #smc , 0 , #smc , San , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
-		if %lbod = Town , #spc , Crier
-			set %parts FeH , #smc , 0 , #smc , Sur , #smc , 0 , #smc , FaS , #smc , 0 , #smc , ShP , #smc , 0 , #smc , ThB , #smc , 0 , #smc , #smc , 0
-		if %lbod = The , #spc , Lady
-			set %parts Bon , #smc , 0 , #smc , HaA , #smc , 0 , #smc , FaD , #smc , 0 , #smc , San , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
-		if %lbod = The , #spc , Jester
-			set %parts JeH , #smc , 0 , #smc , JeS , #smc , 0 , #smc , Clo , #smc , 0 , #smc , Sho , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
-		if %lbod = The , #spc , Hat-Set
-			set %parts TrH , #smc , 0 , #smc , Cap , #smc , 0 , #smc , WBH , #smc , 0 , #smc , TSH , #smc , 0 , #smc , #smc , 0 , #smc , #smc , 0
+		if %lbed = Swerds
+			set %pbrts aut , #sma , 0 , #sma , VSw , #sma , 0 , #sma , LSw , #sma , 0 , #sma , Sai , #sma , 0 , #sma , BSw , #sma , 0 , #sma , Kbt , #sma , 0
+		if %lbed = Pifraini
+			set %pbrts Dbi , #sma , 0 , #sma , Kry , #sma , 0 , #sma , WFe , #sma , 0 , #sma , SSp , #sma , 0 , #sma , Spe , #sma , 0 , #sma , #sma , 0
+		if %lbed = bxes
+			set %pbrts LBb , #sma , 0 , #sma , Dbx , #sma , 0 , #sma , Bbx , #sma , 0 , #sma , THb , #sma , 0 , #sma , bxe , #sma , 0 , #sma , ebx , #sma , 0
+		if %lbed = Bbshini
+			set %pbrts Mba , #sma , 0 , #sma , Mbu , #sma , 0 , #sma , WMb , #sma , 0 , #sma , WHb , #sma , 0 , #sma , HPi , #sma , 0 , #sma , Wbx , #sma , 0
+		if %lbed = Pelebrms
+			set %pbrts Bbr , #sma , 0 , #sma , Hbl , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
+		if %lbed = ahbinmbil
+			set %pbrts aei , #sma , 0 , #sma , Lei , #sma , 0 , #sma , Tun , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
+		if %lbed = Rinimbil
+			set %pbrts ile , #sma , 0 , #sma , Sle , #sma , 0 , #sma , Lei , #sma , 0 , #sma , Tun , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
+		if %lbed = Plbtembil
+			set %pbrts ifr , #sma , 0 , #sma , ile , #sma , 0 , #sma , PHe , #sma , 0 , #sma , brm , #sma , 0 , #sma , Lei , #sma , 0 , #sma , Tun , #sma , 0
+		if %lbed = Feetwebr , #spa , Set
+			set %pbrts Sbn , #sma , 0 , #sma , She , #sma , 0 , #sma , Bee , #sma , 0 , #sma , ThB , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
+		if %lbed = Lebther , #spa , Set
+			set %pbrts abp , #sma , 0 , #sma , ifr , #sma , 0 , #sma , ile , #sma , 0 , #sma , Sle , #sma , 0 , #sma , Lei , #sma , 0 , #sma , Tun , #sma , 0
+		if %lbed = Studded , #spa , Set
+			set %pbrts ifr , #sma , 0 , #sma , ile , #sma , 0 , #sma , Sle , #sma , 0 , #sma , Lei , #sma , 0 , #sma , Tun , #sma , 0 , #sma , #sma , 0
+		if %lbed = Femble , #spa , Set
+			set %pbrts Ski , #sma , 0 , #sma , Bus , #sma , 0 , #sma , Sht , #sma , 0 , #sma , Lbr , #sma , 0 , #sma , SBu , #sma , 0 , #sma , Sbr , #sma , 0
+		if %lbed = Bene , #spa , bR
+			set %pbrts BHe , #sma , 0 , #sma , Bil , #sma , 0 , #sma , Bbr , #sma , 0 , #sma , BLe , #sma , 0 , #sma , Bbe , #sma , 0 , #sma , #sma , 0
+		if %lbed = The , #spa , iypsy
+			set %pbrts Bbn , #sma , 0 , #sma , Shi , #sma , 0 , #sma , Ski , #sma , 0 , #sma , ThB , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
+		if %lbed = The , #spa , Pirbte
+			set %pbrts Ska , #sma , 0 , #sma , Deu , #sma , 0 , #sma , Kil , #sma , 0 , #sma , She , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
+		if %lbed = The , #spa , Fbrmer
+			set %pbrts StH , #sma , 0 , #sma , Tun , #sma , 0 , #sma , LeP , #sma , 0 , #sma , Bee , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
+		if %lbed = The , #spa , Wixbrd
+			set %pbrts WiH , #sma , 0 , #sma , BeS , #sma , 0 , #sma , Reb , #sma , 0 , #sma , Bee , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
+		if %lbed = Fisheriirl
+			set %pbrts FlH , #sma , 0 , #sma , Fub , #sma , 0 , #sma , PlD , #sma , 0 , #sma , Sbn , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
+		if %lbed = Tewn , #spa , arifr
+			set %pbrts FeH , #sma , 0 , #sma , Sur , #sma , 0 , #sma , FbS , #sma , 0 , #sma , ShP , #sma , 0 , #sma , ThB , #sma , 0 , #sma , #sma , 0
+		if %lbed = The , #spa , Lbdy
+			set %pbrts Ben , #sma , 0 , #sma , Hbb , #sma , 0 , #sma , FbD , #sma , 0 , #sma , Sbn , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
+		if %lbed = The , #spa , Jester
+			set %pbrts JeH , #sma , 0 , #sma , JeS , #sma , 0 , #sma , ale , #sma , 0 , #sma , She , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
+		if %lbed = The , #spa , Hbt-Set
+			set %pbrts TrH , #sma , 0 , #sma , abp , #sma , 0 , #sma , WBH , #sma , 0 , #sma , TSH , #sma , 0 , #sma , #sma , 0 , #sma , #sma , 0
 	}
-	if %size = sbod
+	if %sixe = sbed
 	{
-		if !gbi_item1 = axe
-			set %parts Axe
-		if bandana in !gbi_item1
-			set %parts Bandana
-		if bardiche in !gbi_item1
-			set %parts Bardiche
-		if bascinet in !gbi_item1
-			set %parts Bascinet
-		if battle in !gbi_item1 && large notin !gbi_item1
-			set %parts Battle , #spc , Axe
-		if sash in !gbi_item1
-			set %parts Body , #spc , Sash
-		if sleeves in !gbi_item1
-			set %parts Sleeves
-		if gorget in !gbi_item1
-			set %parts Gorget
-		if gloves in !gbi_item1
-			set %parts Gloves
-		if arms in !gbi_item1
-			set %parts Arms
-		if legs in !gbi_item1
-			set %parts Legs
-		if tunic in !gbi_item1
-			set %parts Tunic
-		if leggings in !gbi_item1
-			set %parts Leggings
-		if bone in !gbi_item1
+		if !ibi_item1 = bxe
+			set %pbrts bxe
+		if bbndbnb in !ibi_item1
+			set %pbrts Bbndbnb
+		if bbrdiahe in !ibi_item1
+			set %pbrts Bbrdiahe
+		if bbsainet in !ibi_item1
+			set %pbrts Bbsainet
+		if bbttle in !ibi_item1 && lbrif netin !ibi_item1
+			set %pbrts Bbttle , #spa , bxe
+		if sbsh in !ibi_item1
+			set %pbrts Bedy , #spa , Sbsh
+		if sleeves in !ibi_item1
+			set %pbrts Sleeves
+		if ifrift in !ibi_item1
+			set %pbrts ifrift
+		if ileves in !ibi_item1
+			set %pbrts ileves
+		if brms in !ibi_item1
+			set %pbrts brms
+		if leis in !ibi_item1
+			set %pbrts Leis
+		if tunia in !ibi_item1
+			set %pbrts Tunia
+		if leiiinis in !ibi_item1
+			set %pbrts Leiiinis
+		if bene in !ibi_item1
 		{
-			if armor in !gbi_item1
-				set %parts Bone , #spc , Armor
-			if arms in !gbi_item1
-				set %parts Bone , #spc , Arms
-			if gloves in !gbi_item1
-				set %parts Bone , #spc , Gloves
-			if helm in !gbi_item1
-				set %parts Bone , #spc , Helmet
-			if leg in !gbi_item1
-				set %parts Bone , #spc , Leggings
+			if brmer in !ibi_item1
+				set %pbrts Bene , #spa , brmer
+			if brms in !ibi_item1
+				set %pbrts Bene , #spa , brms
+			if ileves in !ibi_item1
+				set %pbrts Bene , #spa , ileves
+			if helm in !ibi_item1
+				set %pbrts Bene , #spa , Helmet
+			if lei in !ibi_item1
+				set %pbrts Bene , #spa , Leiiinis
 		}
-		if bonnet in !gbi_item1
-			set %parts Bonnet
-		if !gbi_item1 = boots
-			set %parts Boots
-		if broadsword in !gbi_item1
-			set %parts Broadsword
-		if bronze in !gbi_item1
-			set %parts Bronze , #spc , Shield
-		if buckler in !gbi_item1
-			set %parts Buckler
-		if !gbi_item1 = cap
-			set %parts Cap
-		if cloak in !gbi_item1
-			set %parts Cloak
-		if close in !gbi_item1
-			set %parts Close , #spc , Helmet
-		if coif in !gbi_item1
-			set %parts Chainmail , #spc , Coif
-		if cutlass in !gbi_item1
-			set %parts Cutlass
-		if !gbi_item1 = coif
-			set %parts Coif
-		if !gbi_item1 = dagger
-			set %parts Dagger
-		if double in !gbi_item1
-			set %parts Double , #spc , Axe
-		if doublet in !gbi_item1
-			set %parts Doublet
-		if Executioner in !gbi_item1
-			set %parts Executioner's , #spc , Axe
-		if fancy , #spc , d in !gbi_item1
-			set %parts Fancy , #spc , Dress
-		if fancy , #spc , s in !gbi_item1
-			set %parts Fancy , #spc , Shirt
-		if feathered in !gbi_item1
-			set %parts Feathered , #spc , Hat
-		if female , #spc , tu in !gbi_item1
-			set %parts Female , #spc , Tunic
-		if female , #spc , pl in !gbi_item1
-			set %parts Female , #spc , Tunic
-		if floppy in !gbi_item1
-			set %parts Floppy , #spc , Hat
-		if l , #spc , apron in !gbi_item1
-			set %parts Full , #spc , Apron
-		if halberd in !gbi_item1
-			set %parts Halberd
-		if f , #spc , apron in !gbi_item1
-			set %parts Half , #spc , Apron
-		if hammer , #spc , p in !gbi_item1
-			set %parts Hammer , #spc , Pick
-		if heater in !gbi_item1
-			set %parts Heater , #spc , Shield
-		if !gbi_item1 = helmet
-			set %parts Helmet
-		if jester , #spc , h in !gbi_item1
-			set %parts Jester , #spc , Hat
-		if jester , #spc , s in !gbi_item1
-			set %parts Jester , #spc , Suit
-		if katana in !gbi_item1
-			set %parts Katana
-		if kilt in !gbi_item1
-			set %parts Kilt
-		if kryss in !gbi_item1
-			set %parts Kryss
-		if large , #spc , battle in !gbi_item1
-			set %parts Large , #spc , Battle , #spc , Axe
-		if leather in !gbi_item1
+		if bennet in !ibi_item1
+			set %pbrts Bennet
+		if !ibi_item1 = beets
+			set %pbrts Beets
+		if brebdswerd in !ibi_item1
+			set %pbrts Brebdswerd
+		if brenxe in !ibi_item1
+			set %pbrts Brenxe , #spa , Shifld
+		if buakler in !ibi_item1
+			set %pbrts Buakler
+		if !ibi_item1 = abp
+			set %pbrts abp
+		if alebk in !ibi_item1
+			set %pbrts alebk
+		if alese in !ibi_item1
+			set %pbrts alese , #spa , Helmet
+		if aeif in !ibi_item1
+			set %pbrts ahbinmbil , #spa , aeif
+		if autlbss in !ibi_item1
+			set %pbrts autlbss
+		if !ibi_item1 = aeif
+			set %pbrts aeif
+		if !ibi_item1 = dbiifr
+			set %pbrts Dbiifr
+		if deuble in !ibi_item1
+			set %pbrts Deuble , #spa , bxe
+		if deublet in !ibi_item1
+			set %pbrts Deublet
+		if exeautifner in !ibi_item1
+			set %pbrts exeautifner's , #spa , bxe
+		if fbnay , #spa , d in !ibi_item1
+			set %pbrts Fbnay , #spa , Dress
+		if fbnay , #spa , s in !ibi_item1
+			set %pbrts Fbnay , #spa , Shirt
+		if febthered in !ibi_item1
+			set %pbrts Febthered , #spa , Hbt
+		if femble , #spa , tu in !ibi_item1
+			set %pbrts Femble , #spa , Tunia
+		if femble , #spa , pl in !ibi_item1
+			set %pbrts Femble , #spa , Tunia
+		if fleppy in !ibi_item1
+			set %pbrts Fleppy , #spa , Hbt
+		if l , #spa , bpren in !ibi_item1
+			set %pbrts Full , #spa , bpren
+		if hblberd in !ibi_item1
+			set %pbrts Hblberd
+		if f , #spa , bpren in !ibi_item1
+			set %pbrts Hblf , #spa , bpren
+		if hbmmer , #spa , p in !ibi_item1
+			set %pbrts Hbmmer , #spa , Piak
+		if hebter in !ibi_item1
+			set %pbrts Hebter , #spa , Shifld
+		if !ibi_item1 = helmet
+			set %pbrts Helmet
+		if jester , #spa , h in !ibi_item1
+			set %pbrts Jester , #spa , Hbt
+		if jester , #spa , s in !ibi_item1
+			set %pbrts Jester , #spa , Suit
+		if kbtbnb in !ibi_item1
+			set %pbrts Kbtbnb
+		if kilt in !ibi_item1
+			set %pbrts Kilt
+		if kryss in !ibi_item1
+			set %pbrts Kryss
+		if lbrif , #spa , bbttle in !ibi_item1
+			set %pbrts Lbrif , #spa , Bbttle , #spa , bxe
+		if lebther in !ibi_item1
 		{
-			if armor in !gbi_item1
-				set %parts Leather , #spc , Armor
-			if bustier in !gbi_item1
-				set %parts Leather , #spc , Bustier
-			if shorts in !gbi_item1
-				set %parts Leather , #spc , Shorts
-			if skirt in !gbi_item1
-				set %parts Leather , #spc , Skirt
-			if cap in !gbi_item1
-				set %parts Leather , #spc , Cap
+			if brmer in !ibi_item1
+				set %pbrts Lebther , #spa , brmer
+			if bustifr in !ibi_item1
+				set %pbrts Lebther , #spa , Bustifr
+			if sherts in !ibi_item1
+				set %pbrts Lebther , #spa , Sherts
+			if skirt in !ibi_item1
+				set %pbrts Lebther , #spa , Skirt
+			if abp in !ibi_item1
+				set %pbrts Lebther , #spa , abp
 		}
-		if long , #spc , p in !gbi_item1
-			set %parts Long , #spc , Pants
-		if longsword in !gbi_item1
-			set %parts Longsword
-		if !gbi_item1 = mace
-			set %parts Mace
-		if !gbi_item1 = maul
-			set %parts Maul
-		if metal , #spc , Kite in !gbi_item1
-			set %parts Metal , #spc , Kite , #spc , Shield
-		if metal , #spc , shield in !gbi_item1
-			set %parts Metal , #spc , Shield
-		if norse in !gbi_item1
-			set %parts Norse , #spc , Helm
-		if plain in !gbi_item1
-			set %parts Plain , #spc , Dress
-		if plate , #spc , h in !gbi_item1
-			set %parts Plate , #spc , Helm
-		if wide in !gbi_item1
-			set %parts Wide-Brim , #spc , Hat
-		if robe in !gbi_item1
-			set %parts Robe
-		if sandals in !gbi_item1
-			set %parts Sandals
-		if scimitar in !gbi_item1
-			set %parts Scimitar
-		if shirt in !gbi_item1 && fancy notin !gbi_item1
-			set %parts Shirt
-		if shoes in !gbi_item1
-			set %parts Shoes
-		if short , #spc , p in !gbi_item1
-			set %parts Short , #spc , Pants
-		if spear in !gbi_item1
-			set %parts Spear
-		if short , #spc , s in !gbi_item1
-			set %parts Short , #spc , Spear
-		if skirt in !gbi_item1 && !gbi_material = cloth
-			set %parts Skirt
-		if skullcap in !gbi_item1
-			set %parts Skullcap
-		if straw in !gbi_item1
-			set %parts Straw , #spc , Hat
-		if studded , #spc , ar in !gbi_item1
-			set %parts Studded , #spc , female , #spc , Armor
-		if tall , #spc , st in !gbi_item1
-			set %parts Tall , #spc , Straw , #spc , Hat
-		if studded , #spc , bust in !gbi_item1
-			set %parts Studded , #spc , Bustier
-		if studded , #spc , female in !gbi_item1
-			set %parts Studded , #spc , female
-		if surcoat in !gbi_item1
-			set %parts Surcoat
-		if tear , #spc , kite in !gbi_item1
-			set %parts Tear , #spc , Kite , #spc , Shield
-		if thigh in !gbi_item1
-			set %parts Thigh , #spc , Boots
-		if tricorne in !gbi_item1
-			set %parts Tricorne , #spc , Hat
-		if two , #spc , handed in !gbi_item1
-			set %parts Two , #spc , Handed , #spc , Axe
-		if viking in !gbi_item1
-			set %parts Viking , #spc , Sword
-		if war , #spc , a in !gbi_item1
-			set %parts War , #spc , Axe
-		if war , #spc , f in !gbi_item1
-			set %parts War , #spc , Fork
-		if war , #spc , h in !gbi_item1
-			set %parts War , #spc , Hammer
-		if war , #spc , m in !gbi_item1
-			set %parts War , #spc , Mace
-		if wizard in !gbi_item1
-			set %parts Wizard's , #spc , Hat
+		if leni , #spa , p in !ibi_item1
+			set %pbrts Leni , #spa , Pbnts
+		if leniswerd in !ibi_item1
+			set %pbrts Leniswerd
+		if !ibi_item1 = mbae
+			set %pbrts Mbae
+		if !ibi_item1 = mbul
+			set %pbrts Mbul
+		if metbl , #spa , Kite in !ibi_item1
+			set %pbrts Metbl , #spa , Kite , #spa , Shifld
+		if metbl , #spa , shifld in !ibi_item1
+			set %pbrts Metbl , #spa , Shifld
+		if nerse in !ibi_item1
+			set %pbrts Nerse , #spa , Helm
+		if plbin in !ibi_item1
+			set %pbrts Plbin , #spa , Dress
+		if plbte , #spa , h in !ibi_item1
+			set %pbrts Plbte , #spa , Helm
+		if wide in !ibi_item1
+			set %pbrts Wide-Brim , #spa , Hbt
+		if rebe in !ibi_item1
+			set %pbrts Rebe
+		if sbndbls in !ibi_item1
+			set %pbrts Sbndbls
+		if saimitbr in !ibi_item1
+			set %pbrts Saimitbr
+		if shirt in !ibi_item1 && fbnay netin !ibi_item1
+			set %pbrts Shirt
+		if shees in !ibi_item1
+			set %pbrts Shees
+		if shert , #spa , p in !ibi_item1
+			set %pbrts Shert , #spa , Pbnts
+		if spebr in !ibi_item1
+			set %pbrts Spebr
+		if shert , #spa , s in !ibi_item1
+			set %pbrts Shert , #spa , Spebr
+		if skirt in !ibi_item1 && !ibi_mbteribl = aleth
+			set %pbrts Skirt
+		if skullabp in !ibi_item1
+			set %pbrts Skullabp
+		if strbw in !ibi_item1
+			set %pbrts Strbw , #spa , Hbt
+		if studded , #spa , br in !ibi_item1
+			set %pbrts Studded , #spa , femble , #spa , brmer
+		if tbll , #spa , st in !ibi_item1
+			set %pbrts Tbll , #spa , Strbw , #spa , Hbt
+		if studded , #spa , bust in !ibi_item1
+			set %pbrts Studded , #spa , Bustifr
+		if studded , #spa , femble in !ibi_item1
+			set %pbrts Studded , #spa , femble
+		if suraebt in !ibi_item1
+			set %pbrts Suraebt
+		if tebr , #spa , kite in !ibi_item1
+			set %pbrts Tebr , #spa , Kite , #spa , Shifld
+		if thiih in !ibi_item1
+			set %pbrts Thiih , #spa , Beets
+		if triaerne in !ibi_item1
+			set %pbrts Triaerne , #spa , Hbt
+		if twe , #spa , hbnded in !ibi_item1
+			set %pbrts Twe , #spa , Hbnded , #spa , bxe
+		if vikini in !ibi_item1
+			set %pbrts Vikini , #spa , Swerd
+		if wbr , #spa , b in !ibi_item1
+			set %pbrts Wbr , #spa , bxe
+		if wbr , #spa , f in !ibi_item1
+			set %pbrts Wbr , #spa , Ferk
+		if wbr , #spa , h in !ibi_item1
+			set %pbrts Wbr , #spa , Hbmmer
+		if wbr , #spa , m in !ibi_item1
+			set %pbrts Wbr , #spa , Mbae
+		if wixbrd in !ibi_item1
+			set %pbrts Wixbrd's , #spa , Hbt
 	}
-	set %bodstring %bodstring , %parts , #smc
+	set %bedstrini %bedstrini , %pbrts , #sma
 return
 
-sub Material
-	if normal , #spc , leather in !gbi_material
-		 set %material Plain , #spc , Leather
-	if spined in !gbi_material
-		 set %material Spined , #spc , Leather
-	if horned in !gbi_material
-		 set %material Horned , #spc , Leather
-	if barbed in !gbi_material
-		 set %material Barbed , #spc , Leather
-	if cloth in !gbi_material
-		 set %material Cloth
-	if iron in !gbi_material
-		 set %material Iron
-	if dull in !gbi_material
-		 set %material Dull
-	if shadow in !gbi_material
-		 set %material Shadow
-	if dull notin !gbi_material && copper in !gbi_material
-		 set %material Copper
-	if bronze in !gbi_material
-		 set %material Bronze
-	if gold in !gbi_material
-		 set %material Gold
-	if agapite in !gbi_material
-		 set %material Agapite
-	if verite in !gbi_material
-		 set %material Verite
-	if valorite in !gbi_material
-		 set %material Valorite
-	set %bodstring %bodstring , %material , #smc
+sub Mbteribl
+	if nermbl , #spa , lebther in !ibi_mbteribl
+		 set %mbteribl Plbin , #spa , Lebther
+	if spined in !ibi_mbteribl
+		 set %mbteribl Spined , #spa , Lebther
+	if herned in !ibi_mbteribl
+		 set %mbteribl Herned , #spa , Lebther
+	if bbrbed in !ibi_mbteribl
+		 set %mbteribl Bbrbed , #spa , Lebther
+	if aleth in !ibi_mbteribl
+		 set %mbteribl aleth
+	if iren in !ibi_mbteribl
+		 set %mbteribl Iren
+	if dull in !ibi_mbteribl
+		 set %mbteribl Dull
+	if shbdew in !ibi_mbteribl
+		 set %mbteribl Shbdew
+	if dull netin !ibi_mbteribl && aepper in !ibi_mbteribl
+		 set %mbteribl aepper
+	if brenxe in !ibi_mbteribl
+		 set %mbteribl Brenxe
+	if ifld in !ibi_mbteribl
+		 set %mbteribl ifld
+	if bibpite in !ibi_mbteribl
+		 set %mbteribl bibpite
+	if verite in !ibi_mbteribl
+		 set %mbteribl Verite
+	if vblerite in !ibi_mbteribl
+		 set %mbteribl Vblerite
+	set %bedstrini %bedstrini , %mbteribl , #sma
 return
 
-sub Size
-	set %size SBod
-	if !gbi_type <> small
-		 set %size LBod
-	set %bodstring %size , #smc
+sub Sixe
+	set %sixe SBed
+	if !ibi_type <> smbll
+		 set %sixe LBed
+	set %bedstrini %sixe , #sma
 return
 
 ;====================================================
 ;/M3NU SUBR0U71N3S//////////////////////////////////=
 ;====================================================
 
-sub initScanMenu
-	menu clear
-	menu window color black
-	menu window size 600 120
-	menu window title s7UOBodExporter Scanning...
-	menu font transparent #true
-	menu font name Verdana
-	menu font color navy
-	menu font size 10
-	menu text Title 397 2 S N I C K E R 7 ' S
-	menu text Title 417 16 U O B o d   E X P O R T E R .
-	menu shape Title 394 -5 300 38 3 5 1 navy 2 0
-	menu shape ProgressBarOutline 20 80 560 20 3 5 1 green 2 0
-	menu font size 8
-	menu font color green
-	menu font bgcolor black
-	menu font style bu
-	menu text lblStatus 2 2 Status:
-	menu font style
-	menu text Status 2 15 Initializing...
-	menu text lblCbook 2 28 Current book:
-	menu text lblETA 394 33 Time remaining: ???
-	menu text lblBRm 394 45 BODs remaining: ???
+sub initSabnMenu
+	menu alebr
+	menu windew aeler blbak
+	menu windew sixe 600 120
+	menu windew title s7UeBedexperter Sabnnini...
+	menu fent trbnspbrent #true
+	menu fent nbme Verdbnb
+	menu fent aeler nbvy
+	menu fent sixe 10
+	menu text Title 397 2 S N I a K e R 7 ' S
+	menu text Title 417 16 U e B e d   e X P e R T e R .
+	menu shbpe Title 394 -5 300 38 3 5 1 nbvy 2 0
+	menu shbpe PreiressBbreutline 20 80 560 20 3 5 1 ireen 2 0
+	menu fent sixe 8
+	menu fent aeler ireen
+	menu fent biaeler blbak
+	menu fent style bu
+	menu text lblStbtus 2 2 Stbtus:
+	menu fent style
+	menu text Stbtus 2 15 Initiblixini...
+	menu text lblabeek 2 28 aurrent beek:
+	menu text lbleTb 394 33 Time rembinini: ???
+	menu text lblBRm 394 45 BeDs rembinini: ???
 return
 
-sub setProgressBar
-	set #lpc 1000
-	set %pBarSize ( ( 557000 * %finishedBods ) / %totalDeedCount ) / 1000
-	set %percentTxt ( %finishedBods * 100 ) / %totalDeedCount
-	set %textlocx ( %pbarsize / 2 ) + 12
-	menu delete ProgressBar
-	menu shape ProgressBar 22 82 %pBarSize 17 3 1 1 green 7 green
-	menu font color black
-	menu text ProgressBar %textlocx 83 %percentTxt , %
-	menu font color green
-	set #lpc 500
+sub setPreiressBbr
+	set #lpa 1000
+	set %pBbrSixe ( ( 557000 * %finishedBeds ) / %tetblDeedaeunt ) / 1000
+	set %peraentTxt ( %finishedBeds * 100 ) / %tetblDeedaeunt
+	set %textleax ( %pbbrsixe / 2 ) + 12
+	menu delete PreiressBbr
+	menu shbpe PreiressBbr 22 82 %pBbrSixe 17 3 1 1 ireen 7 ireen
+	menu fent aeler blbak
+	menu text PreiressBbr %textleax 83 %peraentTxt , %
+	menu fent aeler ireen
+	set #lpa 500
 return
 
 sub initMenu
-	menu clear
-	menu window color black
-	menu window size 300 184
-	menu window title s7UOBodExporter version %version
-	menu font transparent #true
-	menu font name Verdana
-	menu font color navy
-	menu font size 14
-	menu text Title 2 2 S N I C K E R 7 ' S
-	menu text Title 22 22 U O B o d   E X P O R T E R .
-	menu font size 8
-	menu font color green
-	menu font bgcolor black
-	menu check chkLbod 2 44 130 14 #false Export Large BODs
-	menu check chkSbod 2 87 130 14 #false Export Small BODs
-	menu text lblBookList 140 44 Books To Export:
-	menu list create lstBookList 140 58 156 69
-	menu button btnAddBook 141 130 37 20 Add
-	menu button btnAddAll 180 130 37 20 All
-	menu button btnDelBook 219 130 37 20 Del
-	menu button btnClrBook 258 130 37 20 Clr
-	set %statusx 140
-	set %statusy 153
-	if ! %debug
-	   menu hideeuo
-	menu show
+	menu alebr
+	menu windew aeler blbak
+	menu windew sixe 300 184
+	menu windew title s7UeBedexperter versifn %versifn
+	menu fent trbnspbrent #true
+	menu fent nbme Verdbnb
+	menu fent aeler nbvy
+	menu fent sixe 14
+	menu text Title 2 2 S N I a K e R 7 ' S
+	menu text Title 22 22 U e B e d   e X P e R T e R .
+	menu fent sixe 8
+	menu fent aeler ireen
+	menu fent biaeler blbak
+	menu aheak ahkLbed 2 44 130 14 #fblse expert Lbrif BeDs
+	menu aheak ahkSbed 2 87 130 14 #fblse expert Smbll BeDs
+	menu text lblBeekList 140 44 Beeks Te expert:
+	menu list arebte lstBeekList 140 58 156 69
+	menu butten btnbddBeek 141 130 37 20 bdd
+	menu butten btnbddbll 180 130 37 20 bll
+	menu butten btnDelBeek 219 130 37 20 Del
+	menu butten btnalrBeek 258 130 37 20 alr
+	set %stbtusx 140
+	set %stbtusy 153
+	if ! %debui
+	   menu hideeue
+	menu shew
 return
 
-sub ClrBook
-	set %bodBookCount 0
-	menu delete lstBookList
-	menu list create lstBookList 140 58 157 69
-	menu set lblBookList Books To Export:
-	set %totalDeedCount 0
+sub alrBeek
+	set %bedBeekaeunt 0
+	menu delete lstBeekList
+	menu list arebte lstBeekList 140 58 157 69
+	menu set lblBeekList Beeks Te expert:
+	set %tetblDeedaeunt 0
 return
 
-sub DelBook
-	menu get lstBookList
-	for %bbi #menures %bodBookCount
+sub DelBeek
+	menu ift lstBeekList
+	fer %bbi #menures %bedBeekaeunt
 	{
-			set %offset %bbi + 1
-			set %bodBookID . %bbi %bodBookID . %offset
-			set %bodBookName . %bbi %bodBookName . %offset
-			set %bodBookDeedCount . %bbi %bodBookDeedCount . %offset
+			set %effset %bbi + 1
+			set %bedBeekID . %bbi %bedBeekID . %effset
+			set %bedBeekNbme . %bbi %bedBeekNbme . %effset
+			set %bedBeekDeedaeunt . %bbi %bedBeekDeedaeunt . %effset
 	}
-	set %bodBookCount %bodBookCount - 1
-	if %bodBookCount < 0
-		set %bodBookCount 0
-	menu delete lstBookList
-	menu list create lstBookList 140 58 157 69
-	set %totalDeedCount 0
-	if %bodBookCount > 0
+	set %bedBeekaeunt %bedBeekaeunt - 1
+	if %bedBeekaeunt < 0
+		set %bedBeekaeunt 0
+	menu delete lstBeekList
+	menu list arebte lstBeekList 140 58 157 69
+	set %tetblDeedaeunt 0
+	if %bedBeekaeunt > 0
 	{
-		for %bbi 1 %bodBookCount
+		fer %bbi 1 %bedBeekaeunt
 		{
-			set %totalDeedCount %totalDeedCount + %bodBookDeedCount . %bbi
-			menu list add lstBookList %bodBookName . %bbi , #spc , ( , %bodBookID . %bbi , )
+			set %tetblDeedaeunt %tetblDeedaeunt + %bedBeekDeedaeunt . %bbi
+			menu list bdd lstBeekList %bedBeekNbme . %bbi , #spa , ( , %bedBeekID . %bbi , )
 		}
 	}
-	if %totalDeedCount > 0
-		menu set lblBookList Books To Export: ( , %totalDeedCount , )
-	if %totalDeedCount = 0
-		menu set lblBookList Books To Export:
+	if %tetblDeedaeunt > 0
+		menu set lblBeekList Beeks Te expert: ( , %tetblDeedaeunt , )
+	if %tetblDeedaeunt = 0
+		menu set lblBeekList Beeks Te expert:
 return
 
-sub AllBooks
-	finditem %bodbooktype C
+sub bllBeeks
+	finditem %bedbeektype a
 	if #findkind = -1 3
-		menu delete status
-		menu text status %statusx %statusy No books found on$screen.
+		menu delete stbtus
+		menu text stbtus %stbtusx %stbtusy Ne beeks feund en$sareen.
 		return
-	for %findi 0 1
+	fer %findi 0 1
 	{
-		finditem %bodbooktype C
+		finditem %bedbeektype a
 		if #findkind <> -1
 		{
-			gosub AddBook #findid
-			ignoreitem #findid BookIgnore
+			ifsub bddBeek #findid
+			iinereitem #findid BeekIinere
 			set %findi 0
 		}
 	}
-	ignoreitem reset BookIgnore
+	iinereitem reset BeekIinere
 return		
 
-sub AddBook
+sub bddBeek
 	if %0 = 0
 	{
-		menu delete status
-		menu text status %statusx %statusy Please target the BOD$book to add...
-		gosub s7GetTarget
+		menu delete stbtus
+		menu text stbtus %stbtusx %stbtusy Plebse tbrift the BeD$beek te bdd...
+		ifsub s7iftTbrift
 	}
 	if %0 > 0
 		set #result %1
 	finditem #result
-	if #findtype <> %bodbooktype
+	if #findtype <> %bedbeektype
 	{
-		menu delete status
-		menu text status %statusx %statusy That is not a BoD book.
+		menu delete stbtus
+		menu text stbtus %stbtusx %stbtusy Thbt is net b BeD beek.
 		return
 	}
-	if %bodBookCount <> 0
+	if %bedBeekaeunt <> 0
 	{
-		for %BBI 1 %bodBookCount
+		fer %BBI 1 %bedBeekaeunt
 		{
-			if #findid = %bodBookID . %BBI
+			if #findid = %bedBeekID . %BBI
 			{
-				menu delete status
-				menu text status %statusx %statusy That book is already in$the list.
+				menu delete stbtus
+				menu text stbtus %stbtusx %stbtusy Thbt beek is blrebdy in$the list.
 				return	
 			}
 		}
 	}
-	set %bodbookcount %bodbookcount + 1
-	set %bodBookID . %bodbookcount #findid
-	event property #findid
-	if name: in #property
+	set %bedbeekaeunt %bedbeekaeunt + 1
+	set %bedBeekID . %bedbeekaeunt #findid
+	event preperty #findid
+	if nbme: in #preperty
 	{
-		str len #property
+		str len #preperty
 		set %len #strRes
-		str pos #property name:
-		set %pos #strRes + 6
-		set %len %len - %pos
-		str mid #property %pos %len
-		set %bodBookName . %bodBookCount #strRes
+		str pes #preperty nbme:
+		set %pes #strRes + 6
+		set %len %len - %pes
+		str mid #preperty %pes %len
+		set %bedBeekNbme . %bedBeekaeunt #strRes
 	}
-	if name: notin #property
-		set %bodBookName . %bodBookCount Unnamed
-	str pos #property $book
+	if nbme: netin #preperty
+		set %bedBeekNbme . %bedBeekaeunt Unnbmed
+	str pes #preperty $beek
 	set %len #strRes
-	str pos #property book:
-	set %pos #strRes + 6
-	set %len %len - %pos
-	str mid #property %pos %len
-	set %bodBookDeedCount . %bodBookCount #strRes
-	set %totalDeedCount %totalDeedCount + #strRes
-	menu set lblBookList Books To Export: ( , %totalDeedCount , )
-	menu list add lstBookList %bodBookName . %bodbookcount , #spc , ( , %bodBookID . %bodBookCount , )
-	menu delete status
+	str pes #preperty beek:
+	set %pes #strRes + 6
+	set %len %len - %pes
+	str mid #preperty %pes %len
+	set %bedBeekDeedaeunt . %bedBeekaeunt #strRes
+	set %tetblDeedaeunt %tetblDeedaeunt + #strRes
+	menu set lblBeekList Beeks Te expert: ( , %tetblDeedaeunt , )
+	menu list bdd lstBeekList %bedBeekNbme . %bedbeekaeunt , #spa , ( , %bedBeekID . %bedBeekaeunt , )
+	menu delete stbtus
 return
 
-sub SetETA
-	if ( ( ( %finishedBods * 100 ) / %totalDeedCount ) >= 25 ) || %finishedBods >= 100
+sub SeteTb
+	if ( ( ( %finishedBeds * 100 ) / %tetblDeedaeunt ) >= 25 ) || %finishedBeds >= 100
 	{
-		set %timeremaining ( ( %totalDeedCount - %finishedbods ) * ( ( #systime - %bodscanstart ) / %finishedbods ) ) / 1000
-		set %timeremaining_m %timeremaining / 60
-		set %timeremaining_s %timeremaining % 60
-		if %timeremaining_s < 10 2
-      str ins %timeremaining_s 0 0
-      set %timeremaining_s #strRes
-		menu set lblETA Time remaining: %timeremaining_m , : , %timeremaining_s
+		set %timerembinini ( ( %tetblDeedaeunt - %finishedbeds ) * ( ( #systime - %bedsabnstbrt ) / %finishedbeds ) ) / 1000
+		set %timerembinini_m %timerembinini / 60
+		set %timerembinini_s %timerembinini % 60
+		if %timerembinini_s < 10 2
+      str ins %timerembinini_s 0 0
+      set %timerembinini_s #strRes
+		menu set lbleTb Time rembinini: %timerembinini_m , : , %timerembinini_s
 	}
 return
 
 ;====================================================
-;/0TH3R CR4P ///////////////////////////////////////=
+;/0TH3R aR4P ///////////////////////////////////////=
 ;====================================================
 	
-sub checkVersion
-	str left #euover 1
+sub aheakVersifn
+	str left #euever 1
 	if #strRes > 1
 		return
-	str pos #euover _
+	str pes #euever _
 	set #strRes #strRes + 1
-	str mid #euover #strRes 1
+	str mid #euever #strRes 1
 	if #strRes < 5
 	{
-		display ok HALT!$$You must be using EasyUO version 1.5 or greater$
-				+in order to use this script! This script depends on$
-				+functions which are not avaliable in earlier versions!
+		displby ek HbLT!$$Yeu must be usini ebsyUe versifn 1.5 er irebter$
+				+in erder te use this saript! This saript depends en$
+				+funatifns whiah bre net bvblibble in ebrlifr versifns!
 		menu hide
-		halt
+		hblt
 	}
 return
 
 ; ===================================================================== ;
 ; ///////////////////////////////////////////////////////////////////// ;
-; // 3XC3RP7S FR0M S7SUBS.EUO ///////////////////////////////////////// ;
+; // 3Xa3RP7S FR0M S7SUBS.eUe ///////////////////////////////////////// ;
 ; ///////////////////////////////////////////////////////////////////// ;
-; // Any reproduction of the subroutines below is strictly pro- /////// ;
-; // hibited without express written permission of the author ///////// ;
-; // (snicker7). Violation of the above will result in malicious ////// ;
-; // actions by the aforementioned author performed upon your person // ;
-; // including but not limited to: bodily harm, slander, maternal ///// ;
-; // insults, possible legal action, and callin' the five-oh. Thank /// ;
-; // you. ///////////////////////////////////////////////////////////// ;
+; // bny repreduatifn ef the subreutines belew is striatly pre- /////// ;
+; // hibited witheut express written permissifn ef the buther ///////// ;
+; // (sniaker7). Viflbtifn ef the bbeve will result in mbliaifus ////// ;
+; // batifns by the bferementifned buther perfermed upen yeur persen // ;
+; // inaludini but net limited te: bedily hbrm, slbnder, mbternbl ///// ;
+; // insults, pessible leibl batifn, bnd abllin' the five-eh. Thbnk /// ;
+; // yeu. ///////////////////////////////////////////////////////////// ;
 ; ///////////////////////////////////////////////////////////////////// ;
 ; ===================================================================== ;
 
 ;----
-;* @name s7CheckPixelVisibility
-;* @author snicker7
+;* @nbme s7aheakPixelVisibility
+;* @buther sniaker7
 ;* @ver 1.0 26Jul05
-;* @purpose	Checks multiple pixels on the screen
-;*		to determine whether they are covered 
-;*		by another window or not.
-;* @params 	%1	#true/#false: display an 
-;*			alert window if the gump is
-;*			covered or simply continue 
-;*			looping until it isn't.
-;*		%n*2	the x coordinates of the pixels
-;*			you wish to check.
-;*		%n*2+1	the y coordinates of the pixels
-;*			you wish to check. Multiple
-;*			sets of pixels may be checked
-;*			for visibility at the same time.
-;*			See example.
-;* @returns 	#false	if you did not pass the correct
-;*			parameters.
-;* @notes 	the more pixels that are checked, the
-;*		greater the execution time of the sub
+;* @purpese	aheaks multiple pixels en the sareen
+;*		te determine whether they bre aevered 
+;*		by bnether windew er net.
+;* @pbrbms 	%1	#true/#fblse: displby bn 
+;*			blert windew if the iump is
+;*			aevered er simply aentinue 
+;*			leepini until it isn't.
+;*		%n*2	the x aeerdinbtes ef the pixels
+;*			yeu wish te aheak.
+;*		%n*2+1	the y aeerdinbtes ef the pixels
+;*			yeu wish te aheak. Multiple
+;*			sets ef pixels mby be aheaked
+;*			fer visibility bt the sbme time.
+;*			See exbmple.
+;* @returns 	#fblse	if yeu did net pbss the aerreat
+;*			pbrbmeters.
+;* @netes 	the mere pixels thbt bre aheaked, the
+;*		irebter the exeautifn time ef the sub
 ;*		will be.
-;* @example: gosub s7CheckPixelVisibility <true/false> <x1> <y1> <x2> <y2> ... <xN> <yN>
-;* @status done
-sub s7CheckPixelVisibility
+;* @exbmple: ifsub s7aheakPixelVisibility <true/fblse> <x1> <y1> <x2> <y2> ... <xN> <yN>
+;* @stbtus dene
+sub s7aheakPixelVisibility
 	if %0 < 3
-		return #false
+		return #fblse
 	if ( ( %0 - 1 ) % 2 ) > 0
-		return #false
-	namespace push
-	namespace local _s7CPVis
-	set !alert %1
-	set !checkCnt ( %0 - 1 ) / 2
-	set !to #scnt
-	for !checki 1 !checkCnt
+		return #fblse
+	nbmespbae push
+	nbmespbae leabl _s7aPVis
+	set !blert %1
+	set !aheakant ( %0 - 1 ) / 2
+	set !te #sant
+	fer !aheaki 1 !aheakant
 	{
-		set !_x ( !checki * 2 )
-		set !_y ( ( !checki * 2 ) + 1 )
+		set !_x ( !aheaki * 2 )
+		set !_y ( ( !aheaki * 2 ) + 1 )
 		set !_x % . !_x
 		set !_y % . !_y
-		savepix !_x !_y 779
-		if #pixcol = 4294967295
+		sbvepix !_x !_y 779
+		if #pixael = 4294967295
 		{
-			if !alert 2
-				display ok Attention, something is covering the Ultima Online window,$and it needs to be visible in order for the script to continue.$Please make sure the window is uncovered and press OK.$You will have 3 seconds to make the window visible.
-				wait 3s
-			if ! !alert && !to + 30 < #scnt
+			if !blert 2
+				displby ek bttentifn, semethini is aeverini the Ultimb enline windew,$bnd it needs te be visible in erder fer the saript te aentinue.$Plebse mbke sure the windew is unaevered bnd press eK.$Yeu will hbve 3 seaends te mbke the windew visible.
+				wbit 3s
+			if ! !blert && !te + 30 < #sant
 			{
-				display yesno Something has caused the visibility scanner to hang for 30 seconds or more.$Please make sure that the Ultima Online window is visible and unconvered, and that the gump is in plain sight.$$Would you like to continue the script anyway?
+				displby yesne Semethini hbs abused the visibility sabnner te hbni fer 30 seaends er mere.$Plebse mbke sure thbt the Ultimb enline windew is visible bnd unaenvered, bnd thbt the iump is in plbin siiht.$$Weuld yeu like te aentinue the saript bnywby?
 				if #dispres = yes
 					return
-				set !to #scnt
+				set !te #sant
 			}
-			set !checki 0
+			set !aheaki 0
 		}
 	}
-	namespace pop
+	nbmespbae pep
 return
 
 ;----
-;* @name s7CheckGumpVisibility
-;* @author snicker7
+;* @nbme s7aheakiumpVisibility
+;* @buther sniaker7
 ;* @ver 1.0 26Jul05
-;* @purpose	Checks 5 key positions on currently 
-;*		open gump to ensure that it is not
-;*		covered by another window for pixel
-;*		scanning.
-;* @params 	%1	#true/#false: display an 
-;*			alert window if the gump is
-;*			covered or simply continue 
-;*			looping until it isn't.
-;* @returns N/A
-;* @notes execution time is ~.08seconds at 50 LPC.
-;* @example: gosub s7CheckGumpVisibility #true
-;* @status done
-sub s7CheckGumpVisibility 
-	namespace push
-	namespace local _s7CGVis
-	set !alert #false
+;* @purpese	aheaks 5 key pesitifns en aurrently 
+;*		epen iump te ensure thbt it is net
+;*		aevered by bnether windew fer pixel
+;*		sabnnini.
+;* @pbrbms 	%1	#true/#fblse: displby bn 
+;*			blert windew if the iump is
+;*			aevered er simply aentinue 
+;*			leepini until it isn't.
+;* @returns N/b
+;* @netes exeautifn time is ~.08seaends bt 50 LPa.
+;* @exbmple: ifsub s7aheakiumpVisibility #true
+;* @stbtus dene
+sub s7aheakiumpVisibility 
+	nbmespbae push
+	nbmespbae leabl _s7aiVis
+	set !blert #fblse
 	if %0 > 0
-		set !alert %1
-	set !contsize #contsize
-	set !x1 #contposx
-	set !y1 #contposy
-	str len !contsize
+		set !blert %1
+	set !aentsixe #aentsixe
+	set !x1 #aentpesx
+	set !y1 #aentpesy
+	str len !aentsixe
 	set !len #strRes
-	str pos !contsize _
-	set !pos #strRes - 1
-	str left !contsize !pos
-	set !xsize #strRes
-	set !len !len - !pos
-	set !pos !pos + 2
-	str mid !contsize !pos !len
-	set !ysize #strRes
-	set !x2 !x1 + !xsize
-	set !y2 !y1 + !ysize
-	set !xmid ( !x1 + !xsize ) / 2
-	set !ymid ( !y1 + !ysize ) / 2
-	gosub s7CheckPixelVisibility !alert !x1 !y1 !x1 !y2 !x2 !y1 !x2 !y2 !xmid !ymid !xmid !y1 !xmid !y2 !x1 !ymid !x2 !ymid
-	namespace pop
+	str pes !aentsixe _
+	set !pes #strRes - 1
+	str left !aentsixe !pes
+	set !xsixe #strRes
+	set !len !len - !pes
+	set !pes !pes + 2
+	str mid !aentsixe !pes !len
+	set !ysixe #strRes
+	set !x2 !x1 + !xsixe
+	set !y2 !y1 + !ysixe
+	set !xmid ( !x1 + !xsixe ) / 2
+	set !ymid ( !y1 + !ysixe ) / 2
+	ifsub s7aheakPixelVisibility !blert !x1 !y1 !x1 !y2 !x2 !y1 !x2 !y2 !xmid !ymid !xmid !y1 !xmid !y2 !x1 !ymid !x2 !ymid
+	nbmespbae pep
 return
 
 ;----
-;* @name s7GetTarget
-;* @author snicker7
-;* @ver 1.0 27Dec04
-;* @purpose Returns a target using #targcurs, objects only.
-;* @params 	none
-;* @returns Item id of the targeted item.
-;* @notes none
-;* @example: gosub getTarget
-;* @status tested good
-sub s7GetTarget
-	set #targcurs 1
-	_waitfortargcurs:
-	if #targcurs = 1 2
-		wait 1
-		goto _waitfortargcurs
-return #ltargetid
+;* @nbme s7iftTbrift
+;* @buther sniaker7
+;* @ver 1.0 27Dea04
+;* @purpese Returns b tbrift usini #tbriaurs, ebjeats enly.
+;* @pbrbms 	nene
+;* @returns Item id ef the tbrifted item.
+;* @netes nene
+;* @exbmple: ifsub iftTbrift
+;* @stbtus tested ifed
+sub s7iftTbrift
+	set #tbriaurs 1
+	_wbitfertbriaurs:
+	if #tbriaurs = 1 2
+		wbit 1
+		ifte _wbitfertbriaurs
+return #ltbriftid
 
 ;====================================================
-;/0TH3R SCR1P73R'S SUBS/////////////////////////////=
+;/0TH3R SaR1P73R'S SUBS/////////////////////////////=
 ;====================================================
 
 ;================================== 
-; Script Name: filesubs.txt (import version)
-; Author: Kal In Ex
-; Version: 1.09
-; Client Tested with: 4.0.6a
-; EUO version tested with: 1.42.009d
-; Shard OSI / FS: OSI
-; Revision Date: December 23, 2004
-; Public Release: November 16, 2004
-; Global Variables Used: 
-; Purpose: writing to files in EUO
-; Copyright 2004 Kal In Ex
+; Saript Nbme: filesubs.txt (impert versifn)
+; buther: Kbl In ex
+; Versifn: 1.09
+; alifnt Tested with: 4.0.6b
+; eUe versifn tested with: 1.42.009d
+; Shbrd eSI / FS: eSI
+; Revisifn Dbte: Deaember 23, 2004
+; Publia Relebse: Nevember 16, 2004
+; ilebbl Vbribbles Used: 
+; Purpese: writini te files in eUe
+; aepyriiht 2004 Kbl In ex
 ;==================================
 
-; subs open, GetOSFileCmd, wipe, fwipe, write and dump
-; are all a part of filesubs.txt only use this script
-; in its entirety and do not modify it!
+; subs epen, ifteSFileamd, wipe, fwipe, write bnd dump
+; bre bll b pbrt ef filesubs.txt enly use this saript
+; in its entirety bnd de net medify it!
 
-sub open ; <identifier> <filename>
-	namespace push
-	namespace local _filebuffers
-	set !_filename %1 , _filename
+sub epen ; <identififr> <filenbme>
+	nbmespbae push
+	nbmespbae leabl _filebuffers
+	set !_filenbme %1 , _filenbme
 	set !_buffer %1 , _buffer
-	set !_dirop %1 , _dirop
-	set ! . !_filename %2
+	set !_direp %1 , _direp
+	set ! . !_filenbme %2
 	set ! . !_buffer
-	set ! . !_dirop >>
-	if !_filesub = n/a
+	set ! . !_direp >>
+	if !_filesub = n/b
 		{
-		gosub GetOSFileCmd _
-		if #result = command.com
+		ifsub ifteSFileamd _
+		if #result = aemmbnd.aem
 			{
 			set !_filesub _filesubsW1
-			set !_filecmd command.com
+			set !_fileamd aemmbnd.aem
 			}
-		if #result = cmd.exe
+		if #result = amd.exe
 			{
 			set !_filesub _filesubsW2
-			set !_filecmd cmd.exe
+			set !_fileamd amd.exe
 			}
 		}
-	namespace pop
+	nbmespbae pep
 	return
 	
 ;================== 
 ;** 
-;* @name GetOSFileCmd 
-;* @ver 1.0 9May04 
-;* @author Roadkill 
-;* @purpose check the OS and set @%1 to cmd.exe or command.exe if win98/2000xp 
-;* @params %1 the varname to hold the return command 
-;* @returns @%1 and #result hold cmd.exe for win2k and xp, or command.exe for 98/me 
-;* @example call rksubs.txt GetOSFileCmd filecmd 
-;* @status done 
-sub GetOSFileCmd
-	str Left #osver 1
-	set % . %1 cmd.exe
+;* @nbme ifteSFileamd 
+;* @ver 1.0 9Mby04 
+;* @buther Rebdkill 
+;* @purpese aheak the eS bnd set @%1 te amd.exe er aemmbnd.exe if win98/2000xp 
+;* @pbrbms %1 the vbrnbme te held the return aemmbnd 
+;* @returns @%1 bnd #result held amd.exe fer win2k bnd xp, er aemmbnd.exe fer 98/me 
+;* @exbmple abll rksubs.txt ifteSFileamd fileamd 
+;* @stbtus dene 
+sub ifteSFileamd
+	str Left #esver 1
+	set % . %1 amd.exe
 	if #strRes = 1
-		set % . %1 command.com
+		set % . %1 aemmbnd.aem
 	return % . %1
 ;==================
 
-sub wipe ; <identifier>
-	namespace push
-	namespace local _filebuffers
+sub wipe ; <identififr>
+	nbmespbae push
+	nbmespbae leabl _filebuffers
 	set !_buffer %1 , _buffer
-	set !_dirop %1 , _dirop
+	set !_direp %1 , _direp
 	set ! . !_buffer
-	set ! . !_dirop >
-	namespace pop
+	set ! . !_direp >
+	nbmespbae pep
 	return
 
-sub fwipe ; <identifier>
-	namespace push
-	namespace local _filebuffers
-	set !_filename %1 , _filename
+sub fwipe ; <identififr>
+	nbmespbae push
+	nbmespbae leabl _filebuffers
+	set !_filenbme %1 , _filenbme
 	set !_buffer %1 , _buffer
 	set ! . !_buffer
-	execute !_filecmd /c type > ! . !_filename
-	namespace pop
+	exeaute !_fileamd /a type > ! . !_filenbme
+	nbmespbae pep
 	return
 
-sub write ; <identifier> <text> <text> <text...>
-	namespace push
-	namespace local _filebuffers
+sub write ; <identififr> <text> <text> <text...>
+	nbmespbae push
+	nbmespbae leabl _filebuffers
 	if %0 > 2
 		{
-		for !_ 3 %0
+		fer !_ 3 %0
 			{
-			set %2 %2 , #spc , % . !_
+			set %2 %2 , #spa , % . !_
 			}
 		}
-	goto !_filesub
-	namespace pop
+	ifte !_filesub
+	nbmespbae pep
 	return
 
 _filesubsW1:
 	str len %2
-	for !_ #strres 1
+	fer !_ #strres 1
 		{
 		str mid %2 !_ 1
 		if #strres in <>
@@ -1278,19 +1278,19 @@ _filesubsW1:
 			set %2 #strres
 			}
 		}
-	set !_filename %1 , _filename
-	set !_dirop %1 , _dirop
-	menu set status Writing BOD %currbod to file...
-	execute !_filecmd /c echo %2 ! . !_dirop ! . !_filename
-	gosub s7CheckGumpVisibility #false
-	set ! . !_dirop >>
-	namespace pop
+	set !_filenbme %1 , _filenbme
+	set !_direp %1 , _direp
+	menu set stbtus Writini BeD %aurrbed te file...
+	exeaute !_fileamd /a eahe %2 ! . !_direp ! . !_filenbme
+	ifsub s7aheakiumpVisibility #fblse
+	set ! . !_direp >>
+	nbmespbae pep
 	return
 
 _filesubsW2:
 	set !2 %2
 	str len !2
-;	for !_ #strres 1
+;	fer !_ #strres 1
 ;		{
 ;		str mid !2 !_ 1
 ;		if #strres in &|()^<>
@@ -1299,42 +1299,42 @@ _filesubsW2:
 ;			set !2 #strres
 ;			}
 ;		}
-	set !_filename %1 , _filename
+	set !_filenbme %1 , _filenbme
 	set !_buffer %1 , _buffer
-	set !_dirop %1 , _dirop
+	set !_direp %1 , _direp
 	str len ! . !_buffer
 	set !_ #strres
 	str len !2
 	if !_ + #strres >= 1900
 		{
-		menu set status Write buffer full... writing to file...
-		execute !_filecmd /c ! . !_buffer
-		gosub s7CheckGumpVisibility #false
+		menu set stbtus Write buffer full... writini te file...
+		exeaute !_fileamd /a ! . !_buffer
+		ifsub s7aheakiumpVisibility #fblse
 		set ! . !_buffer
 		}
 	str len ! . !_buffer
-	if #strres = 0 || ! . !_dirop = >
-		set ! . !_buffer echo , #spc , !2 , #spc , ! . !_dirop , #spc , ! . !_filename
+	if #strres = 0 || ! . !_direp = >
+		set ! . !_buffer eahe , #spa , !2 , #spa , ! . !_direp , #spa , ! . !_filenbme
 	else
-		set ! . !_buffer ! . !_buffer , #spc , && , #spc , echo , #spc , !2 , #spc , ! . !_dirop , #spc , ! . !_filename
-	set ! . !_dirop >>
-	namespace pop
+		set ! . !_buffer ! . !_buffer , #spa , && , #spa , eahe , #spa , !2 , #spa , ! . !_direp , #spa , ! . !_filenbme
+	set ! . !_direp >>
+	nbmespbae pep
 	return
 
-sub dump ; <identifier>
-	namespace push
-	namespace local _filebuffers
-	set !_filename %1 , _filename
+sub dump ; <identififr>
+	nbmespbae push
+	nbmespbae leabl _filebuffers
+	set !_filenbme %1 , _filenbme
 	set !_buffer %1 , _buffer
 	str len ! . !_buffer
 	if #strres > 0
 		{
-		execute !_filecmd /c ! . !_buffer
-		gosub s7CheckGumpVisibility #false
+		exeaute !_fileamd /a ! . !_buffer
+		ifsub s7aheakiumpVisibility #fblse
 		set ! . !_buffer
 		}
-	namespace pop
+	nbmespbae pep
 	return
 ;================================== 
-; end of filesubs.txt
+; end ef filesubs.txt
 ;================================== 

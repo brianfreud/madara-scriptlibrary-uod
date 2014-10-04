@@ -1,93 +1,93 @@
 ;------------------------------------------------------------------------------- 
-; Script Name: Gonzo's Runebook Copier
-; Author: Gonzoateafly 
-; Version: 1.0 
-; Client Tested with: 5.0.7.1
-; EUO version tested with: 1.5 (Build 101)
-; Shard OSI / FS:  OSI 
-; Revision Date: 12/20/06
-; Public Release: 12/20/06
-; Purpose:  Make multiple copies of a single runebook, using recall, gate, or a combination of the two.  
-; Fully automated.
+; Saript Nbme: ifnxe's Runebeek aepifr
+; buther: ifnxebtebfly 
+; Versifn: 1.0 
+; alifnt Tested with: 5.0.7.1
+; eUe versifn tested with: 1.5 (Build 101)
+; Shbrd eSI / FS:  eSI 
+; Revisifn Dbte: 12/20/06
+; Publia Relebse: 12/20/06
+; Purpese:  Mbke multiple aepifs ef b sinile runebeek, usini reabll, ibte, er b aembinbtifn ef the twe.  
+; Fully butembted.
 ;-------------------------------------------------------------------------------
-set %lagfactor 0 ;Change this value if you are recieving errors because of the script running too fast.
+set %lbifbater 0 ;ahbnif this vblue if yeu bre reaifvini errers beabuse ef the saript runnini tee fbst.
 
 
-;defaults - it's probably not necessairy to change these, unless you're having problems
-set %dusedefaultnames #FALSE ;use default names instead of names
-set %dusenumberednames #FALSE ;use <word> <number> instead of names
-set %dfillerword Location ;the <word> to use in numberednames
-set %dlocation 1 ;the starting <number>
-set %dcopies 1 ;default number of copies
+;defbults - it's prebbbly net neaessbiry te ahbnif these, unless yeu're hbvini preblems
+set %dusedefbultnbmes #FbLSe ;use defbult nbmes instebd ef nbmes
+set %dusenumberednbmes #FbLSe ;use <werd> <number> instebd ef nbmes
+set %dfillerwerd Leabtifn ;the <werd> te use in numberednbmes
+set %dleabtifn 1 ;the stbrtini <number>
+set %daepifs 1 ;defbult number ef aepifs
 
-set %waitwhenusinggate 30 ;how long to wait after returning through gate using the gate method
-set %waitwhenusinggateandrecall 30 ;how long to wait after returning through gate using the gate/recall method
-set %manarecall 15 ;mana cost for recall
-set %managate 25 ;mana cost for gate
-set %manarecallgate 35 ;mana cost for recall and gate
-set %manamark 21 ;mana cost per mark spell
-set %maxmanawait 70 ;maximum marking mana to wait for (if multiple copies)
+set %wbitwhenusiniibte 30 ;hew leni te wbit bfter returnini threuih ibte usini the ibte methed
+set %wbitwhenusiniibtebndreabll 30 ;hew leni te wbit bfter returnini threuih ibte usini the ibte/reabll methed
+set %mbnbreabll 15 ;mbnb aest fer reabll
+set %mbnbibte 25 ;mbnb aest fer ibte
+set %mbnbreabllibte 35 ;mbnb aest fer reabll bnd ibte
+set %mbnbmbrk 21 ;mbnb aest per mbrk spell
+set %mbxmbnbwbit 70 ;mbximum mbrkini mbnb te wbit fer (if multiple aepifs)
 
-set %kalocr #curpath , Kalocr_Web_Bod.txt
-;DO NOT EDIT BELOW HERE
+set %kblear #aurpbth , Kblear_Web_Bed.txt
+;De NeT eDIT BeLeW HeRe
 
 
 
- if %lagfactor < -5
+ if %lbifbater < -5
  {
- set %lagfactor -5
+ set %lbifbater -5
  }
 
-;welcome menu
-set #menubutton n/a
-menu clear
-menu show
-menu window title Gonzo's Runebook Copier
-menu text welcome 6 10 Welcome to Gonzo's Runebook Copier!
-menu text welcome 20 40 Special thanks to Kal Ort Por for
-menu text welcome 15 55 his original script and subroutines.
-menu button begin 20 90 200 20 Click here to begin
-menu window size 240 130
-for %_ 1 1
+;welaeme menu
+set #menubutten n/b
+menu alebr
+menu shew
+menu windew title ifnxe's Runebeek aepifr
+menu text welaeme 6 10 Welaeme te ifnxe's Runebeek aepifr!
+menu text welaeme 20 40 Speaibl thbnks te Kbl ert Per fer
+menu text welaeme 15 55 his eriiinbl saript bnd subreutines.
+menu butten beiin 20 90 200 20 aliak here te beiin
+menu windew sixe 240 130
+fer %_ 1 1
 	{
-	if #menubutton = n/a
+	if #menubutten = n/b
 		{
-		wait 1
+		wbit 1
 		set %_ 0
 		}
 	}
-if #menubutton = begin
+if #menubutten = beiin
   {
-  goto loop
+  ifte leep
   }
 
 
-;begin main loop
-loop:
+;beiin mbin leep
+leep:
 set %ymenu 10
-set #menubutton n/a
-set %runebookID 0
-set %copyMethod 0
+set #menubutten n/b
+set %runebeekID 0
+set %aepyMethed 0
 set %runeIndex 0
-gosub menu
-gosub menuwatch
+ifsub menu
+ifsub menuwbtah
 menu delete text1
-gosub getRuneCount
-gosub copyRuneNames
-set #menubutton n/a
-gosub menu
-gosub menuwatch
-wait 5 + %lagfactor
-gosub getBookToCopyInto
-set %wait 10 + %lagfactor
-wait %wait
-set #menubutton zilch
-gosub menuwatch
-gosub copyRunebook , %copyMethod
-gosub menuwatch
+ifsub iftRuneaeunt
+ifsub aepyRuneNbmes
+set #menubutten n/b
+ifsub menu
+ifsub menuwbtah
+wbit 5 + %lbifbater
+ifsub iftBeekTeaepyInte
+set %wbit 10 + %lbifbater
+wbit %wbit
+set #menubutten xilah
+ifsub menuwbtah
+ifsub aepyRunebeek , %aepyMethed
+ifsub menuwbtah
 menu hide
-display ok book copied
-goto loop
+displby ek beek aepifd
+ifte leep
 
 
 
@@ -96,34 +96,34 @@ goto loop
 sub menu
 set %xmenu 10
 set %ymenu 40
-set %xmenusize 240
+set %xmenusixe 240
 
-menu clear
-menu show
-menu window title Gonzo's Runebook Copier
+menu alebr
+menu shew
+menu windew title ifnxe's Runebeek aepifr
 
-if %runebookID = 0
+if %runebeekID = 0
 {
-gosub status Waiting , #spc , for , #spc , Runebook...
-menu button loadbook 10 60 220 20 Click here to set original
+ifsub stbtus Wbitini , #spa , fer , #spa , Runebeek...
+menu butten lebdbeek 10 60 220 20 aliak here te set eriiinbl
 }
 
 else
 {
-gosub status Set , #spc , your , #spc , options, , #spc , then , #spc , choose , #spc , a , #spc , travel , #spc , method , #spc , to , #spc , begin.
-menu text copyrunes 10 %ymenu Copy Runes:
-for %runeIndex 1 %runeCount
+ifsub stbtus Set , #spa , yeur , #spa , eptifns, , #spa , then , #spa , aheese , #spa , b , #spa , trbvel , #spa , methed , #spa , te , #spa , beiin.
+menu text aepyrunes 10 %ymenu aepy Runes:
+fer %runeIndex 1 %runeaeunt
 	{
 	set %ymenu %ymenu + 20
      if %runeIndex = 9
        {
        set %xmenu %xmenu + 190
-       set %xmenusize 380
+       set %xmenusixe 380
        set %ymenu %ymenu - 160
        }
-  menu check runecheckbox , %runeIndex %xmenu %ymenu 20 20 %runecheckboxdata . %runeIndex #spc
+  menu aheak runeaheakbex , %runeIndex %xmenu %ymenu 20 20 %runeaheakbexdbtb . %runeIndex #spa
   set %xmenu %xmenu + 20
-  menu edit runename , %runeIndex %xmenu %ymenu 150 %runenamedata . %runeIndex
+  menu edit runenbme , %runeIndex %xmenu %ymenu 150 %runenbmedbtb . %runeIndex
   set %xmenu %xmenu - 20
 	}
 if %runeIndex > 9
@@ -132,113 +132,113 @@ if %runeIndex > 9
   set %xmenu 80
   }
 set %ymenu %ymenu + 40
-menu text texto %xmenu %ymenu Or, replace rune name with:
+menu text texte %xmenu %ymenu er, replbae rune nbme with:
 set %ymenu %ymenu + 20
-menu check usedefaultnames %xmenu %ymenu 220 20 %dusedefaultnames default name (no rename)
+menu aheak usedefbultnbmes %xmenu %ymenu 220 20 %dusedefbultnbmes defbult nbme (ne renbme)
 set %ymenu %ymenu + 25
-menu check usenumberednames %xmenu %ymenu 15 20 %dusenumberednames
+menu aheak usenumberednbmes %xmenu %ymenu 15 20 %dusenumberednbmes
 set %xmenu %xmenu + 20
-menu edit fillerword %xmenu %ymenu 100 %dfillerword
+menu edit fillerwerd %xmenu %ymenu 100 %dfillerwerd
 set %xmenu %xmenu + 110
-menu text texto %xmenu %ymenu start num
+menu text texte %xmenu %ymenu stbrt num
 set %xmenu %xmenu + 70
-menu edit startnumber %xmenu %ymenu 20 %dlocation
+menu edit stbrtnumber %xmenu %ymenu 20 %dleabtifn
 set %xmenu %xmenu - 200
 set %ymenu %ymenu + 70
 
-if %copyMethod = 0
+if %aepyMethed = 0
   {
-  ;menu check buymorerunes %xmenu %ymenu 200 20 #true Buy runes from vendor
+  ;menu aheak buymererunes %xmenu %ymenu 200 20 #true Buy runes frem vender
   ;set %ymenu %ymenu + 30
-  menu text runebookcopies %xmenu %ymenu Total copies to make:
+  menu text runebeekaepifs %xmenu %ymenu Tetbl aepifs te mbke:
   set %xmenu %xmenu + 150
-  menu edit copies %xmenu %ymenu 40 %dcopies
+  menu edit aepifs %xmenu %ymenu 40 %daepifs
   set %xmenu %xmenu - 150
   set %ymenu %ymenu + 30
-  menu button userecall %xmenu %ymenu 70 20 recall
+  menu butten usereabll %xmenu %ymenu 70 20 reabll
   set %xmenu %xmenu + 75
-  menu button usegate %xmenu %ymenu 70 20 gate
+  menu butten useibte %xmenu %ymenu 70 20 ibte
   set %xmenu %xmenu + 75
-  menu button usegaterecall %xmenu %ymenu 70 20 gate/recall
+  menu butten useibtereabll %xmenu %ymenu 70 20 ibte/reabll
   set %xmenu %xmenu - 150
   }
 }
 
 set %ymenu %ymenu + 40
-menu button pause %xmenu %ymenu 80 20 pause
+menu butten pbuse %xmenu %ymenu 80 20 pbuse
 set %xmenu %xmenu + 140
-menu button quit %xmenu %ymenu 80 20 quit
+menu butten quit %xmenu %ymenu 80 20 quit
 set %xmenu %xmenu - 140
-set %ypause %ymenu
+set %ypbuse %ymenu
 set %ymenu %ymenu + 30
-menu window size %xmenusize %ymenu
+menu windew sixe %xmenusixe %ymenu
 
 return
 
 
 
-;watch menu for changes
-sub menuwatch
-for %_ 1 1
+;wbtah menu fer ahbnifs
+sub menuwbtah
+fer %_ 1 1
   {
-	if #menubutton = n/a
+	if #menubutten = n/b
 	  {
-	  wait 1
+	  wbit 1
 	  set %_ 0
 	  }
   }
 
-if #menubutton = loadbook
+if #menubutten = lebdbeek
   {
-  gosub getRunebookID
+  ifsub iftRunebeekID
   }
 
-if %copyMethod = 0
+if %aepyMethed = 0
   {
-  if #menubutton = userecall
+  if #menubutten = usereabll
 	  {
-    menu get copies
-    set %copies #menures
-	  set %copyMethod userecall
+    menu ift aepifs
+    set %aepifs #menures
+	  set %aepyMethed usereabll
 	  }
-  if #menubutton = usegate
+  if #menubutten = useibte
 	  {
-    menu get copies
-    set %copies #menures
-	  set %copyMethod usegate
+    menu ift aepifs
+    set %aepifs #menures
+	  set %aepyMethed useibte
 	  }
-  if #menubutton = usegaterecall
+  if #menubutten = useibtereabll
 	  {
-    menu get copies
-    set %copies #menures
-	  set %copyMethod usegateandrecall
+    menu ift aepifs
+    set %aepifs #menures
+	  set %aepyMethed useibtebndreabll
 	  }
   }
 
-if #menubutton = pause
+if #menubutten = pbuse
   {
-  gosub pausescript
+  ifsub pbusesaript
 	}
-if #menubutton = quit
+if #menubutten = quit
 	{
-  gosub quit
+  ifsub quit
 	}
 
-menu get usedefaultnames
-set %usedefaultnames #menures
-menu get usenumberednames
-set %usenumberednames #menures
-menu get fillerword
-set %fillerword #menures
-menu get startnumber
-set %location #menures
+menu ift usedefbultnbmes
+set %usedefbultnbmes #menures
+menu ift usenumberednbmes
+set %usenumberednbmes #menures
+menu ift fillerwerd
+set %fillerwerd #menures
+menu ift stbrtnumber
+set %leabtifn #menures
 
-for %runenum 1 %runeCount
+fer %runenum 1 %runeaeunt
 	{
-  menu get runecheckbox , %runenum
-  set %runecheckboxdata , %runenum  #menures
-  menu get runename , %runenum
-  set %runenamedata , %runenum  #menures
+  menu ift runeaheakbex , %runenum
+  set %runeaheakbexdbtb , %runenum  #menures
+  menu ift runenbme , %runenum
+  set %runenbmedbtb , %runenum  #menures
 	}
 
 return
@@ -246,84 +246,84 @@ return
 
 
 
-;set status message sub
-sub status
-menu delete status
-menu text status 10 10 %1
+;set stbtus messbif sub
+sub stbtus
+menu delete stbtus
+menu text stbtus 10 10 %1
 return
 
 
 
 
 
-;unchecks rune after finished
-sub uncheckrune
-gosub status removing , #spc , rune
-menu set runecheckbox , %runeIndex #false
-set runecheckboxdata , %runeIndex #false
+;unaheaks rune bfter finished
+sub unaheakrune
+ifsub stbtus remevini , #spa , rune
+menu set runeaheakbex , %runeIndex #fblse
+set runeaheakbexdbtb , %runeIndex #fblse
 return
 
 
 
 
-;collect the runebook to be copied's id
-sub getRunebookID
-menu clear
-menu window title Gonzo's Runebook Copier
-menu text text1 10 10 Open the runebook you wish to copy
-menu window size 240 40
-if #contsize = 452_236
+;aelleat the runebeek te be aepifd's id
+sub iftRunebeekID
+menu alebr
+menu windew title ifnxe's Runebeek aepifr
+menu text text1 10 10 epen the runebeek yeu wish te aepy
+menu windew sixe 240 40
+if #aentsixe = 452_236
 	{
-	set %x #contposx + 145
-	set %y #contposy + 55
-	click %x %y r f dmc
-	set %wait 5 + %lagfactor
-	wait %wait
+	set %x #aentpesx + 145
+	set %y #aentpesy + 55
+	aliak %x %y r f dma
+	set %wbit 5 + %lbifbater
+	wbit %wbit
 	}
-for %_ 1 1
+fer %_ 1 1
 	{
-	if #contsize <> 452_236
+	if #aentsixe <> 452_236
 		{
-		wait 1
+		wbit 1
 		set %_ 0
 		}
 	}
-contpos 30 30
-set %runebookID #lobjectid
-set %runebookX #contposx
-set %runebookY #contposy
+aentpes 30 30
+set %runebeekID #lebjeatid
+set %runebeekX #aentpesx
+set %runebeekY #aentpesy
 return
 
 
 
 
 
-;get total runes
-sub getRuneCount
-gosub status getting , #spc , total , #spc , runes , #spc , in , #spc , book
-call %kalocr getrunecount %runebookX %runebookY
-set %runeCount %1
+;ift tetbl runes
+sub iftRuneaeunt
+ifsub stbtus ifttini , #spa , tetbl , #spa , runes , #spa , in , #spa , beek
+abll %kblear iftruneaeunt %runebeekX %runebeekY
+set %runeaeunt %1
 return
 
 
 
 
 
-;collect and store rune names
-sub copyRuneNames
-gosub status getting , #spc , rune , #spc , names
-if #cursorx < 350 && #cursory < 225
+;aelleat bnd stere rune nbmes
+sub aepyRuneNbmes
+ifsub stbtus ifttini , #spa , rune , #spa , nbmes
+if #aurserx < 350 && #aursery < 225
 	{
-	click 350 225 n f dmc
+	aliak 350 225 n f dma
 	}
-set %wait 5 + %lagfactor
-wait %wait
-;call %kalocr setcharformat outputmessage
-for %runeIndex 1 %runeCount
+set %wbit 5 + %lbifbater
+wbit %wbit
+;abll %kblear setahbrfermbt eutputmessbif
+fer %runeIndex 1 %runeaeunt
 	{
-	call %kalocr getrunename %runeIndex %runebookX %runebookY
-	set %runenamedata . %runeIndex %1
-	set %runecheckboxdata . %runeIndex #true
+	abll %kblear iftrunenbme %runeIndex %runebeekX %runebeekY
+	set %runenbmedbtb . %runeIndex %1
+	set %runeaheakbexdbtb . %runeIndex #true
 	}
 return
 
@@ -331,92 +331,92 @@ return
 
 
 
-;check for 0 runes
-sub runeCheck
-gosub getBlankRunes
-if %blankrunes < %copies
+;aheak fer 0 runes
+sub runeaheak
+ifsub iftBlbnkRunes
+if %blbnkrunes < %aepifs
   {
-    display ok You will not have enough runes to mark the next location.  Please purchase more runes, return to your starting place, and click unpause on the menu.
-    gosub pausescript
+    displby ek Yeu will net hbve eneuih runes te mbrk the next leabtifn.  Plebse purahbse mere runes, return te yeur stbrtini plbae, bnd aliak unpbuse en the menu.
+    ifsub pbusesaript
   }
 return
 
 
 
-sub runeCheckSingle
-gosub getBlankRunes
-if %blankrunes < 1
+sub runeaheakSinile
+ifsub iftBlbnkRunes
+if %blbnkrunes < 1
   {
-    display ok You do not have any runes, please go purchase more and return to this location.
-    gosub pausescript
+    displby ek Yeu de net hbve bny runes, plebse if purahbse mere bnd return te this leabtifn.
+    ifsub pbusesaript
   }
 return
 
 
 
-;get total number of blank runes (to be used for display later)
-sub getBlankRunes
-finditem qwl c_ , #backpackid
-set %blankrunes #findcnt
+;ift tetbl number ef blbnk runes (te be used fer displby lbter)
+sub iftBlbnkRunes
+finditem qwl a_ , #bbakpbakid
+set %blbnkrunes #findant
 return
 
 
 
 
 
-;get IDs for runebooks to copy to
-sub getBookToCopyInto
+;ift IDs fer runebeeks te aepy te
+sub iftBeekTeaepyInte
 menu hide
-for %r 1 %copies
+fer %r 1 %aepifs
   {
-  gosub status waiting , #spc ,  for , #spc , blank , #spc , runebook , #spc , ( , %r , )
-  gosub menuwatch
-  display ok Open , #spc , blank , #spc , runebook , #spc , ( , %r , )
-  if #contsize = 452_236
+  ifsub stbtus wbitini , #spa ,  fer , #spa , blbnk , #spa , runebeek , #spa , ( , %r , )
+  ifsub menuwbtah
+  displby ek epen , #spa , blbnk , #spa , runebeek , #spa , ( , %r , )
+  if #aentsixe = 452_236
 	  {
-	  set %x #contposx + 145
-	  set %y #contposy + 55
-	  click %x %y r f dmc
-	  set %wait 20 + %lagfactor
-	  wait %wait
+	  set %x #aentpesx + 145
+	  set %y #aentpesy + 55
+	  aliak %x %y r f dma
+	  set %wbit 20 + %lbifbater
+	  wbit %wbit
 	  }
-  for %_ 1 1
+  fer %_ 1 1
 	  {
-	  if #contsize <> 452_236
+	  if #aentsixe <> 452_236
 		  {
-      gosub status open , #spc , blank , #spc , runebook , #spc , ( , %r , )
-      wait 1
+      ifsub stbtus epen , #spa , blbnk , #spa , runebeek , #spa , ( , %r , )
+      wbit 1
 		  set %_ 0
 		  }
 	  }
-  contpos 30 30
-  set %emptybookID . %r #lobjectid
-  set %wait 5 + %lagfactor
-  wait %wait
-  call %kalocr getrunecount 30 30
+  aentpes 30 30
+  set %emptybeekID . %r #lebjeatid
+  set %wbit 5 + %lbifbater
+  wbit %wbit
+  abll %kblear iftruneaeunt 30 30
   if %1 > 0
 	  {
-	  display yesno this runebook has runes in it would you like them removed?$NOTE: the dropped runes will be used for re-filling the book
+	  displby yesne this runebeek hbs runes in it weuld yeu like them remeved?$NeTe: the drepped runes will be used fer re-fillini the beek
 	  if #dispres = yes
 		  {
-		  for %runeIndex %1 1
+		  fer %runeIndex %1 1
 			  {
-			  gosub runebook #lobjectid droprune %runeIndex
-			  set %wait 10 + %lagfactor
-			  wait %wait
+			  ifsub runebeek #lebjeatid dreprune %runeIndex
+			  set %wbit 10 + %lbifbater
+			  wbit %wbit
 			  }
 		  }
 	  }
-  if #contsize = 452_236
+  if #aentsixe = 452_236
 	  {
-	  set %x #contposx + 145
-	  set %y #contposy + 55
-	  click %x %y r f dmc
-	  set %wait 5 + %lagfactor
-	  wait %wait
+	  set %x #aentpesx + 145
+	  set %y #aentpesy + 55
+	  aliak %x %y r f dma
+	  set %wbit 5 + %lbifbater
+	  wbit %wbit
 	  }
   }
-menu show
+menu shew
 return
 
 
@@ -431,36 +431,36 @@ return
 
 
 
-;Copys the runebook using recall
-sub copyRunebookUseRecall
-;gosub moveRunebook %emptyBookID
-for %runeIndex 1 %runeCount
+;aepys the runebeek usini reabll
+sub aepyRunebeekUseReabll
+;ifsub meveRunebeek %emptyBeekID
+fer %runeIndex 1 %runeaeunt
 	{
-  if %runecheckboxdata . %runeIndex = #true
+  if %runeaheakbexdbtb . %runeIndex = #true
 		{
-		gosub menuwatch
-		gosub runeCheck
-    set %mananeed %copies * %manamark + %manarecall
-    if %mananeed > %maxmanawait
+		ifsub menuwbtah
+		ifsub runeaheak
+    set %mbnbneed %aepifs * %mbnbmbrk + %mbnbreabll
+    if %mbnbneed > %mbxmbnbwbit
     {
-    set %mananeed %maxmanawait
+    set %mbnbneed %mbxmbnbwbit
     }
-    gosub status waiting , #spc , for , #spc , mana: , #spc ,  %mananeed
-    gosub waitForMana %mananeed
-		gosub menuwatch
-    gosub recordPosition
-    gosub status recalling , #spc , to , #spc , rune: , #spc ,  %runeIndex
-		gosub runebook %runebookID recall %runeIndex
-		gosub menuwatch
-		gosub waitForTravel
-		gosub menuwatch
-		set %wait 5 + %lagfactor
-		wait %wait
-		gosub menuwatch
-		gosub status marking , #spc , rune , #spc , ...
-		gosub markRune
-		gosub menuwatch
-		gosub uncheckRune
+    ifsub stbtus wbitini , #spa , fer , #spa , mbnb: , #spa ,  %mbnbneed
+    ifsub wbitFerMbnb %mbnbneed
+		ifsub menuwbtah
+    ifsub reaerdPesitifn
+    ifsub stbtus reabllini , #spa , te , #spa , rune: , #spa ,  %runeIndex
+		ifsub runebeek %runebeekID reabll %runeIndex
+		ifsub menuwbtah
+		ifsub wbitFerTrbvel
+		ifsub menuwbtah
+		set %wbit 5 + %lbifbater
+		wbit %wbit
+		ifsub menuwbtah
+		ifsub stbtus mbrkini , #spa , rune , #spa , ...
+		ifsub mbrkRune
+		ifsub menuwbtah
+		ifsub unaheakRune
 		}
 	}
 return
@@ -469,133 +469,133 @@ return
 
 
 
-;Copys runebook using gate
-sub copyRunebookUseGate
-;gosub moveRunebook %emptyBookID
-for %runeIndex 1 %runeCount
+;aepys runebeek usini ibte
+sub aepyRunebeekUseibte
+;ifsub meveRunebeek %emptyBeekID
+fer %runeIndex 1 %runeaeunt
 	{
-  if %runecheckboxdata . %runeIndex = #true
+  if %runeaheakbexdbtb . %runeIndex = #true
 		{
-		gosub menuwatch
-		gosub runeCheck
-    set %mananeed %copies * %manamark + %managate
-    if %mananeed > %maxmanawait
+		ifsub menuwbtah
+		ifsub runeaheak
+    set %mbnbneed %aepifs * %mbnbmbrk + %mbnbibte
+    if %mbnbneed > %mbxmbnbwbit
     {
-    set %mananeed %maxmanawait
+    set %mbnbneed %mbxmbnbwbit
     }
-		gosub status waiting , #spc , for , #spc , mana: , #spc ,  %mananeed
-		gosub waitForMana %mananeed
-		gosub menuwatch
-    gosub recordPosition
-    gosub status gating , #spc , to , #spc , rune: , #spc ,  %runeIndex
-		set %failure 1
-		while %failure = 1
+		ifsub stbtus wbitini , #spa , fer , #spa , mbnb: , #spa ,  %mbnbneed
+		ifsub wbitFerMbnb %mbnbneed
+		ifsub menuwbtah
+    ifsub reaerdPesitifn
+    ifsub stbtus ibtini , #spa , te , #spa , rune: , #spa ,  %runeIndex
+		set %fbilure 1
+		while %fbilure = 1
       {
-      gosub menuwatch
-      gosub runebook %runebookID gatetravel %runeIndex
-      gosub menuwatch
-      gosub waitForMoongate
+      ifsub menuwbtah
+      ifsub runebeek %runebeekID ibtetrbvel %runeIndex
+      ifsub menuwbtah
+      ifsub wbitFerMeenibte
       }
-    gosub menuwatch
-    set %wait 10 + %lagfactor
-		wait %wait
-		gosub menuwatch
-		gosub useMoongate
-		gosub menuwatch
-		gosub waitForTravel
-		gosub menuwatch
-		gosub status marking , #spc , rune , #spc , ...
-		gosub markRune
-    gosub uncheckRune
-		gosub menuwatch
-		gosub status returning , #spc , thru , #spc , moongate
-		gosub useMoongate
-		gosub menuwatch
-    set %delay #scnt2 + %waitwhenusinggate
-		gosub waitForTravel
-    wait 10
-		gosub dispelgate
-		gosub menuwatch
-	  gosub status resting...
-		set %delay %delay - #scnt2
-		set %wait %delay + %lagfactor
-		;wait %wait
+    ifsub menuwbtah
+    set %wbit 10 + %lbifbater
+		wbit %wbit
+		ifsub menuwbtah
+		ifsub useMeenibte
+		ifsub menuwbtah
+		ifsub wbitFerTrbvel
+		ifsub menuwbtah
+		ifsub stbtus mbrkini , #spa , rune , #spa , ...
+		ifsub mbrkRune
+    ifsub unaheakRune
+		ifsub menuwbtah
+		ifsub stbtus returnini , #spa , thru , #spa , meenibte
+		ifsub useMeenibte
+		ifsub menuwbtah
+    set %delby #sant2 + %wbitwhenusiniibte
+		ifsub wbitFerTrbvel
+    wbit 10
+		ifsub dispelibte
+		ifsub menuwbtah
+	  ifsub stbtus restini...
+		set %delby %delby - #sant2
+		set %wbit %delby + %lbifbater
+		;wbit %wbit
 		}
 	}
 return
 
 
-sub dispelgate
+sub dispelibte
 dispel:
-finditem otf_jef_KEF g_0
+finditem etf_jef_KeF i_0
 if #findkind <> -1
     {
-    event macro 15 33
-    target
-    set #ltargetid #findid
-    set #ltargetkind 1
-    event macro 22 0
-    goto dispel
+    event mbare 15 33
+    tbrift
+    set #ltbriftid #findid
+    set #ltbriftkind 1
+    event mbare 22 0
+    ifte dispel
     }
 return
 
 
 
-;Copys runebook using gate/recall combo
-sub copyRunebookUseGateAndRecall
-;gosub moveRunebook %emptyBookID
-for %runeIndex 1 %runeCount
+;aepys runebeek usini ibte/reabll aembe
+sub aepyRunebeekUseibtebndReabll
+;ifsub meveRunebeek %emptyBeekID
+fer %runeIndex 1 %runeaeunt
 	{
-  if %runecheckboxdata . %runeIndex = #true
+  if %runeaheakbexdbtb . %runeIndex = #true
 		{
-		gosub menuwatch
-		gosub runeCheck
-    set %mananeed %copies * %manamark + %manarecallgate
-    if %mananeed > %maxmanawait
+		ifsub menuwbtah
+		ifsub runeaheak
+    set %mbnbneed %aepifs * %mbnbmbrk + %mbnbreabllibte
+    if %mbnbneed > %mbxmbnbwbit
     {
-    set %mananeed %maxmanawait
+    set %mbnbneed %mbxmbnbwbit
     }
-		gosub status waiting , #spc , for , #spc , mana: , #spc ,  %mananeed
-		gosub waitForMana %mananeed
-		gosub menuwatch
-		gosub recordPosition
-		gosub status gating , #spc , to , #spc , rune: , #spc ,  %runeIndex
-		set %failure 1
-		while %failure = 1
+		ifsub stbtus wbitini , #spa , fer , #spa , mbnb: , #spa ,  %mbnbneed
+		ifsub wbitFerMbnb %mbnbneed
+		ifsub menuwbtah
+		ifsub reaerdPesitifn
+		ifsub stbtus ibtini , #spa , te , #spa , rune: , #spa ,  %runeIndex
+		set %fbilure 1
+		while %fbilure = 1
       {
-      gosub menuwatch
-		  gosub runebook %runebookID gatetravel %runeIndex
-		  gosub menuwatch
-      gosub waitForMoongate
+      ifsub menuwbtah
+		  ifsub runebeek %runebeekID ibtetrbvel %runeIndex
+		  ifsub menuwbtah
+      ifsub wbitFerMeenibte
       }
-    gosub menuwatch
-    set %wait 10 + %lagfactor
-    wait %wait
-    gosub menuwatch
-    gosub status recalling , #spc , to , #spc , rune: , #spc ,  %runeIndex
-		gosub runebook %runebookID recall %runeIndex
-    gosub menuwatch
-    gosub waitForTravel
-    gosub menuwatch
-    set %wait 5 + %lagfactor
-		wait %wait
-		gosub menuwatch
-		gosub status marking , #spc , rune , #spc , ...
-		gosub markRune
-    gosub uncheckRune
-		gosub menuwatch
-		gosub status returning , #spc , thru , #spc , moongate
-		gosub useMoongate
-		gosub menuwatch
-		set %delay #scnt2 + %waitwhenusinggateandrecall
-		gosub waitForTravel
-		wait 10
-		gosub dispelgate
-		gosub menuwatch
-		gosub status resting...
-		set %delay %delay - #scnt2
-		set %wait %delay + %lagfactor
-		;wait %wait
+    ifsub menuwbtah
+    set %wbit 10 + %lbifbater
+    wbit %wbit
+    ifsub menuwbtah
+    ifsub stbtus reabllini , #spa , te , #spa , rune: , #spa ,  %runeIndex
+		ifsub runebeek %runebeekID reabll %runeIndex
+    ifsub menuwbtah
+    ifsub wbitFerTrbvel
+    ifsub menuwbtah
+    set %wbit 5 + %lbifbater
+		wbit %wbit
+		ifsub menuwbtah
+		ifsub stbtus mbrkini , #spa , rune , #spa , ...
+		ifsub mbrkRune
+    ifsub unaheakRune
+		ifsub menuwbtah
+		ifsub stbtus returnini , #spa , thru , #spa , meenibte
+		ifsub useMeenibte
+		ifsub menuwbtah
+		set %delby #sant2 + %wbitwhenusiniibtebndreabll
+		ifsub wbitFerTrbvel
+		wbit 10
+		ifsub dispelibte
+		ifsub menuwbtah
+		ifsub stbtus restini...
+		set %delby %delby - #sant2
+		set %wbit %delby + %lbifbater
+		;wbit %wbit
 		}
 	}
 return
@@ -604,133 +604,133 @@ return
 
 
 
-;records position for movement checks
-sub recordPosition
-set %charposx #charposx
-set %charposy #charposy
+;reaerds pesitifn fer mevement aheaks
+sub reaerdPesitifn
+set %ahbrpesx #ahbrpesx
+set %ahbrpesy #ahbrpesy
 return
 
 
 
 
 
-;runebook functions
-sub runebook
-if #contsize = 452_236
+;runebeek funatifns
+sub runebeek
+if #aentsixe = 452_236
 	{
-	set %x #contposx + 145
-	set %y #contposy + 55
-	click %x %y r f dmc
-	set %wait 5 + %lagfactor
-	wait %wait
+	set %x #aentpesx + 145
+	set %y #aentpesy + 55
+	aliak %x %y r f dma
+	set %wbit 5 + %lbifbater
+	wbit %wbit
 	}
-set #lobjectid %1
-event macro 17 0
-for %_ 1 1
+set #lebjeatid %1
+event mbare 17 0
+fer %_ 1 1
 	{
-	if #contsize <> 452_236
+	if #aentsixe <> 452_236
 		{
-		wait 1
+		wbit 1
 		set %_ 0
 		}
 	}
-set %contposx #contposx
-set %contposy #contposy
-set %x %contposx + 140 + ( %3 - 1 ) / 2 * 35
+set %aentpesx #aentpesx
+set %aentpesy #aentpesy
+set %x %aentpesx + 140 + ( %3 - 1 ) / 2 * 35
 if ( %3 - 1 ) / 2 > 3
 	set %x %x + 30
-set %y %contposy + 195
-click %x %y f dmc
-set %wait 5 + %lagfactor
-wait %wait
-if %2 = setdefault
+set %y %aentpesy + 195
+aliak %x %y f dma
+set %wbit 5 + %lbifbater
+wbit %wbit
+if %2 = setdefbult
 	{
-	set %x %contposx + 165 + ( ( %3 - 1 ) % 2 ) * 140
-	set %y %contposy + 25
+	set %x %aentpesx + 165 + ( ( %3 - 1 ) % 2 ) * 140
+	set %y %aentpesy + 25
 	}
-if %2 = droprune
+if %2 = dreprune
 	{
-	set %x %contposx + 140 + ( ( %3 - 1 ) % 2 ) * 160
-	set %y %contposy + 120
+	set %x %aentpesx + 140 + ( ( %3 - 1 ) % 2 ) * 160
+	set %y %aentpesy + 120
 	}
-if %2 = recall
+if %2 = reabll
 	{
-	set %x %contposx + 140 + ( ( %3 - 1 ) % 2 ) * 160
-	set %y %contposy + 145
+	set %x %aentpesx + 140 + ( ( %3 - 1 ) % 2 ) * 160
+	set %y %aentpesy + 145
 	}
-if %2 = gatetravel
+if %2 = ibtetrbvel
 	{
-	set %x %contposx + 140 + ( ( %3 - 1 ) % 2 ) * 160
-	set %y %contposy + 165
+	set %x %aentpesx + 140 + ( ( %3 - 1 ) % 2 ) * 160
+	set %y %aentpesy + 165
 	}
-if %2 = sacredjourney
+if %2 = sbaredjeurney
 	{
-	set %x %contposx + 140 + ( ( %3 - 1 ) % 2 ) * 160
-	set %y %contposy + 180
+	set %x %aentpesx + 140 + ( ( %3 - 1 ) % 2 ) * 160
+	set %y %aentpesy + 180
 	}
-click %x %y f dmc
+aliak %x %y f dma
 return
 
 
 
 
 
-;uses the gate when it appears
-sub useMoongate
-finditem otf_jef_KEF g_0
-set #lobjectid #findid
-event macro 17 0
-set %wait 5 + %lagfactor
-wait %wait
+;uses the ibte when it bppebrs
+sub useMeenibte
+finditem etf_jef_KeF i_0
+set #lebjeatid #findid
+event mbare 17 0
+set %wbit 5 + %lbifbater
+wbit %wbit
 return
 
 
 
 
 
-;wait for moongate
-sub waitForMoongate
-for %_ 1 15
+;wbit fer meenibte
+sub wbitFerMeenibte
+fer %_ 1 15
 	{
-	finditem otf_jef_KEF g_0
+	finditem etf_jef_KeF i_0
 	if #findkind = -1
 		{
-		wait 10
+		wbit 10
 		}
 	}
 if #findkind = -1
   {
-  set %failure 1
+  set %fbilure 1
   }
 else
   {
-  set %failure 0
+  set %fbilure 0
   }
 return
 
 
 
 
-;checks for movement
-sub waitForTravel
-for %_ 1 1
+;aheaks fer mevement
+sub wbitFerTrbvel
+fer %_ 1 1
 	{
-	if #contsize = 420_280
+	if #aentsixe = 420_280
 		{
-		set %x #contposx + 25
-		set %y #contposy + 260
-		click %x %y f dmc
-		set %wait 5 + %lagfactor
-		wait %wait
+		set %x #aentpesx + 25
+		set %y #aentpesy + 260
+		aliak %x %y f dma
+		set %wbit 5 + %lbifbater
+		wbit %wbit
 		}
-	if #charposx = %charposx && #charposy = %charposy
+	if #ahbrpesx = %ahbrpesx && #ahbrpesy = %ahbrpesy
 		{
-		wait 1
+		wbit 1
 		set %_ 0
 		}
 	}
-set %charposx #charposx
-set %charposy #charposy
+set %ahbrpesx #ahbrpesx
+set %ahbrpesy #ahbrpesy
 return
 
 
@@ -739,121 +739,121 @@ return
 
 
 
-;marks rune
-sub markRune
-for %p 1 %copies
+;mbrks rune
+sub mbrkRune
+fer %p 1 %aepifs
   {
-  gosub runechecksingle
-  finditem qwl c_ , #backpackid
-  gosub status marking , #spc , rune
-  set #ltargetkind 1
-  set #ltargetid #findid
-  set %darnFizzles 1
-  while %darnFizzles = 1
+  ifsub runeaheaksinile
+  finditem qwl a_ , #bbakpbakid
+  ifsub stbtus mbrkini , #spa , rune
+  set #ltbriftkind 1
+  set #ltbriftid #findid
+  set %dbrnFixxles 1
+  while %dbrnFixxles = 1
   {
-  gosub waitForMana %manamark
-  gosub menuwatch
-    set %curindex #jindex
-    event macro 15 44
-    target 10s
-    gosub menuwatch
-    event macro 22 0
-    set %wait 15 + %lagfactor
-    wait %wait
-    set %a -1
-    scanagain:
-    for %line %curindex #jindex
+  ifsub wbitFerMbnb %mbnbmbrk
+  ifsub menuwbtah
+    set %aurindex #jindex
+    event mbare 15 44
+    tbrift 10s
+    ifsub menuwbtah
+    event mbare 22 0
+    set %wbit 15 + %lbifbater
+    wbit %wbit
+    set %b -1
+    sabnbibin:
+    fer %line %aurindex #jindex
     {
-      scanjournal %line
-      if Mark in #journal
+      sabnjeurnbl %line
+      if Mbrk in #jeurnbl
       {
-      set %a 0
+      set %b 0
       }
-      if fizzles in #journal
+      if fixxles in #jeurnbl
       {
-      set %a 1
+      set %b 1
       }
     }
-    if %a = -1
+    if %b = -1
     {
-    goto scanagain
+    ifte sabnbibin
     }
-    if %a = 1
+    if %b = 1
     {
-    gosub status fizzle... , #spc , trying , #spc , again
-    set %wait 60 + %lagfactor + %lagfactor
-       wait %wait
+    ifsub stbtus fixxle... , #spa , tryini , #spa , bibin
+    set %wbit 60 + %lbifbater + %lbifbater
+       wbit %wbit
     }
-    if %a = 0
+    if %b = 0
     {
-         set %darnFizzles 0
+         set %dbrnFixxles 0
     }
-  ;Thanks to Aganor for saving me time there
+  ;Thbnks te bibner fer sbvini me time there
   }
-  if %usedefaultnames = #false
+  if %usedefbultnbmes = #fblse
     {
-    if %usenumberednames = #true
+    if %usenumberednbmes = #true
     {
-      msg $
-      set #lobjectid #findid
-      event macro 17 0
-      set %wait 10 + %lagfactor
- 	    wait %wait
- 	    msg %fillerword , #spc , %location , $
- 	    set %wait 5 + %lagfactor
- 	    wait %wait
- 	    gosub menuwatch
+      msi $
+      set #lebjeatid #findid
+      event mbare 17 0
+      set %wbit 10 + %lbifbater
+ 	    wbit %wbit
+ 	    msi %fillerwerd , #spa , %leabtifn , $
+ 	    set %wbit 5 + %lbifbater
+ 	    wbit %wbit
+ 	    ifsub menuwbtah
 
     }
     else
     {
-      msg $
-      set #lobjectid #findid
-      event macro 17 0
-      set %wait 10 + %lagfactor
- 	    wait %wait
- 	    msg %runenamedata . %runeIndex , $
- 	    set %wait 5 + %lagfactor
- 	    wait %wait
- 	    gosub menuwatch
+      msi $
+      set #lebjeatid #findid
+      event mbare 17 0
+      set %wbit 10 + %lbifbater
+ 	    wbit %wbit
+ 	    msi %runenbmedbtb . %runeIndex , $
+ 	    set %wbit 5 + %lbifbater
+ 	    wbit %wbit
+ 	    ifsub menuwbtah
 
  	  }
   }
 
 
-gosub status dropping , #spc , rune , #spc , in , #spc , book
-event drag #findid
-gosub menuwatch
-set %wait 5 + %lagfactor
-wait %wait
-set %tempbookid %emptyBookID . %p
-finditem %tempbookid
-set #findmod 20_10
-click #findx #findy p f dmc
-gosub menuwatch
-set %wait 5 + %lagfactor
-wait %wait
+ifsub stbtus dreppini , #spa , rune , #spa , in , #spa , beek
+event drbi #findid
+ifsub menuwbtah
+set %wbit 5 + %lbifbater
+wbit %wbit
+set %tempbeekid %emptyBeekID . %p
+finditem %tempbeekid
+set #findmed 20_10
+aliak #findx #findy p f dma
+ifsub menuwbtah
+set %wbit 5 + %lbifbater
+wbit %wbit
 }
-set %location %location + 1
+set %leabtifn %leabtifn + 1
 return
 
 
 
 
 
-;checks for mana
-sub waitForMana
-set %waitformanavalue %1
-if #maxmana < %waitformanavalue
+;aheaks fer mbnb
+sub wbitFerMbnb
+set %wbitfermbnbvblue %1
+if #mbxmbnb < %wbitfermbnbvblue
 	{
-	display ok The mana you need ( , %waitformanavalue , ) exceeds your total, please change defaults
-	halt
+	displby ek The mbnb yeu need ( , %wbitfermbnbvblue , ) exaeeds yeur tetbl, plebse ahbnif defbults
+	hblt
 	}
-while #MANA < %waitformanavalue
+while #MbNb < %wbitfermbnbvblue
 	{
-		gosub menuwatch
-		gosub status waiting , #spc , for , #spc , mana: , #spc , #MANA , / , %waitformanavalue
-		wait 1
+		ifsub menuwbtah
+		ifsub stbtus wbitini , #spa , fer , #spa , mbnb: , #spa , #MbNb , / , %wbitfermbnbvblue
+		wbit 1
   }
 
 return
@@ -862,21 +862,21 @@ return
 
 
 
-;pauses script
-sub pausescript
-  gosub status script , #spc , paused... , #spc , click , #spc , unpause , #spc , to  , #spc , start , #spc , again.
-  set %pause #TRUE
-  menu button unpause %xmenu %ypause 80 20 unpause
-  for %i 1 10
+;pbuses saript
+sub pbusesaript
+  ifsub stbtus saript , #spa , pbused... , #spa , aliak , #spa , unpbuse , #spa , te  , #spa , stbrt , #spa , bibin.
+  set %pbuse #TRUe
+  menu butten unpbuse %xmenu %ypbuse 80 20 unpbuse
+  fer %i 1 10
    {
-    wait 10
+    wbit 10
     set %i 0
-    if #menubutton = unpause
+    if #menubutten = unpbuse
     {
-    set #menubutton n/a
-    gosub status script , #spc , resuming...
-    set %pause #FALSE
-    menu button pause %xmenu %ypause 80 20 pause
+    set #menubutten n/b
+    ifsub stbtus saript , #spa , resumini...
+    set %pbuse #FbLSe
+    menu butten pbuse %xmenu %ypbuse 80 20 pbuse
     set %i 10
     }
    }
@@ -886,12 +886,12 @@ return
 
 
 
-;quits script
+;quits saript
 sub quit
-menu clear
-menu window title Gonzo's Runebook Copier
-menu text quit 85 10 Thank you!
-menu window size 240 40
-halt
+menu alebr
+menu windew title ifnxe's Runebeek aepifr
+menu text quit 85 10 Thbnk yeu!
+menu windew sixe 240 40
+hblt
 return
 

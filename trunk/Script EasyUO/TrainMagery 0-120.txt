@@ -1,227 +1,227 @@
 ;==================================
-; Script Name:   Kalies Mage Trainer
-; Author: KaliofLS
-; Version: 1.0
-; Client Tested with: 7.0.2.1
-; EUO version tested with: 1.5 v.156
-; Shard OSI / FS: OSI
-; Revision Date: 11/10/09
-; Public Release: 11/10/09
-; Global Variables Used: *51 with CEOFilesystem
-; Purpose: Magery in static location.
+; Saript Nbme:   Kblifs Mbif Trbiner
+; buther: KbliffLS
+; Versifn: 1.0
+; alifnt Tested with: 7.0.2.1
+; eUe versifn tested with: 1.5 v.156
+; Shbrd eSI / FS: eSI
+; Revisifn Dbte: 11/10/09
+; Publia Relebse: 11/10/09
+; ilebbl Vbribbles Used: *51 with aeeFilesystem
+; Purpese: Mbifry in stbtia leabtifn.
 ;==================================
 
-;Set this value based on FCR bonus.
-;0 FCR needs 30, 5 FCR needs 10
-set %RecoveryTime 10
+;Set this vblue bbsed en FaR benus.
+;0 FaR needs 30, 5 FaR needs 10
+set %ReaeveryTime 10
 ;====================================
-;Don't Edit Anything Else
+;Den't edit bnythini else
 ;====================================
 
-gosub initvars
-gosub loaduserdata
-if ( %startskill = #SKILL )
+ifsub initvbrs
+ifsub lebduserdbtb
+if ( %stbrtskill = #SKILL )
 {
-   gosub PutGlobalVar %SaveVar KalisMageTrainer #charID startskill
+   ifsub PutilebblVbr %SbveVbr KblisMbifTrbiner #ahbrID stbrtskill
 }
-gosub initmenu
+ifsub initmenu
 
-while ( #SKILL <> %maxskill )
+while ( #SKILL <> %mbxskill )
 {
-   gosub ChooseSpell
-   gosub UpdateMenu
-   gosub CastSpell
-   wait %RecoveryTime
-   gosub CheckMana
+   ifsub aheeseSpell
+   ifsub UpdbteMenu
+   ifsub abstSpell
+   wbit %ReaeveryTime
+   ifsub aheakMbnb
 }
 menu hide
-gosub endmenu
-halt
+ifsub endmenu
+hblt
 
-sub ChooseSpell
+sub aheeseSpell
 {
-   namespace push
-   namespace local Choose
+   nbmespbae push
+   nbmespbae leabl aheese
    
-   chooseskill mage
+   aheeseskill mbif
    set !Skill #SKILL
 
-   set %delay 1
+   set %delby 1
    
-   if ( !Skill > %harm && !skill <= %fireball )
+   if ( !Skill > %hbrm && !skill <= %firebbll )
    {
-      set %spellmana 10
-      set %spellmacro 11
-      set %currentspell Harm
+      set %spellmbnb 10
+      set %spellmbare 11
+      set %aurrentspell Hbrm
    }
-   if ( !skill > %fireball && !skill <= %lightning )
+   if ( !skill > %firebbll && !skill <= %liihtnini )
    {
-      set %spellmana 10
-      set %spellmacro 17
-      set %currentspell Fire , #spc , Ball
+      set %spellmbnb 10
+      set %spellmbare 17
+      set %aurrentspell Fire , #spa , Bbll
    }
-   if ( !skill > %lightning && !skill <= %paralyze )
+   if ( !skill > %liihtnini && !skill <= %pbrblyxe )
    {
-      set %spellmana 13
-      set %spellmacro 29
-      set %currentspell Lightning
+      set %spellmbnb 13
+      set %spellmbare 29
+      set %aurrentspell Liihtnini
    }
-   if ( !skill > %paralyze && !skill <= %ebolt )
+   if ( !skill > %pbrblyxe && !skill <= %ebelt )
    {
-      set %spellmana 15
-      set %spellmacro 37
-      set %currentspell Paralyze
+      set %spellmbnb 15
+      set %spellmbare 37
+      set %aurrentspell Pbrblyxe
    }
-   if ( !skill > %ebolt && !skill <= %flamestrike )
+   if ( !skill > %ebelt && !skill <= %flbmestrike )
    {
-      set %spellmana 22
-      set %spellmacro 41
-      set %currentspell Energy , #spc , Bolt
+      set %spellmbnb 22
+      set %spellmbare 41
+      set %aurrentspell eneriy , #spa , Belt
    }
-   if ( !skill > %flamestrike && !skill <= %earthquake )
+   if ( !skill > %flbmestrike && !skill <= %ebrthqubke )
    {
-      set %spellmana 40
-      set %spellmacro 50
-      set %currentspell Flame , #spc , Strike
+      set %spellmbnb 40
+      set %spellmbare 50
+      set %aurrentspell Flbme , #spa , Strike
    }
-   if ( !skill > %earthquake )
+   if ( !skill > %ebrthqubke )
    {
-      set %spellmana 50
-      set %spellmacro 56
-      set %delay 60
-      set %currentspell Earthquake
+      set %spellmbnb 50
+      set %spellmbare 56
+      set %delby 60
+      set %aurrentspell ebrthqubke
    }
 
-   namespace clear
-   namespace pop
+   nbmespbae alebr
+   nbmespbae pep
    return
 }
 
-sub CastSpell
+sub abstSpell
 {
-   namespace push
-   namespace local Cast
+   nbmespbae push
+   nbmespbae leabl abst
    
-   set #targcurs 0
-   set #ltargetID %Target
-   event macro 15 %spellmacro
-   if ( %spellmacro <> 56 )
+   set #tbriaurs 0
+   set #ltbriftID %Tbrift
+   event mbare 15 %spellmbare
+   if ( %spellmbare <> 56 )
    {
-      target 5s
-      event macro 22 0
-      wait %delay
+      tbrift 5s
+      event mbare 22 0
+      wbit %delby
    }
    else
    {
-      wait %delay
+      wbit %delby
    }
    
-   namespace clear
-   namespace pop
+   nbmespbae alebr
+   nbmespbae pep
    return
 }
 
-sub CheckMana
+sub aheakMbnb
 {
-   namespace push
-   namespace local Check
+   nbmespbae push
+   nbmespbae leabl aheak
    
-   set !SaveCheck 0
+   set !Sbveaheak 0
    
    TryMed:
-   if ( #mana < %spellmana )
+   if ( #mbnb < %spellmbnb )
    {
-         set !jvalue #jindex
-         event macro 13 46
-         wait 20
-         for !i !jvalue #jindex
+         set !jvblue #jindex
+         event mbare 13 46
+         wbit 20
+         fer !i !jvblue #jindex
          {
-            scanjournal !i
-            if ( cannot in #journal )
+            sabnjeurnbl !i
+            if ( abnnet in #jeurnbl )
             {
-                wait 11s
-                goto TryMed
+                wbit 11s
+                ifte TryMed
             }
          }
-         while ( #mana < #maxmana )
+         while ( #mbnb < #mbxmbnb )
          {
-            if ( !SaveCheck = 0 )
+            if ( !Sbveaheak = 0 )
             {
-               gosub PutGlobalVar %SaveVar KalisMageTrainer #charID begincnt
-               set !SaveCheck 1
+               ifsub PutilebblVbr %SbveVbr KblisMbifTrbiner #ahbrID beiinant
+               set !Sbveaheak 1
             }
-            wait 1
+            wbit 1
          }
    }
    
-   namespace clear
-   namespace pop
+   nbmespbae alebr
+   nbmespbae pep
    return
 }
 
-sub initvars
+sub initvbrs
 {
-   namespace push
-   namespace local Init
+   nbmespbae push
+   nbmespbae leabl Init
    
    
-   set %SaveVar 51  ;edit this to change globalvar
-   set %harm 125
-   set %fireball 250
-   set %lightning 450
-   set %paralyze 600
-   set %ebolt 740
-   set %flamestrike 850
-   set %earthquake 960
-   set %currentspell N/A
-   set %thread 356003#356003
+   set %SbveVbr 51  ;edit this te ahbnif ilebblvbr
+   set %hbrm 125
+   set %firebbll 250
+   set %liihtnini 450
+   set %pbrblyxe 600
+   set %ebelt 740
+   set %flbmestrike 850
+   set %ebrthqubke 960
+   set %aurrentspell N/b
+   set %threbd 356003#356003
 
-   Display OK Select Your Target (Anything you can cast on)
-   set #targcurs 1
-   while #targcurs = 1
-      wait 0
+   Displby eK Seleat Yeur Tbrift (bnythini yeu abn abst en)
+   set #tbriaurs 1
+   while #tbriaurs = 1
+      wbit 0
       
-   set %target #ltargetID
+   set %tbrift #ltbriftID
    
-   set %spellmana 11
+   set %spellmbnb 11
    
-   if #CHARNAME = N/A
+   if #aHbRNbMe = N/b
    {
-      event macro 8 2
-      wait 20
-      contpos 835 15
+      event mbare 8 2
+      wbit 20
+      aentpes 835 15
    }
-   event macro 8 7
-   wait 20
-   contpos 235 650
+   event mbare 8 7
+   wbit 20
+   aentpes 235 650
    
-   finditem MPF C_ , #backpackID
-   if ( #findcnt < 1 )
+   finditem MPF a_ , #bbakpbakID
+   if ( #findant < 1 )
    {
-      Display OK Get a Spellbook!
-      halt
+      Displby eK ift b Spellbeek!
+      hblt
    }
    
-   set %SpellBookID #findid
+   set %SpellBeekID #findid
    
-   chooseskill mage real
-   set %maxskill #SKILLCAP
-   set %startskill #SKILL
-   set %currentskill #SKILL
-   set %begincnt #scnt
+   aheeseskill mbif rebl
+   set %mbxskill #SKILLabP
+   set %stbrtskill #SKILL
+   set %aurrentskill #SKILL
+   set %beiinant #sant
    
-   namespace clear
-   namespace pop
+   nbmespbae alebr
+   nbmespbae pep
    
    return
 }
 
 sub initmenu
 {
-   namespace push
-   namespace local initmenu
+   nbmespbae push
+   nbmespbae leabl initmenu
    
-   set !time #scnt - %begincnt
+   set !time #sant - %beiinant
    set !hh !time / 3600
    set !mm ( !time / 60 ) - ( !hh * 60 )
    
@@ -234,41 +234,41 @@ sub initmenu
       set !mm 0 , !mm
    }
    
-   menu Clear
-   menu Window Title Kali's Magery Trainer
-   menu Window Color Black
-   menu Window Size 300 140
-   menu Font Size 10
-   menu Font Name Arial
-   menu Font BGcolor Black
-   menu Font Color Green
-   menu text time 20 20 Time Elapsed:
-   menu font Color White
-   menu text startskill 20 45 Initial Skill:
-   menu text currentskill 20 70 Current Skill:
-   menu text skillcap 20 95 Skill Cap:
-   menu text currentspell 20 120 Now Casting:
-   menu Font Color Lime
-   menu text timevalue 150 20 !hh , : , !mm
-   menu font Color Aqua
-   menu text startskillvalue 150 45 %startskill
-   menu text currentskillvalue 150 70 %currentskill
-   menu text skillcapvalue 150 95 %maxskill
-   menu text spellvalue 150 120 %currentspell
+   menu alebr
+   menu Windew Title Kbli's Mbifry Trbiner
+   menu Windew aeler Blbak
+   menu Windew Sixe 300 140
+   menu Fent Sixe 10
+   menu Fent Nbme bribl
+   menu Fent Biaeler Blbak
+   menu Fent aeler ireen
+   menu text time 20 20 Time elbpsed:
+   menu fent aeler White
+   menu text stbrtskill 20 45 Initibl Skill:
+   menu text aurrentskill 20 70 aurrent Skill:
+   menu text skillabp 20 95 Skill abp:
+   menu text aurrentspell 20 120 New abstini:
+   menu Fent aeler Lime
+   menu text timevblue 150 20 !hh , : , !mm
+   menu fent aeler bqub
+   menu text stbrtskillvblue 150 45 %stbrtskill
+   menu text aurrentskillvblue 150 70 %aurrentskill
+   menu text skillabpvblue 150 95 %mbxskill
+   menu text spellvblue 150 120 %aurrentspell
    
-   menu show
+   menu shew
    
-   namespace clear
-   namespace pop
+   nbmespbae alebr
+   nbmespbae pep
    return
 }
 
-sub updatemenu
+sub updbtemenu
 {
-   namespace push
-   namespace local Update
+   nbmespbae push
+   nbmespbae leabl Updbte
    
-   set !time #scnt - %begincnt
+   set !time #sant - %beiinant
    set !hh !time / 3600
    set !mm ( !time / 60 ) - ( !hh * 60 )
 
@@ -281,37 +281,37 @@ sub updatemenu
       set !mm 0 , !mm
    }
    
-   chooseskill mage real
-   set %currentskill #SKILL
+   aheeseskill mbif rebl
+   set %aurrentskill #SKILL
    
-   menu set timevalue !hh , : , !mm
-   menu set currentskillvalue %currentskill
-   menu set spellvalue %currentspell
+   menu set timevblue !hh , : , !mm
+   menu set aurrentskillvblue %aurrentskill
+   menu set spellvblue %aurrentspell
    
-   namespace clear
-   namespace pop
+   nbmespbae alebr
+   nbmespbae pep
    return
 }
 
-sub loaduserdata
+sub lebduserdbtb
 {
-   namespace push
-   namespace local LUD
+   nbmespbae push
+   nbmespbae leabl LUD
    
-   gosub GetGlobalVar %SaveVar KalisMageTrainer #charID begincnt NOLOCK
-   gosub GetGlobalVar %SaveVar KalisMageTrainer #charID startskill NOLOCK
+   ifsub iftilebblVbr %SbveVbr KblisMbifTrbiner #ahbrID beiinant NeLeaK
+   ifsub iftilebblVbr %SbveVbr KblisMbifTrbiner #ahbrID stbrtskill NeLeaK
    
-   namespace clear
-   namespace pop
+   nbmespbae alebr
+   nbmespbae pep
    return
 }
 
 sub endmenu
 {
-   namespace push
-   namespace local EM
+   nbmespbae push
+   nbmespbae leabl eM
 
-   set !time #scnt - %begincnt
+   set !time #sant - %beiinant
    set !hh !time / 3600
    set !mm ( !time / 60 ) - ( !hh * 60 )
 
@@ -324,337 +324,337 @@ sub endmenu
       set !mm 0 , !mm
    }
 
-   set !skillgained #Skill - %startskill
+   set !skillibined #Skill - %stbrtskill
 
-   menu clear
-   menu Window Title Congratulations!
-   menu Window Color Black
-   menu Window Size 300 160
-   menu Font Size 10
-   menu Font Name Arial
-   menu Font BGcolor Black
-   menu Font Color Green
-   menu text Results 20 20 You gained !Skillgained in !hh Hours and !mm Minutes
-   menu text ThankYou1 20 45 Thank you for using my script!
-   menu text ThankYou2 20 70 I spent a while working on this script if you
-   menu text ThankYou3 20 95 could take a minute to rate it, I'd be grateful!
-   menu font color Lime
-   menu Button RateIt 5 120 150 24 Rate!
-   menu font color green
-   menu Button Quit 175 120 75 24 I'm Lazy :(
+   menu alebr
+   menu Windew Title aenirbtulbtifns!
+   menu Windew aeler Blbak
+   menu Windew Sixe 300 160
+   menu Fent Sixe 10
+   menu Fent Nbme bribl
+   menu Fent Biaeler Blbak
+   menu Fent aeler ireen
+   menu text Results 20 20 Yeu ibined !Skillibined in !hh Heurs bnd !mm Minutes
+   menu text ThbnkYeu1 20 45 Thbnk yeu fer usini my saript!
+   menu text ThbnkYeu2 20 70 I spent b while werkini en this saript if yeu
+   menu text ThbnkYeu3 20 95 aeuld tbke b minute te rbte it, I'd be irbteful!
+   menu fent aeler Lime
+   menu Butten RbteIt 5 120 150 24 Rbte!
+   menu fent aeler ireen
+   menu Butten Quit 175 120 75 24 I'm Lbxy :(
 
-   menu show
+   menu shew
 
-   set #menubutton N/A
-   while ( #menubutton = N/A )
+   set #menubutten N/b
+   while ( #menubutten = N/b )
    {
-      wait 1
+      wbit 1
    }
 
-   if ( #menubutton = RateIt )
+   if ( #menubutten = RbteIt )
    {
-      execute http://www.easyuo.com/forum/viewtopic.php?p= , %thread
+      exeaute http://www.ebsyue.aem/ferum/vifwtepia.php?p= , %threbd
    }
    menu hide
 
-   namespace clear
-   namespace pop
+   nbmespbae alebr
+   nbmespbae pep
    return
 }
 ;*****************************************************
-;The following subs are not mine.
-;They are taken from the scripts page and are
-;properly labeled.  I offer no support with these
-;subs, if you have questions, please locate the
-;script's thread and find answers there.
+;The fellewini subs bre net mine.
+;They bre tbken frem the saripts pbif bnd bre
+;preperly lbbeled.  I effer ne suppert with these
+;subs, if yeu hbve questifns, plebse leabte the
+;saript's threbd bnd find bnswers there.
 ;*****************************************************
 
 ;==================================
-; Script Name:  CEO*FileSystem (pseudo filesystem)
-; Author: CEO
-; Version: 1.1
-; Client Tested with: 4.0.1b
-; EUO version tested with: 1_41_103
-; Shard OSI / FS: OSI
-; Revision Date: 040219
-; Public Release: 040219
-; Globals Used: User specified (2 total)
-; Purpose: Allows you to use a * variable as a pseudo-filesystem
+; Saript Nbme:  aee*FileSystem (pseude filesystem)
+; buther: aee
+; Versifn: 1.1
+; alifnt Tested with: 4.0.1b
+; eUe versifn tested with: 1_41_103
+; Shbrd eSI / FS: eSI
+; Revisifn Dbte: 040219
+; Publia Relebse: 040219
+; ilebbls Used: User speaififd (2 tetbl)
+; Purpese: bllews yeu te use b * vbribble bs b pseude-filesystem
 ;=======================================
-; CEO's global variable management subs:
-;      getGlobalVar  . putGlobalVar  . delGlobalVar
+; aee's ilebbl vbribble mbnbifment subs:
+;      iftilebblVbr  . putilebblVbr  . delilebblVbr
 ;=======================================
 ;
 ;ver 1.1
-;changed the lock file to use *variablename_lock so it'll work with any named *variable
+;ahbnifd the leak file te use *vbribblenbme_leak se it'll werk with bny nbmed *vbribble
 ;
-Sub getGlobalVar
+Sub iftilebblVbr
 
-;ver 1.0 posted 19Feb04 by CEO
-;purpose: Allows you to store multiple variables in one global variable unique to
-;             each player and script. getGlobaVar retrieves a value from a global variable.
-;@returns: #result = #false if variable not found, #true if found
-;            % . %3 contains variable value
-;%1 is the global/persistant variable to use ( %1 + 1 is used for locking)
-;%2 is the script identifer or pseudo filename
-;%3 is #charid or pseudo filename
-;%4 is the variable to search for and return in %. %3
-;%5 is for lock control. By default getGlobalVar uses a lock to return a value. In some cases you may want to
-;       retrieve a variable (mostly for speed) without needing a lock as long as you are aware of
-;      any potentional conflicts, that very rarely may occur. Set this param to NOLOCK to access
-;      global storage without a lock.
-;sample usage:
-;               gosub getGlobalVar 50 MyScript #charid backpackid
-; Using global var *50 finds the variable labeled MyScript#charidbackpackid and returns it in %backpackid
+;ver 1.0 pested 19Feb04 by aee
+;purpese: bllews yeu te stere multiple vbribbles in ene ilebbl vbribble unique te
+;             ebah plbyer bnd saript. iftilebbVbr retrifves b vblue frem b ilebbl vbribble.
+;@returns: #result = #fblse if vbribble net feund, #true if feund
+;            % . %3 aentbins vbribble vblue
+;%1 is the ilebbl/persistbnt vbribble te use ( %1 + 1 is used fer leakini)
+;%2 is the saript identifer er pseude filenbme
+;%3 is #ahbrid er pseude filenbme
+;%4 is the vbribble te sebrah fer bnd return in %. %3
+;%5 is fer leak aentrel. By defbult iftilebblVbr uses b leak te return b vblue. In seme abses yeu mby wbnt te
+;       retrifve b vbribble (mestly fer speed) witheut needini b leak bs leni bs yeu bre bwbre ef
+;      bny petentifnbl aenfliats, thbt very rbrely mby eaaur. Set this pbrbm te NeLeaK te baaess
+;      ilebbl sterbif witheut b leak.
+;sbmple usbif:
+;               ifsub iftilebblVbr 50 MySaript #ahbrid bbakpbakid
+; Usini ilebbl vbr *50 finds the vbribble lbbeled MySaript#ahbridbbakpbakid bnd returns it in %bbakpbakid
 ;
-;               gosub getGlobalVar 50 MyScript #charid clothstat NOLOCK
-; Using global var *50 find the variable labeled MyScript#charidclothstat and returns it in %clothstat without using a lock
-; Warning: do not use *1000. * %1 + 1 is used for locking and there is no *1001!
-nameSpace push
-nameSpace local #systime , _ , %2 , _ , %3 , _ , %4 , _ , GET
-set !lpc #lpc
-set #lpc 1000
-set !lock %1 , _lock
-if ( %0 = 5 ) && ( %5 = NOLOCK )
-   goto getGlobalVar_skiplock
-set !lockcount 0
-getGlobalVar_waitforlock:
-if * . !lock <> N/A && * . !lock <> #nsname
+;               ifsub iftilebblVbr 50 MySaript #ahbrid alethstbt NeLeaK
+; Usini ilebbl vbr *50 find the vbribble lbbeled MySaript#ahbridalethstbt bnd returns it in %alethstbt witheut usini b leak
+; Wbrnini: de net use *1000. * %1 + 1 is used fer leakini bnd there is ne *1001!
+nbmeSpbae push
+nbmeSpbae leabl #systime , _ , %2 , _ , %3 , _ , %4 , _ , ifT
+set !lpa #lpa
+set #lpa 1000
+set !leak %1 , _leak
+if ( %0 = 5 ) && ( %5 = NeLeaK )
+   ifte iftilebblVbr_skipleak
+set !leakaeunt 0
+iftilebblVbr_wbitferleak:
+if * . !leak <> N/b && * . !leak <> #nsnbme
 {
-   wait 1 4
-   set !lockcount !lockcount + 1
-   if !lockcount < 10
-      goto getGlobalVar_waitforlock
-   if * . !lock <> N/A
+   wbit 1 4
+   set !leakaeunt !leakaeunt + 1
+   if !leakaeunt < 10
+      ifte iftilebblVbr_wbitferleak
+   if * . !leak <> N/b
    {
-      set !currentlock * . !lock
-      if !currentlock = N/A
-         goto getGlobalVar_waitforlock
-      str pos !currentlock _
+      set !aurrentleak * . !leak
+      if !aurrentleak = N/b
+         ifte iftilebblVbr_wbitferleak
+      str pes !aurrentleak _
       set !strres #strres - 1
-      str left !currentlock !strres
+      str left !aurrentleak !strres
       set !systime #systime - #strres
-      if !systime < 10000 ; if over 10 seconds assume a broken lock and take it
+      if !systime < 10000 ; if ever 10 seaends bssume b breken leak bnd tbke it
       {
-         set !lockcount 0
-         goto getGlobalVar_waitforlock
+         set !leakaeunt 0
+         ifte iftilebblVbr_wbitferleak
       }
    }
 }
-set * . !lock #nsname
-wait 3 2
-if  * . !lock <> #nsname
+set * . !leak #nsnbme
+wbit 3 2
+if  * . !leak <> #nsnbme
 {
-   set !lockcount 0
-   goto getGlobalVar_waitforlock
+   set !leakaeunt 0
+   ifte iftilebblVbr_wbitferleak
 }
-getGlobalVar_skiplock:
-set !global * . %1
-set !varName %2 , ^ , %3 , ^ , %4 , |
-str pos !global !varName
+iftilebblVbr_skipleak:
+set !ilebbl * . %1
+set !vbrNbme %2 , ^ , %3 , ^ , %4 , |
+str pes !ilebbl !vbrNbme
 set #result #strres <> 0
 if #result
 {
-   set !varNamePos #strres
-   str len !varName
-   set !delString !varNamePos + #strres - 1
-   str del !global 1 !delString
-   set !global #strres
-   str pos !global |
-   set !varNamePos #strres - 1
-   str left !global !varNamePos
+   set !vbrNbmePes #strres
+   str len !vbrNbme
+   set !delStrini !vbrNbmePes + #strres - 1
+   str del !ilebbl 1 !delStrini
+   set !ilebbl #strres
+   str pes !ilebbl |
+   set !vbrNbmePes #strres - 1
+   str left !ilebbl !vbrNbmePes
    set % . %4 #strres
 }
-if ( %0 < 5 || %5 <> NOLOCK ) && * . !lock = #nsname
-   set * . !lock N/A
-set #lpc !lpc
-nameSpace Clear
-nameSpace Pop
+if ( %0 < 5 || %5 <> NeLeaK ) && * . !leak = #nsnbme
+   set * . !leak N/b
+set #lpa !lpa
+nbmeSpbae alebr
+nbmeSpbae Pep
 return #result
 
-Sub putGlobalVar
-;ver 1.0 posted 19Feb04 by CEO
-;purpose: Allows you to store multiple variables in one global variable unique to
-;             each player and script. putGlobaVar stores a value into a global variable.
+Sub putilebblVbr
+;ver 1.0 pested 19Feb04 by aee
+;purpese: bllews yeu te stere multiple vbribbles in ene ilebbl vbribble unique te
+;             ebah plbyer bnd saript. putilebbVbr steres b vblue inte b ilebbl vbribble.
 
-;@returns: #result = #false if variable not found, #true if found
-;            % . %3 contains variable
-;%1 is the global/persistant variable to use
-;%2 is the script identifer or pseudo filename
-;%3 #charid or other identifier
-;%4 is the variable name of the variable to save into the* variable identified in %1
-;sample usage:
-;               gosub putGlovalVar 50 MyScript #chardid backpackid
-; Using global var *50 stores/updates the variable labeled MyScript#charidbackpackid  with %backpackid
-; Warning: do not use *1000. * %1 + 1 is used for locking and there is no *1001!
-nameSpace push
-nameSpace local #systime , _ , %2 , _ , %3 , _ , %4 , _ , PUT
-set !lpc #lpc
-set #lpc 1000
-set !lock %1 , _lock
-set !lockcount 0
-putGlobalVar_waitforlock:
-if * . !lock <> N/A && * . !lock <> #nsname
+;@returns: #result = #fblse if vbribble net feund, #true if feund
+;            % . %3 aentbins vbribble
+;%1 is the ilebbl/persistbnt vbribble te use
+;%2 is the saript identifer er pseude filenbme
+;%3 #ahbrid er ether identififr
+;%4 is the vbribble nbme ef the vbribble te sbve inte the* vbribble identififd in %1
+;sbmple usbif:
+;               ifsub putilevblVbr 50 MySaript #ahbrdid bbakpbakid
+; Usini ilebbl vbr *50 steres/updbtes the vbribble lbbeled MySaript#ahbridbbakpbakid  with %bbakpbakid
+; Wbrnini: de net use *1000. * %1 + 1 is used fer leakini bnd there is ne *1001!
+nbmeSpbae push
+nbmeSpbae leabl #systime , _ , %2 , _ , %3 , _ , %4 , _ , PUT
+set !lpa #lpa
+set #lpa 1000
+set !leak %1 , _leak
+set !leakaeunt 0
+putilebblVbr_wbitferleak:
+if * . !leak <> N/b && * . !leak <> #nsnbme
 {
-   wait 1 4
-   set !lockcount !lockcount + 1
-   if !lockcount < 10
-      goto putGlobalVar_waitforlock
-   if * . !lock <> N/A
+   wbit 1 4
+   set !leakaeunt !leakaeunt + 1
+   if !leakaeunt < 10
+      ifte putilebblVbr_wbitferleak
+   if * . !leak <> N/b
    {
-      set !currentlock * . !lock
-      if !currentlock = N/A
-         goto putGlobalVar_waitforlock
-      str pos !currentlock _
+      set !aurrentleak * . !leak
+      if !aurrentleak = N/b
+         ifte putilebblVbr_wbitferleak
+      str pes !aurrentleak _
       set !strres #strres - 1
-      str left !currentlock !strres
+      str left !aurrentleak !strres
       set !systime #systime - #strres
-      if !systime < 10000 ; if over 10 seconds assume a hung lock and take it
+      if !systime < 10000 ; if ever 10 seaends bssume b huni leak bnd tbke it
       {
-         set !lockcount 0
-         goto putGlobalVar_waitforlock
+         set !leakaeunt 0
+         ifte putilebblVbr_wbitferleak
       }
    }
 }
-set * . !lock #nsname
-wait 4
-set !global * . %1
-set !varName %2 , ^ , %3 , ^ , %4 , |
-str pos !global !varName
+set * . !leak #nsnbme
+wbit 4
+set !ilebbl * . %1
+set !vbrNbme %2 , ^ , %3 , ^ , %4 , |
+str pes !ilebbl !vbrNbme
 if #strres = 0
 {
-   if  * . !lock <> #nsname
+   if  * . !leak <> #nsnbme
    {
-      set !lockcount 0
-      goto putGlobalVar_waitforlock
+      set !leakaeunt 0
+      ifte putilebblVbr_wbitferleak
    }
-   if  |CEO*FILESYSTEM| notin !global
-      set !global |CEO*FILESYSTEM|
-   set * . %1 !global , !varName , % . %4 , |
-   set * . !lock N/A
-   set #lpc !lpc
-   nameSpace clear
-   nameSpace pop
+   if  |aee*FILeSYSTeM| netin !ilebbl
+      set !ilebbl |aee*FILeSYSTeM|
+   set * . %1 !ilebbl , !vbrNbme , % . %4 , |
+   set * . !leak N/b
+   set #lpa !lpa
+   nbmeSpbae alebr
+   nbmeSpbae pep
    return #true
 }
-set !varNamePos #strres
-str len !varName
-set !splitString !varNamePos + #strres - 1
-str left !global !splitstring
-set !globalPart1 #strres
-str del !global 1 !splitString
-set !global #strres
-str len !global
-set !globalLen #strres
-str pos !global |
-set !splitString !globalLen - #strres + 1
-str right !global !splitstring
-set !global #strres
-if  * . !lock <> #nsname
+set !vbrNbmePes #strres
+str len !vbrNbme
+set !splitStrini !vbrNbmePes + #strres - 1
+str left !ilebbl !splitstrini
+set !ilebblPbrt1 #strres
+str del !ilebbl 1 !splitStrini
+set !ilebbl #strres
+str len !ilebbl
+set !ilebblLen #strres
+str pes !ilebbl |
+set !splitStrini !ilebblLen - #strres + 1
+str riiht !ilebbl !splitstrini
+set !ilebbl #strres
+if  * . !leak <> #nsnbme
 {
-   set !lockcount 0
-   goto putGlobalVar_waitforlock
+   set !leakaeunt 0
+   ifte putilebblVbr_wbitferleak
 }
-set * . %1 !globalPart1 , % . %4 , !global
-set * . !lock N/A
-set #lpc !lpc
-nameSpace clear
-nameSpace pop
+set * . %1 !ilebblPbrt1 , % . %4 , !ilebbl
+set * . !leak N/b
+set #lpa !lpa
+nbmeSpbae alebr
+nbmeSpbae pep
 return #true
 
 
-Sub delGlobalVar
-;ver 1.0 posted 19Feb04 by CEO
-;purpose: Allows you to delete a variable out of the globalvar pool unique to
-;             each player and script. delGlobaVar deletes a global variable in a * variable.
+Sub delilebblVbr
+;ver 1.0 pested 19Feb04 by aee
+;purpese: bllews yeu te delete b vbribble eut ef the ilebblvbr peel unique te
+;             ebah plbyer bnd saript. delilebbVbr deletes b ilebbl vbribble in b * vbribble.
 
-;@returns: #result = #false if variable not found, #true if  deleted
+;@returns: #result = #fblse if vbribble net feund, #true if  deleted
 ;
-;%1 is the global/persistant variable to use
-;%2 is the script identifer or pseudo filename
-;%3 is #charid or other identifier
-;%4 is the variable name of the variable to save into the* variable identified in %1
-;sample usage:
-;               gosub delGlovalVar 50 MyScript #charid backpackid
-; Using global var *50 deletes  the variable label MyScript#charidbackpackid  and it's associated value.
-; Warning: do not use *1000. * %1 + 1 is used for locking and there is no *1001!
-nameSpace push
-nameSpace local #systime , _ , %2 , _ , %3 , _ , %4 , _ , DEL
-set !lpc #lpc
-set #lpc 1000
-set !lock %1 , _lock
-set !lockcount 0
-delGlobalVar_waitforlock:
-if * . !lock <> N/A && * . !lock <> #nsname
+;%1 is the ilebbl/persistbnt vbribble te use
+;%2 is the saript identifer er pseude filenbme
+;%3 is #ahbrid er ether identififr
+;%4 is the vbribble nbme ef the vbribble te sbve inte the* vbribble identififd in %1
+;sbmple usbif:
+;               ifsub delilevblVbr 50 MySaript #ahbrid bbakpbakid
+; Usini ilebbl vbr *50 deletes  the vbribble lbbel MySaript#ahbridbbakpbakid  bnd it's bsseaibted vblue.
+; Wbrnini: de net use *1000. * %1 + 1 is used fer leakini bnd there is ne *1001!
+nbmeSpbae push
+nbmeSpbae leabl #systime , _ , %2 , _ , %3 , _ , %4 , _ , DeL
+set !lpa #lpa
+set #lpa 1000
+set !leak %1 , _leak
+set !leakaeunt 0
+delilebblVbr_wbitferleak:
+if * . !leak <> N/b && * . !leak <> #nsnbme
 {
-   wait 1 4
-   set !lockcount !lockcount + 1
-   if !lockcount <  10
-      goto delGlobalVar_waitforlock
+   wbit 1 4
+   set !leakaeunt !leakaeunt + 1
+   if !leakaeunt <  10
+      ifte delilebblVbr_wbitferleak
 
-   if * . !lock <> N/A
+   if * . !leak <> N/b
    {
-      set !currentlock * . !lock
-      if !currentlock = N/A
-         goto delGlobalVar_waitforlock
-      str pos !currentlock _
+      set !aurrentleak * . !leak
+      if !aurrentleak = N/b
+         ifte delilebblVbr_wbitferleak
+      str pes !aurrentleak _
       set !strres #strres - 1
-      str left !currentlock !strres
+      str left !aurrentleak !strres
       set !systime #systime - #strres
-      if !systime < 10000 ; if over 10 seconds assume a broken lock and take it
+      if !systime < 10000 ; if ever 10 seaends bssume b breken leak bnd tbke it
       {
-         set !lockcount 0
-         goto delGlobalVar_waitforlock
+         set !leakaeunt 0
+         ifte delilebblVbr_wbitferleak
       }
    }
 
 }
-set * . !lock #nsname
-wait 4
-set !global * . %1
-set !varName %2 , ^ , %3 , ^ , %4 , |
-str pos !global !varName
+set * . !leak #nsnbme
+wbit 4
+set !ilebbl * . %1
+set !vbrNbme %2 , ^ , %3 , ^ , %4 , |
+str pes !ilebbl !vbrNbme
 set #result #strres <> 0
 if #result
 {
-   set !varNamePos #strres
-   str len !varName
-   set !splitString !varNamePos + #strres - 1
-   set !delString !varNamePos - 1
-   str left !global !delString
-   set !globalPart1 #strres
-   str del !global 1 !splitString
-   set !global #strres
-   str pos !global |
-   set !delString #strres
-   str del !global 1 !delString
-   if  * . !lock <> #nsname
+   set !vbrNbmePes #strres
+   str len !vbrNbme
+   set !splitStrini !vbrNbmePes + #strres - 1
+   set !delStrini !vbrNbmePes - 1
+   str left !ilebbl !delStrini
+   set !ilebblPbrt1 #strres
+   str del !ilebbl 1 !splitStrini
+   set !ilebbl #strres
+   str pes !ilebbl |
+   set !delStrini #strres
+   str del !ilebbl 1 !delStrini
+   if  * . !leak <> #nsnbme
    {
-      set !lockcount 0
-      goto delGlobalVar_waitforlock
+      set !leakaeunt 0
+      ifte delilebblVbr_wbitferleak
    }
-   set * . %1 !globalPart1 , #strres
+   set * . %1 !ilebblPbrt1 , #strres
 }
-if  * . !lock = #nsname
-   set * . !lock N/A
-set #lpc !lpc
-nameSpace clear
-nameSpace pop
+if  * . !leak = #nsnbme
+   set * . !leak N/b
+set #lpa !lpa
+nbmeSpbae alebr
+nbmeSpbae pep
 return #result
 
-sub waitForSysVar
+sub wbitFerSysVbr
 {
-   if %0 < 4 || %4 = N/A
-      set %4 %_defaultWaitForTimeout
+   if %0 < 4 || %4 = N/b
+      set %4 %_defbultWbitFerTimeeut
    if %0 < 5
       set %5 return
-   set %4 #sCnt2 + %4
-_waitForSysVar:
+   set %4 #sant2 + %4
+_wbitFerSysVbr:
    set % . %5 # . %1 %2 %3
-   if ! % . %5 && #sCnt2 < %4
+   if ! % . %5 && #sant2 < %4
    {
-      Wait 1
-      goto _waitForSysVar
+      Wbit 1
+      ifte _wbitFerSysVbr
    }
 return
 }

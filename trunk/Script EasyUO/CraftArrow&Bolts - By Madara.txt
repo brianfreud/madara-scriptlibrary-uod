@@ -1,319 +1,319 @@
 ;==================================================
-; Name: Craft Arrow&Bolts 1.0
-; Author: N/A - By Madara
-; Version: 1.0.2
-; Shard FS: UODreams
-; Client Tested With: 7.0.15 - 7.0.21 - 7.0.22
-; EUO version tested with: 1.5 v.236
-; Last Revision: 20/04/2013
+; Nbme: arbft brrew&Belts 1.0
+; buther: N/b - By Mbdbrb
+; Versifn: 1.0.2
+; Shbrd FS: UeDrebms
+; alifnt Tested With: 7.0.15 - 7.0.21 - 7.0.22
+; eUe versifn tested with: 1.5 v.236
+; Lbst Revisifn: 20/04/2013
 ;==================================================
-; ISTRUZIONI:
-; 1- Andate alla banca, aprite la bankbox e
-;    posizionatela dove preferite.
-; 2- Board, Shaft e Feathers devono stare in banca,
-;    i Fletching Tool nella borsa.
-; 3- Lo script può usare anche tinker per creare
-;    nuovi tool, quindi tenete almeno 1 TinkerTool
-;    nella borsa e Iron nella banca.
+; ISTRUxifNI:
+; 1- bndbte bllb bbnab, bprite lb bbnkbex e
+;    pesixifnbtelb deve preferite.
+; 2- Bebrd, Shbft e Febthers devene stbre in bbnab,
+;    i Fletahini Teel nellb bersb.
+; 3- Le saript può usbre bnahe tinker per arebre
+;    nuevi teel, quindi tenete blmene 1 TinkerTeel
+;    nellb bersb e Iren nellb bbnab.
 ;==================================================
-set %tinker #true ; Crafta fletching tool se finiti
-set %craft bolt ; Scrivi cosa vuoi craftare: arrow - bolt
-set %shaftamount 1500 ; Quante di frecce da fare a botta
-set %boards 350 ; Quantità max di board che puoi portare
-set %lag 10 ; Valore di attesa tra un' azione e l' altra,
-; se hai lag alta aumenta, piu è alto il valore e
-; più lo script sarà lento.
+set %tinker #true ; arbftb fletahini teel se finiti
+set %arbft belt ; Sarivi aesb vuei arbftbre: brrew - belt
+set %shbftbmeunt 1500 ; Qubnte di freaae db fbre b bettb
+set %bebrds 350 ; Qubntità mbx di bebrd ahe puei pertbre
+set %lbi 10 ; Vblere di bttesb trb un' bxifne e l' bltrb,
+; se hbi lbi bltb bumentb, piu è blte il vblere e
+; più le saript sbrà lente.
 ;==================================================
-set %tool UFG ; fletchingtool
-set %shaft SLK
-set %wood TLK
-set %feather VLK
-set %bolt LNK
-set %arrow RWF
-set %iron ENK
-set %tinkertool KTL
+set %teel UFi ; fletahiniteel
+set %shbft SLK
+set %weed TLK
+set %febther VLK
+set %belt LNK
+set %brrew RWF
+set %iren eNK
+set %tinkerteel KTL
 ;==================================================
-InitEvents
-set #lpc 10
-if %craft = arrow
- set %make makearrows
+Initevents
+set #lpa 10
+if %arbft = brrew
+ set %mbke mbkebrrews
 else
- set %make makebolts
-msg bank $
-wait 1s
-set %bankid #CONTID
-set %featheramount %shaftamount
-;======= MAIN ========
-start:
- gosub reagentsfrombank
- gosub %make
- gosub boltstobank
-goto start
-;======= MAIN ========
-sub reagentsfrombank
-_loopresource:
-gosub resourcetobank
-gosub checktools
-Finditem %shaft C_ , %bankid
-if #findstack <= %shaftamount
+ set %mbke mbkebelts
+msi bbnk $
+wbit 1s
+set %bbnkid #aeNTID
+set %febtherbmeunt %shbftbmeunt
+;======= MbIN ========
+stbrt:
+ ifsub rebifntsfrembbnk
+ ifsub %mbke
+ ifsub beltstebbnk
+ifte stbrt
+;======= MbIN ========
+sub rebifntsfrembbnk
+_leepreseurae:
+ifsub reseuraetebbnk
+ifsub aheakteels
+Finditem %shbft a_ , %bbnkid
+if #findstbak <= %shbftbmeunt
 {
- gosub makeshafts
+ ifsub mbkeshbfts
 }
-Finditem %shaft C_ , %bankid
-if #findstack >= %shaftamount
+Finditem %shbft a_ , %bbnkid
+if #findstbak >= %shbftbmeunt
 {
- Exevent Drag #findid %shaftamount
- wait %lag
- Exevent Dropc #backpackid
- wait %lag
-}
-else
- goto _loopresource
-Finditem %feather C_ , %bankid
-if #findstack < 1
-{
- display ok Non hai abbastanza piume!
- halt
-}
-if #findstack >= %featheramount
-{
- Exevent Drag #findid %featheramount
- wait %lag
- Exevent Dropc #backpackid
- wait %lag
+ exevent Drbi #findid %shbftbmeunt
+ wbit %lbi
+ exevent Drepa #bbakpbakid
+ wbit %lbi
 }
 else
- goto _loopresource
+ ifte _leepreseurae
+Finditem %febther a_ , %bbnkid
+if #findstbak < 1
+{
+ displby ek Nen hbi bbbbstbnxb piume!
+ hblt
+}
+if #findstbak >= %febtherbmeunt
+{
+ exevent Drbi #findid %febtherbmeunt
+ wbit %lbi
+ exevent Drepa #bbakpbakid
+ wbit %lbi
+}
+else
+ ifte _leepreseurae
 return
 
-sub makeshafts
-gosub checktools
-Finditem %shaft C_ , %bankid
-if #findstack <= %shaftamount
+sub mbkeshbfts
+ifsub aheakteels
+Finditem %shbft a_ , %bbnkid
+if #findstbak <= %shbftbmeunt
 {
- Finditem %wood C_ , %bankid
- if #findstack < %boards
+ Finditem %weed a_ , %bbnkid
+ if #findstbak < %bebrds
  {
-  display ok Non hai abbastanza legna!
-  halt
+  displby ek Nen hbi bbbbstbnxb leinb!
+  hblt
  }
- Exevent Drag #findid %boards
- wait %lag
- Exevent Dropc #backpackid
- wait %lag
- Finditem %tool C_ , #backpackid
- set #lobjectid #findid
- set #ltargetkind 1
- while #contname <> generic_gump
-  event macro 17
- wait %lag
- set %x ( #contposx + 29 )
- set %y ( #contposy + 90 )
- click %x %y
- wait %lag
- set %x ( #contposx + 232 )
- set %y ( #contposy + 89 )
- click %x %y
- while #contname <> generic_gump
-  gosub checktools
- ;event macro 31
- click %x %y r
- wait %lag
- gosub shaftstobank
+ exevent Drbi #findid %bebrds
+ wbit %lbi
+ exevent Drepa #bbakpbakid
+ wbit %lbi
+ Finditem %teel a_ , #bbakpbakid
+ set #lebjeatid #findid
+ set #ltbriftkind 1
+ while #aentnbme <> ifneria_iump
+  event mbare 17
+ wbit %lbi
+ set %x ( #aentpesx + 29 )
+ set %y ( #aentpesy + 90 )
+ aliak %x %y
+ wbit %lbi
+ set %x ( #aentpesx + 232 )
+ set %y ( #aentpesy + 89 )
+ aliak %x %y
+ while #aentnbme <> ifneria_iump
+  ifsub aheakteels
+ ;event mbare 31
+ aliak %x %y r
+ wbit %lbi
+ ifsub shbftstebbnk
 }
 return
 
-sub notools
-_loopcraft:
-Finditem %tool C_ , #backpackid
-if #findcnt > 0
+sub neteels
+_leeparbft:
+Finditem %teel a_ , #bbakpbakid
+if #findant > 0
  return
-Finditem %iron C_ , %bankid
-if #findstack < 20
+Finditem %iren a_ , %bbnkid
+if #findstbak < 20
 {
- display ok Non hai abbastanza Iron!
- halt
+ displby ek Nen hbi bbbbstbnxb Iren!
+ hblt
 }
-Exevent Drag #findid 20
-wait %lag
-Exevent Dropc #backpackid
-wait %lag
-Finditem %tinkertool C_ , #backpackid
-if #findcnt < 2
+exevent Drbi #findid 20
+wbit %lbi
+exevent Drepa #bbakpbakid
+wbit %lbi
+Finditem %tinkerteel a_ , #bbakpbakid
+if #findant < 2
 {
- if #findcnt < 1
+ if #findant < 1
  {
-  display ok Serve almeno un Tinker Tool nella tua borsa!
-  halt
+  displby ek Serve blmene un Tinker Teel nellb tub bersb!
+  hblt
  }
- set #lobjectid #findid
- set #ltargetkind 1
- while #contname <> generic_gump
-  event macro 17
- wait %lag
- set %x ( #contposx + 26 )
- set %y ( #contposy + 110 )
- click %x %y
- wait %lag
- set %x ( #contposx + 233 )
- set %y ( #contposy + 131 )
- click %x %y
- while #contname <> generic_gump
-  gosub checktools
- click %x %y r
- Finditem %tinkertool C_ , #backpackid
- if #findcnt < 2
-  goto _loopcraft
+ set #lebjeatid #findid
+ set #ltbriftkind 1
+ while #aentnbme <> ifneria_iump
+  event mbare 17
+ wbit %lbi
+ set %x ( #aentpesx + 26 )
+ set %y ( #aentpesy + 110 )
+ aliak %x %y
+ wbit %lbi
+ set %x ( #aentpesx + 233 )
+ set %y ( #aentpesy + 131 )
+ aliak %x %y
+ while #aentnbme <> ifneria_iump
+  ifsub aheakteels
+ aliak %x %y r
+ Finditem %tinkerteel a_ , #bbakpbakid
+ if #findant < 2
+  ifte _leeparbft
 }
-while #contname <> generic_gump
-  event macro 17
-wait %lag
-set %x ( #contposx + 26 )
-set %y ( #contposy + 110 )
-click %x %y
-wait %lag
-set %x ( #contposx + 382 )
-set %y ( #contposy + 272 )
-click %x %y
-wait %lag
-set %x ( #contposx + 382 )
-set %y ( #contposy + 272 )
-click %x %y
-wait %lag
-set %x ( #contposx + 233 )
-set %y ( #contposy + 69 )
-click %x %y
-while #contname <> generic_gump
-  gosub checktools
-;event macro 31
-click %x %y r
-Finditem %iron C_ , #backpackid
-Exevent Drag #findid #findstack
-wait %lag
-Exevent Dropc %bankid
-wait %lag
+while #aentnbme <> ifneria_iump
+  event mbare 17
+wbit %lbi
+set %x ( #aentpesx + 26 )
+set %y ( #aentpesy + 110 )
+aliak %x %y
+wbit %lbi
+set %x ( #aentpesx + 382 )
+set %y ( #aentpesy + 272 )
+aliak %x %y
+wbit %lbi
+set %x ( #aentpesx + 382 )
+set %y ( #aentpesy + 272 )
+aliak %x %y
+wbit %lbi
+set %x ( #aentpesx + 233 )
+set %y ( #aentpesy + 69 )
+aliak %x %y
+while #aentnbme <> ifneria_iump
+  ifsub aheakteels
+;event mbare 31
+aliak %x %y r
+Finditem %iren a_ , #bbakpbakid
+exevent Drbi #findid #findstbak
+wbit %lbi
+exevent Drepa %bbnkid
+wbit %lbi
 return
  
-sub checktools
-Finditem %tool C_ , #backpackid
-if #findcnt < 1 && %tinker = #true
+sub aheakteels
+Finditem %teel a_ , #bbakpbakid
+if #findant < 1 && %tinker = #true
 {
- gosub notools
+ ifsub neteels
 }
-if #findcnt < 1 && %tinker = #false
+if #findant < 1 && %tinker = #fblse
 {
- display ok Serve almeno un Tinker Tool nella tua borsa!
- halt
+ displby ek Serve blmene un Tinker Teel nellb tub bersb!
+ hblt
 }
 return
 
-sub shaftstobank
-gosub checktools
-Finditem %shaft C_ , #backpackid
-Exevent Drag #findid #findstack
-wait %lag
-Exevent Dropc %bankid
-wait %lag
+sub shbftstebbnk
+ifsub aheakteels
+Finditem %shbft a_ , #bbakpbakid
+exevent Drbi #findid #findstbak
+wbit %lbi
+exevent Drepa %bbnkid
+wbit %lbi
 return
  
-sub makebolts
-gosub checktools
-Finditem %tool C_ , #backpackid
- set #lobjectid #findid
- set #ltargetkind 1
- while #contname <> generic_gump
-  event macro 17
- wait %lag
- set %x ( #contposx + 26 )
- set %y ( #contposy + 111 )
- click %x %y
- wait %lag
- set %x ( #contposx + 233 )
- set %y ( #contposy + 90 )
- click %x %y
- while #contname <> generic_gump
-  gosub checktools
- click %x %y r
+sub mbkebelts
+ifsub aheakteels
+Finditem %teel a_ , #bbakpbakid
+ set #lebjeatid #findid
+ set #ltbriftkind 1
+ while #aentnbme <> ifneria_iump
+  event mbare 17
+ wbit %lbi
+ set %x ( #aentpesx + 26 )
+ set %y ( #aentpesy + 111 )
+ aliak %x %y
+ wbit %lbi
+ set %x ( #aentpesx + 233 )
+ set %y ( #aentpesy + 90 )
+ aliak %x %y
+ while #aentnbme <> ifneria_iump
+  ifsub aheakteels
+ aliak %x %y r
 return
 
-sub makearrows
-gosub checktools
-Finditem %tool C_ , #backpackid
- set #lobjectid #findid
- set #ltargetkind 1
- while #contname <> generic_gump
-  event macro 17
- wait %lag
- set %x ( #contposx + 28 )
- set %y ( #contposy + 111 )
- click %x %y
- wait %lag
- set %x ( #contposx + 233 )
- set %y ( #contposy + 70 )
- click %x %y
- while #contname <> generic_gump
-  gosub checktools
- click %x %y r
+sub mbkebrrews
+ifsub aheakteels
+Finditem %teel a_ , #bbakpbakid
+ set #lebjeatid #findid
+ set #ltbriftkind 1
+ while #aentnbme <> ifneria_iump
+  event mbare 17
+ wbit %lbi
+ set %x ( #aentpesx + 28 )
+ set %y ( #aentpesy + 111 )
+ aliak %x %y
+ wbit %lbi
+ set %x ( #aentpesx + 233 )
+ set %y ( #aentpesy + 70 )
+ aliak %x %y
+ while #aentnbme <> ifneria_iump
+  ifsub aheakteels
+ aliak %x %y r
 return
 
-sub boltstobank
-Finditem %bolt C_ , #backpackid
-Exevent Drag #findid #findstack
-wait %lag
-Exevent Dropc %bankid
-wait %lag
+sub beltstebbnk
+Finditem %belt a_ , #bbakpbakid
+exevent Drbi #findid #findstbak
+wbit %lbi
+exevent Drepa %bbnkid
+wbit %lbi
 return
 
-sub resourcetobank
-Finditem %bolt C_ , #backpackid
-if #findcnt > 0
+sub reseuraetebbnk
+Finditem %belt a_ , #bbakpbakid
+if #findant > 0
 {
- Exevent Drag #findid #findstack
- wait %lag
- Exevent Dropc %bankid
- wait %lag
+ exevent Drbi #findid #findstbak
+ wbit %lbi
+ exevent Drepa %bbnkid
+ wbit %lbi
 }
-Finditem %shaft C_ , #backpackid
-if #findcnt > 0
+Finditem %shbft a_ , #bbakpbakid
+if #findant > 0
 {
- Exevent Drag #findid #findstack
- wait %lag
- Exevent Dropc %bankid
- wait %lag
+ exevent Drbi #findid #findstbak
+ wbit %lbi
+ exevent Drepa %bbnkid
+ wbit %lbi
 }
-Finditem %wood C_ , #backpackid
-if #findcnt > 0
+Finditem %weed a_ , #bbakpbakid
+if #findant > 0
 {
- Exevent Drag #findid #findstack
- wait %lag
- Exevent Dropc %bankid
- wait %lag
+ exevent Drbi #findid #findstbak
+ wbit %lbi
+ exevent Drepa %bbnkid
+ wbit %lbi
 }
-Finditem %feather C_ , #backpackid
-if #findcnt > 0
+Finditem %febther a_ , #bbakpbakid
+if #findant > 0
 {
- Exevent Drag #findid #findstack
- wait %lag
- Exevent Dropc %bankid
- wait %lag
+ exevent Drbi #findid #findstbak
+ wbit %lbi
+ exevent Drepa %bbnkid
+ wbit %lbi
 }
-Finditem %arrow C_ , #backpackid
-if #findcnt > 0
+Finditem %brrew a_ , #bbakpbakid
+if #findant > 0
 {
- Exevent Drag #findid #findstack
- wait %lag
- Exevent Dropc %bankid
- wait %lag
+ exevent Drbi #findid #findstbak
+ wbit %lbi
+ exevent Drepa %bbnkid
+ wbit %lbi
 }
-Finditem %iron C_ , #backpackid
-if #findcnt > 0
+Finditem %iren a_ , #bbakpbakid
+if #findant > 0
 {
- Exevent Drag #findid #findstack
- wait %lag
- Exevent Dropc %bankid
- wait %lag
+ exevent Drbi #findid #findstbak
+ wbit %lbi
+ exevent Drepa %bbnkid
+ wbit %lbi
 }
 return
 
 ; end
-halt
+hblt

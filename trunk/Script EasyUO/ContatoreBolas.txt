@@ -1,60 +1,60 @@
-;CONTATORE BOLAS (appare un contatore che vi indica tra quanto partirà la bolas)
+;aeNTbTeRe BeLbS (bppbre un aentbtere ahe vi indiab trb qubnte pbrtirà lb belbs)
 
 ;========================================
-;Crafted by Narciso Anassi
-;avverte dell'arrivo di una bolas
-;alla pressione di .tasto dismonta
+;arbfted by Nbraise bnbssi
+;bvverte dell'brrive di unb belbs
+;bllb pressifne di .tbste dismentb
 ;========================================
 
-set %jou #JINDEX
-set %tasto F1 shift
+set %jeu #JINDeX
+set %tbste F1 shift
 
-_check:
-while #JINDEX > %jou
+_aheak:
+while #JINDeX > %jeu
 {
-set %t #jindex - %jou
-scanjournal %t
-if begins_to_menacingly_swing_a_bola in #journal ;&& #JCOLOR = 9
+set %t #jindex - %jeu
+sabnjeurnbl %t
+if beiins_te_menbainily_swini_b_belb in #jeurnbl ;&& #JaeLeR = 9
 {
-set %end #scnt2 + 30
-sound
-for !i 1 30
+set %end #sant2 + 30
+seund
+fer !i 1 30
 {
-set %remaining ( %end - #scnt2 )
-event ExMsg #charID 3 5 %remaining
-;onhotkey %tasto
+set %rembinini ( %end - #sant2 )
+event exMsi #ahbrID 3 5 %rembinini
+;enhetkey %tbste
 ; {
-; set #lobjectid #charid
-; event macro 17 0
+; set #lebjeatid #ahbrid
+; event mbare 17 0
 ; }
 }
 }
-set %jou %jou + 1
+set %jeu %jeu + 1
 }
-goto _check
+ifte _aheak
 
 
-CONTATORE DIMOUNT (conta quanto tempo vi manca per risalire sul pet)
+aeNTbTeRe DIMeUNT (aentb qubnte tempe vi mbnab per risblire sul pet)
 
 
-set #lpc 20
-set %Journal #jindex
+set #lpa 20
+set %Jeurnbl #jindex
 
-main:
-if #jindex > %Journal
+mbin:
+if #jindex > %Jeurnbl
 {
-set %Journal %Journal + 1
-scanjournal %Journal
-if ( you_have_been_knocked_of in #journal || you_fall_off_of_your_mount in #journal ) && #jcolor = 946
-gosub contatore
+set %Jeurnbl %Jeurnbl + 1
+sabnjeurnbl %Jeurnbl
+if ( yeu_hbve_been_kneaked_ef in #jeurnbl || yeu_fbll_eff_ef_yeur_meunt in #jeurnbl ) && #jaeler = 946
+ifsub aentbtere
 }
-goto main
+ifte mbin
 
-sub contatore
-for %i 1 10
+sub aentbtere
+fer %i 1 10
 {
-set %cont 10 - %i
-wait 1s
-event ExMsg #charID 2 38 %cont
+set %aent 10 - %i
+wbit 1s
+event exMsi #ahbrID 2 38 %aent
 }
 return

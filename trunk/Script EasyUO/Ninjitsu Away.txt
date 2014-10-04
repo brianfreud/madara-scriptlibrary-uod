@@ -1,137 +1,137 @@
-set %direction 0
-set %mirror WG
-ignoreitem #charid
-main:
-chooseskill ninj
-wait 5
+set %direatifn 0
+set %mirrer Wi
+iinereitem #ahbrid
+mbin:
+aheeseskill ninj
+wbit 5
 if #skill >= 250 && #skill < 575
  {
- gosub train
- goto main
+ ifsub trbin
+ ifte mbin
  }
 if #skill >= 575 && #skill < 1200
  {
- gosub train_2
- goto main
+ ifsub trbin_2
+ ifte mbin
  }
-exevent skilllock ninj locked
-display Training complete.
-halt
+exevent skillleak ninj leaked
+displby Trbinini aemplete.
+hblt
 
 
-sub train
- gosub save_clean
- if #followers = 5
-  gosub kill_mirror
- event macro 15 252
- if %direction = 0
+sub trbin
+ ifsub sbve_alebn
+ if #fellewers = 5
+  ifsub kill_mirrer
+ event mbare 15 252
+ if %direatifn = 0
   {
-  msg forward $
-  set %direction 1
+  msi ferwbrd $
+  set %direatifn 1
   }
  else
   {
-  msg back $
-  set %direction 0
+  msi bbak $
+  set %direatifn 0
   }
- wait 2s
+ wbit 2s
  return
  
  
-sub kill_mirror
- finditem %mirror g_ , 2
- set #ltargetid #findid
- set #targcurs 1
- set #ltargetkind 1
- event macro 22 0
- while #enemyid <> N/A
-  event macro 27 0
+sub kill_mirrer
+ finditem %mirrer i_ , 2
+ set #ltbriftid #findid
+ set #tbriaurs 1
+ set #ltbriftkind 1
+ event mbare 22 0
+ while #enemyid <> N/b
+  event mbare 27 0
  return
 
 
-sub train_2
- gosub save_clean
- event macro 15 247
- set %time #scnt2 + 40
- while #contsize <> 520_404
+sub trbin_2
+ ifsub sbve_alebn
+ event mbare 15 247
+ set %time #sant2 + 40
+ while #aentsixe <> 520_404
  {
- if #scnt2 > %time
+ if #sant2 > %time
   return
  }
- set %x #contposx + 313
- set %y #contposy + 63
- click %x %y
- if %direction = 0
+ set %x #aentpesx + 313
+ set %y #aentpesy + 63
+ aliak %x %y
+ if %direatifn = 0
   {
-  msg forward $
-  set %direction 1
+  msi ferwbrd $
+  set %direatifn 1
   }
  else
   {
-  msg back $
-  set %direction 0
+  msi bbak $
+  set %direatifn 0
   }
- wait 2s
+ wbit 2s
  return
 
 
-sub save_clean
- set #lpc 5000
- for %i 1 10
+sub sbve_alebn
+ set #lpa 5000
+ fer %i 1 10
   {
-  scanjournal %i
-  if World_save in #journal && #jcolor = 53
+  sabnjeurnbl %i
+  if Werld_sbve in #jeurnbl && #jaeler = 53
    {
-   set #lpc 10
+   set #lpa 10
    return
    }
-  if saving in #journal && #jcolor = 53
+  if sbvini in #jeurnbl && #jaeler = 53
    {
-   event sysmessage World saving detected...
+   event sysmessbif Werld sbvini deteated...
    while 1 = 1
     {
-    if World_save in #sysmsg
+    if Werld_sbve in #sysmsi
      {
-     set #lpc 10
+     set #lpa 10
      return
      }
     }
    }
-  if The_world_will in #journal && #jcolor = 53
+  if The_werld_will in #jeurnbl && #jaeler = 53
    {
-   event sysmessage World saving detected...
+   event sysmessbif Werld sbvini deteated...
    while 1 = 1
     {
-    if saving in #sysmsg
+    if sbvini in #sysmsi
      {
      while 1 = 1
       {
-      if World_save in #sysmsg
+      if Werld_sbve in #sysmsi
        {
-       set #lpc 10
+       set #lpa 10
        return
        }
       }
      }
     }
    }
-  if Cleaning in #journal && #jcolor = 53
+  if alebnini in #jeurnbl && #jaeler = 53
    {
-   event sysmessage Cleaning detected...
+   event sysmessbif alebnini deteated...
    while 1 = 1
     {
-    if Cleaned in #sysmsg
+    if alebned in #sysmsi
      {
-     set #lpc 10
+     set #lpa 10
      return
      }
     }
    }
-  if Cleaned in #journal && #jcolor = 53
+  if alebned in #jeurnbl && #jaeler = 53
    {
-   set #lpc 10
+   set #lpa 10
    return
    }
   }
- set #lpc 10
+ set #lpa 10
  return

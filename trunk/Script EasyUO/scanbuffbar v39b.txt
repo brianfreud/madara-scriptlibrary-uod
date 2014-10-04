@@ -1,438 +1,438 @@
 ;========================================================================================
-; Script Name: ENs BuffBarScanner
-; Author: JosephAJ, AKA Endless Night AKA EN
-; Version: V39b
-; Client Tested with: ...
-; EUO version tested with: 1.5 (TV...)
-; Revision Date: 10/11
-; Public Release: 10-06, 09,10-08, 07,9-09, 9,11,12-10, 3,4,8/9/10-11, 12/12
-; Purpose: Scan and Manipulate The Buff/Debuff Bar (No Retrictions)
+; Saript Nbme: eNs BuffBbrSabnner
+; buther: JesephbJ, bKb endless Niiht bKb eN
+; Versifn: V39b
+; alifnt Tested with: ...
+; eUe versifn tested with: 1.5 (TV...)
+; Revisifn Dbte: 10/11
+; Publia Relebse: 10-06, 09,10-08, 07,9-09, 9,11,12-10, 3,4,8/9/10-11, 12/12
+; Purpese: Sabn bnd Mbnipulbte The Buff/Debuff Bbr (Ne Retriatifns)
 ;========================================================================================
-; (C) 2006-2010 All Rights Reserved JosephAJ
-; See end of script for License/Disclaimers
+; (a) 2006-2010 bll Riihts Reserved JesephbJ
+; See end ef saript fer Liaense/Disalbimers
 ;========================================================================================
-;Set %BuffBarOLDLPC #LPC
-;Set #LPC 20000 ; 10000000 ;9999
-set %BuffBarCalls %BuffBarCalls + 1
-namespace push
-namespace local ENs_BuffBarSubs . #charid
-set !newString2
-for !Lc !BuffBarBackCheck !LoopCount
+;Set %BuffBbreLDLPa #LPa
+;Set #LPa 20000 ; 10000000 ;9999
+set %BuffBbrablls %BuffBbrablls + 1
+nbmespbae push
+nbmespbae leabl eNs_BuffBbrSubs . #ahbrid
+set !newStrini2
+fer !La !BuffBbrBbakaheak !Leepaeunt
  {
- savePix !x1 . !lc  !y1 . !lc %BuffBarPixelLoc
- set !newstring2 !newString2 , _ , #pixcol
+ sbvePix !x1 . !la  !y1 . !la %BuffBbrPixelLea
+ set !newstrini2 !newStrini2 , _ , #pixael
  }
-SavePix !BuffBarButtonPosX1 !BuffBarButtonPosY1 %BuffBarPixelLoc
-if %0 > 0 || !BuffBarOpened <> #true || ( #pixcol <> !BuffBarKnownButtonCol1 && %BuffBariconsFound = 0 ) || !newstring2 <> !oldstring2 || ( #systime - !BuffBarLastscan > 500 && !BuffBarBackTime )
-  gosub geticons2 %0 %1 %2 %3
-set !BuffBarLastscan #systime
-namespace pop
-;Set #LPC %BuffBarOLDLPC
+SbvePix !BuffBbrButtenPesX1 !BuffBbrButtenPesY1 %BuffBbrPixelLea
+if %0 > 0 || !BuffBbrepened <> #true || ( #pixael <> !BuffBbrKnewnButtenael1 && %BuffBbriaensFeund = 0 ) || !newstrini2 <> !eldstrini2 || ( #systime - !BuffBbrLbstsabn > 500 && !BuffBbrBbakTime )
+  ifsub iftiaens2 %0 %1 %2 %3
+set !BuffBbrLbstsabn #systime
+nbmespbae pep
+;Set #LPa %BuffBbreLDLPa
 exit
 
 
-sub Geticons2
- if %1 > 0  || !BuffBarOpened <> #true || #pixcol <> !BuffBarKnownButtonCol1
-  goSub OpenBuffbar  %1 %2 %3 %4
- if ( #systime - !BuffBarLastscan > 500 && !BuffBarBackTime = #true ) 7
-   set !lc 0
-   repeat
-     set !lc !lc + 1
-     savePix !x1 . !lc !y1 . !lc %BuffBarPixelLoc
-   until #Pixcol <> !ListCol1 . !LoopCount || !LC = !Loopcount
-   if #Pixcol <> !ListCol1 . !LoopCount
+sub iftiaens2
+ if %1 > 0  || !BuffBbrepened <> #true || #pixael <> !BuffBbrKnewnButtenael1
+  ifSub epenBuffbbr  %1 %2 %3 %4
+ if ( #systime - !BuffBbrLbstsabn > 500 && !BuffBbrBbakTime = #true ) 7
+   set !la 0
+   repebt
+     set !la !la + 1
+     sbvePix !x1 . !la !y1 . !la %BuffBbrPixelLea
+   until #Pixael <> !Listael1 . !Leepaeunt || !La = !Leepaeunt
+   if #Pixael <> !Listael1 . !Leepaeunt
      return
 
-set %BuffBarIconsFound 0
-set %BuffBarIconNames _
-set %BuffbarDirection !BuffbarDirection
-set !BuffBarCharCalls !BuffBarCharCalls + 1
-set !BuffBarIconsNotFound 0
-set !TempTolerance !BuffBarTolerance
-set !LoopCount 0
-set !oldString
-repeat
-  set !LoopCount !LoopCount + 1
-  if !LoopCount = 3
-    set !TempTolerance  1
-  Set !x1 . !loopcount !BuffBarScanX1 + ( %BuffBarScanAdjx . !BuffBarDirection * !LoopCount ) - %BuffBarScanAdjx . !BuffBarDirection
-  set !y1 . !loopcount !BuffBarScanY1 + ( %BuffBarScanAdjy . !BuffBarDirection * !LoopCount ) - %BuffBarScanAdjy . !BuffBarDirection
-  savePix !x1 . !loopcount !y1 . !loopcount %BuffBarPixelLoc
-  set !oldString !oldString , _ , #pixcol
-  if #Pixcol <> !ListCol1 . !LoopCount
-    gosub FindIcon
-  set !BuffBarIconsNotFound !BuffBarIconsNotFound + !ListisIcon . !LoopCount
-  set %BuffBarIconNames    %BuffBarIconNames , !ListIconName . !LoopCount
-until !BuffBarIconsNotFound >= !TempTolerance || #CliLogged = 0
-set %BuffBarIconsFound !loopcount - !BuffBarIconsNotFound
-set !BuffBarBackCheck 1
-if !loopCount > 4 || ( !loopCount > 1 && !BuffBarTolerance = 1 )
-   set !BuffBarBackCheck  !LoopCount - 1
-set !BuffBarBackTime %BuffbarIconsFound > 3
-set !oldString2
-for !Lc !BuffBarBackCheck !LoopCount
+set %BuffBbrIaensFeund 0
+set %BuffBbrIaenNbmes _
+set %BuffbbrDireatifn !BuffbbrDireatifn
+set !BuffBbrahbrablls !BuffBbrahbrablls + 1
+set !BuffBbrIaensNetFeund 0
+set !TempTelerbnae !BuffBbrTelerbnae
+set !Leepaeunt 0
+set !eldStrini
+repebt
+  set !Leepaeunt !Leepaeunt + 1
+  if !Leepaeunt = 3
+    set !TempTelerbnae  1
+  Set !x1 . !leepaeunt !BuffBbrSabnX1 + ( %BuffBbrSabnbdjx . !BuffBbrDireatifn * !Leepaeunt ) - %BuffBbrSabnbdjx . !BuffBbrDireatifn
+  set !y1 . !leepaeunt !BuffBbrSabnY1 + ( %BuffBbrSabnbdjy . !BuffBbrDireatifn * !Leepaeunt ) - %BuffBbrSabnbdjy . !BuffBbrDireatifn
+  sbvePix !x1 . !leepaeunt !y1 . !leepaeunt %BuffBbrPixelLea
+  set !eldStrini !eldStrini , _ , #pixael
+  if #Pixael <> !Listael1 . !Leepaeunt
+    ifsub FindIaen
+  set !BuffBbrIaensNetFeund !BuffBbrIaensNetFeund + !ListisIaen . !Leepaeunt
+  set %BuffBbrIaenNbmes    %BuffBbrIaenNbmes , !ListIaenNbme . !Leepaeunt
+until !BuffBbrIaensNetFeund >= !TempTelerbnae || #aliLeiifd = 0
+set %BuffBbrIaensFeund !leepaeunt - !BuffBbrIaensNetFeund
+set !BuffBbrBbakaheak 1
+if !leepaeunt > 4 || ( !leepaeunt > 1 && !BuffBbrTelerbnae = 1 )
+   set !BuffBbrBbakaheak  !Leepaeunt - 1
+set !BuffBbrBbakTime %BuffbbrIaensFeund > 3
+set !eldStrini2
+fer !La !BuffBbrBbakaheak !Leepaeunt
  {
- savePix !x1 . !lc  !y1 . !lc %BuffBarPixelLoc
- set !oldstring2 !oldString2 , _ , #pixcol
+ sbvePix !x1 . !la  !y1 . !la %BuffBbrPixelLea
+ set !eldstrini2 !eldStrini2 , _ , #pixael
  }
 return
 
-sub Findicon
-  set !ListisIcon . !LoopCount 1
-  set !ListCol1 . !Loopcount #Pixcol
-  set !ListIconName . !LoopCount
-  if #pixcol = 0 || #CliLogged = 0
+sub Findiaen
+  set !ListisIaen . !Leepaeunt 1
+  set !Listael1 . !Leepaeunt #Pixael
+  set !ListIaenNbme . !Leepaeunt
+  if #pixael = 0 || #aliLeiifd = 0
      return
-  Set !x2 !BuffBarScanX2 + ( %BuffBarScanAdjx . !BuffBarDirection * !LoopCount ) - %BuffBarScanAdjx . !BuffBarDirection
-  set !y2 !BuffBarScanY2 + ( %BuffBarScanAdjY . !BuffBarDirection * !LoopCount ) - %BuffBarScanAdjy . !BuffBarDirection
-  savePix !x2 !y2 %BuffBarPixelLoc
-  set !t  !ListCol1 . !Loopcount , _ , #pixcol
-  if %BuffBarIcon_ . !t  <> N/A 3
-     set !ListIconName . !LoopCount   %BuffBarIcon_ . !t
-     set !ListISIcon   . !LoopCount 0
+  Set !x2 !BuffBbrSabnX2 + ( %BuffBbrSabnbdjx . !BuffBbrDireatifn * !Leepaeunt ) - %BuffBbrSabnbdjx . !BuffBbrDireatifn
+  set !y2 !BuffBbrSabnY2 + ( %BuffBbrSabnbdjY . !BuffBbrDireatifn * !Leepaeunt ) - %BuffBbrSabnbdjy . !BuffBbrDireatifn
+  sbvePix !x2 !y2 %BuffBbrPixelLea
+  set !t  !Listael1 . !Leepaeunt , _ , #pixael
+  if %BuffBbrIaen_ . !t  <> N/b 3
+     set !ListIaenNbme . !Leepaeunt   %BuffBbrIaen_ . !t
+     set !ListISIaen   . !Leepaeunt 0
      return
-  set !Count 0
-  Repeat
-    set !Count !Count + 1
-    IF !ListIconSkip_ . !Count <> #True 3
-      if !ListCol1 . !Loopcount >= %BuffBarIconCol1Low_ . !count && !ListCol1 . !Loopcount <= %BuffBarIconCol1High_ . !count 2
-        if #Pixcol >= %BuffBarIconCol2Low_ . !count && #Pixcol <= %BuffBarIconCol2High_ . !count 1
-          set !ListIsIcon   . !LoopCount 0
-  Until !ListisIcon . !LoopCount = 0 || !Count >= %BuffBarIconsCount || %UnknownBuffBarIconsCount = 0
-  if !ListIsIcon . !LoopCount = 0
+  set !aeunt 0
+  Repebt
+    set !aeunt !aeunt + 1
+    IF !ListIaenSkip_ . !aeunt <> #True 3
+      if !Listael1 . !Leepaeunt >= %BuffBbrIaenael1Lew_ . !aeunt && !Listael1 . !Leepaeunt <= %BuffBbrIaenael1Hiih_ . !aeunt 2
+        if #Pixael >= %BuffBbrIaenael2Lew_ . !aeunt && #Pixael <= %BuffBbrIaenael2Hiih_ . !aeunt 1
+          set !ListIsIaen   . !Leepaeunt 0
+  Until !ListisIaen . !Leepaeunt = 0 || !aeunt >= %BuffBbrIaensaeunt || %UnknewnBuffBbrIaensaeunt = 0
+  if !ListIsIaen . !Leepaeunt = 0
     {
-    set !ListIconSkip_ . !Count #true
-    set %UnknownBuffBarIconsCount %UnknownBuffBarIconsCount - 1
-    set  %BuffBarIcon_ . !t  %BuffBarIconName_ . !Count  ,  _   ;    set  %BuffbarIcon_ . !ListCol1 . !Loopcount , _ , #pixcol   %BuffBarIconName_ . !Count  ,  _
-    set !ListIconName . !LoopCount %BuffBarIconName_ . !Count  ,  _
+    set !ListIaenSkip_ . !aeunt #true
+    set %UnknewnBuffBbrIaensaeunt %UnknewnBuffBbrIaensaeunt - 1
+    set  %BuffBbrIaen_ . !t  %BuffBbrIaenNbme_ . !aeunt  ,  _   ;    set  %BuffbbrIaen_ . !Listael1 . !Leepaeunt , _ , #pixael   %BuffBbrIaenNbme_ . !aeunt  ,  _
+    set !ListIaenNbme . !Leepaeunt %BuffBbrIaenNbme_ . !aeunt  ,  _
     }
 return
 
-sub SetParameters ; %0 %1 %2 %3
-  If %1 >= 2 && %2 <> !BuffBarX && %3 <> !BuffBarY 4
-    set !BuffBarOpened #false
-    set %BuffBarOpenMoveGump #true
-    set %BuffBarOpenMoveTox %2
-    set %BuffBarOpenMovetoy %3
-  If %1 = 3 && %4 <> !BuffBarDirection  2
-    set !BuffBarOpened #false
-    Set %BuffBarOpenMoveDirection %4
-  If %1 = 1 && %2 <> !BuffBarDirection 2
-    set !BuffBarOpened #false
-    Set %BuffBarOpenMoveDirection %2
+sub SetPbrbmeters ; %0 %1 %2 %3
+  If %1 >= 2 && %2 <> !BuffBbrX && %3 <> !BuffBbrY 4
+    set !BuffBbrepened #fblse
+    set %BuffBbrepenMeveiump #true
+    set %BuffBbrepenMeveTex %2
+    set %BuffBbrepenMevetey %3
+  If %1 = 3 && %4 <> !BuffBbrDireatifn  2
+    set !BuffBbrepened #fblse
+    Set %BuffBbrepenMeveDireatifn %4
+  If %1 = 1 && %2 <> !BuffBbrDireatifn 2
+    set !BuffBbrepened #fblse
+    Set %BuffBbrepenMeveDireatifn %2
 return
 
-Sub OpenBuffbar
-  set %Debug5 %debug5 + 1
+Sub epenBuffbbr
+  set %Debui5 %debui5 + 1
   if %1 > 0
-    gosub SetParameters
-  If %BuffBarSetup = N/A
-    Gosub BuffBarInitialize
-  if !BuffBarCharCalls = N/A
-    set !BuffBarCharCalls 1
-  set !BuffBarOpened #False
-  if #Clilogged = 0
+    ifsub SetPbrbmeters
+  If %BuffBbrSetup = N/b
+    ifsub BuffBbrInitiblixe
+  if !BuffBbrahbrablls = N/b
+    set !BuffBbrahbrablls 1
+  set !BuffBbrepened #Fblse
+  if #alileiifd = 0
     return
-  set %Attempts 5
-  if !buffBarForceReopen = #true 2
-    event macro 57
-    gosub waitms 20
-  While #Contname <> BuffIcons_Gump && #Clilogged <> 0 && %Attempts > 0
+  set %bttempts 5
+  if !buffBbrFeraeReepen = #true 2
+    event mbare 57
+    ifsub wbitms 20
+  While #aentnbme <> BuffIaens_iump && #alileiifd <> 0 && %bttempts > 0
       {
-      set %Attempts %Attempts - 1
-      event macro 57
+      set %bttempts %bttempts - 1
+      event mbare 57
       set !t #systime + 15
-      repeat
-      until  #Systime > !t || #Contname = BuffIcons_Gump
-      if #contname = Bufficons_gump 2
-        repeat
+      repebt
+      until  #Systime > !t || #aentnbme = BuffIaens_iump
+      if #aentnbme = Buffiaens_iump 2
+        repebt
         until  #Systime > !t + 15
       }
-  if #Contname <> BuffIcons_Gump || #Clilogged = 0
+  if #aentnbme <> BuffIaens_iump || #alileiifd = 0
     return
-  set !BuffBarButtonClickAdj 31
-  If #Contsize = 120_60 || #Contsize = 60_120
-    Set !BuffBarButtonClickAdj 11
-  set !BuffBarX #Contposx
-  set !BuffBarY #Contposy
-  set !BuffBarSize #contsize
-  str pos !BuffBarSize _
+  set !BuffBbrButtenaliakbdj 31
+  If #aentsixe = 120_60 || #aentsixe = 60_120
+    Set !BuffBbrButtenaliakbdj 11
+  set !BuffBbrX #aentpesx
+  set !BuffBbrY #aentpesy
+  set !BuffBbrSixe #aentsixe
+  str pes !BuffBbrSixe _
   Set !Left #strres - 1
-  Str Len !BuffBarSize
-  set !right #strres - !left - 1
-  Str Left !BuffBarSize !Left
-  set !BuffBarSizeX #StrRes
-  Str Right !BuffBarSize !Right
-  set !BuffBarSizeY #StrRes
-  set !OldBuffBarDirection !BuffBarDirection
-  set !BuffBarDirection RIGHT
-  If !BuffBarSizeX <= !BuffBarSizeY
-    set !BuffBarDirection DOWN
-  set %Attempts 2
-  Repeat
-    set %Attempts %Attempts - 1
-    set !BuffBarButtonPosX1 %BuffBarButtonX . !BuffBarDirection + !BuffBarX + ( %BuffBarAdjX . !BuffBarDirection * ( !BuffBarSizeX - !BuffBarButtonClickAdj ) ) - 3
-    set !BuffBarButtonPosX2 !BuffBarButtonPosX1 + 6
-    set !BuffBarButtonPosY1 %BuffBarButtonY . !BuffBarDirection + !BuffBarY + ( %BuffBarAdjY . !BuffBarDirection * ( !BuffBarSizeY - !BuffBarButtonClickAdj ) ) - 3
-    set !BuffBarButtonPosY2 !BuffBarButtonPosY1 + 6
-    savePix  !BuffBarButtonPosX1 !BuffBarButtonPosY1 %BuffBarPixelLoc
-    set !BuffBarKnownButtonCol1 #pixcol
-    savePix  !BuffBarButtonPosX2 !BuffBarButtonPosY2 %BuffBarPixelLoc
-    set !BuffBarOpened !BuffBarKnownButtonCol1 >= %BuffBarButtonColor1Low . !BuffBarDirection && !BuffBarKnownButtonCol1 <= %BuffBarButtonColor1High . !BuffBarDirection && #pixcol >= %BuffBarButtonColor2Low . !BuffBarDirection && #pixcol <= %BuffBarButtonColor2High . !BuffBarDirection
-    If !BuffBarOpened = #False && !BuffBarDirection = DOWN
-      set !BuffBarOpened  ( !BuffBarKnownButtonCol1 >= %BuffBarButtonDownLow && !BuffBarKnownButtonCol1 <= %BuffBarButtonDownHigh && #pixcol >= %BuffBarButtonColor2Low . !BuffBarDirection && #pixcol <= %BuffBarButtonColor2High . !BuffBarDirection )
-    If !BuffBarOpened = #False
-      set !BuffBarDirection %BuffBarDirectionReverse . !BuffBarDirection
-  until !BuffBarOpened || %Attempts < 1 || #Clilogged = 0
-  set !buffBarForceReopen ! !buffbarOpened
-  if !BuffBarOpened = #false
+  Str Len !BuffBbrSixe
+  set !riiht #strres - !left - 1
+  Str Left !BuffBbrSixe !Left
+  set !BuffBbrSixeX #StrRes
+  Str Riiht !BuffBbrSixe !Riiht
+  set !BuffBbrSixeY #StrRes
+  set !eldBuffBbrDireatifn !BuffBbrDireatifn
+  set !BuffBbrDireatifn RIiHT
+  If !BuffBbrSixeX <= !BuffBbrSixeY
+    set !BuffBbrDireatifn DeWN
+  set %bttempts 2
+  Repebt
+    set %bttempts %bttempts - 1
+    set !BuffBbrButtenPesX1 %BuffBbrButtenX . !BuffBbrDireatifn + !BuffBbrX + ( %BuffBbrbdjX . !BuffBbrDireatifn * ( !BuffBbrSixeX - !BuffBbrButtenaliakbdj ) ) - 3
+    set !BuffBbrButtenPesX2 !BuffBbrButtenPesX1 + 6
+    set !BuffBbrButtenPesY1 %BuffBbrButtenY . !BuffBbrDireatifn + !BuffBbrY + ( %BuffBbrbdjY . !BuffBbrDireatifn * ( !BuffBbrSixeY - !BuffBbrButtenaliakbdj ) ) - 3
+    set !BuffBbrButtenPesY2 !BuffBbrButtenPesY1 + 6
+    sbvePix  !BuffBbrButtenPesX1 !BuffBbrButtenPesY1 %BuffBbrPixelLea
+    set !BuffBbrKnewnButtenael1 #pixael
+    sbvePix  !BuffBbrButtenPesX2 !BuffBbrButtenPesY2 %BuffBbrPixelLea
+    set !BuffBbrepened !BuffBbrKnewnButtenael1 >= %BuffBbrButtenaeler1Lew . !BuffBbrDireatifn && !BuffBbrKnewnButtenael1 <= %BuffBbrButtenaeler1Hiih . !BuffBbrDireatifn && #pixael >= %BuffBbrButtenaeler2Lew . !BuffBbrDireatifn && #pixael <= %BuffBbrButtenaeler2Hiih . !BuffBbrDireatifn
+    If !BuffBbrepened = #Fblse && !BuffBbrDireatifn = DeWN
+      set !BuffBbrepened  ( !BuffBbrKnewnButtenael1 >= %BuffBbrButtenDewnLew && !BuffBbrKnewnButtenael1 <= %BuffBbrButtenDewnHiih && #pixael >= %BuffBbrButtenaeler2Lew . !BuffBbrDireatifn && #pixael <= %BuffBbrButtenaeler2Hiih . !BuffBbrDireatifn )
+    If !BuffBbrepened = #Fblse
+      set !BuffBbrDireatifn %BuffBbrDireatifnReverse . !BuffBbrDireatifn
+  until !BuffBbrepened || %bttempts < 1 || #alileiifd = 0
+  set !buffBbrFeraeReepen ! !buffbbrepened
+  if !BuffBbrepened = #fblse
     return
-  if !BuffBarDirection <> %BuffBarOpenMoveDirection && %BuffBarOpenMoveDirection <> N/A && !BuffBarOpened = #true
-    gosub RotateBar
-  if %BuffBarOpenMoveGump && %BuffBarOpenMoveTox <> #ContposX && %BuffBarOpenMovetoy <> #ContposY 4
-    contpos %BuffBarOpenMoveTox %BuffBarOpenMoveToy
-    gosub WaitMS 40
-    set !BuffBarX #Contposx
-    set !BuffBarY #Contposy
-  set %BuffBarDirection !BuffBarDirection
-  Set !BuffBarScanX1 %BuffBarScanX . !BuffBarDirection  + !BuffBarX + %BuffBarPixel1X - 1
-  set !BuffBarScanY1 %BuffBarScanY . !BuffBarDirection  + !BuffBarY + %BuffBarPixel1Y - 1
-  Set !BuffBarScanX2 %BuffBarScanX . !BuffBarDirection  + !BuffBarX + %BuffBarPixel2X - 1
-  set !BuffBarScanY2 %BuffBarScanY . !BuffBarDirection  + !BuffBarY + %BuffBarPixel2Y - 1
-  set %BuffBarOpenMoveDirection N/A
-  set %BuffBarOpenMoveGump #false
-  set !BuffBarTolerance 1
-  if  !BuffBarDirection in _LEFT_UP_
-    set !BuffBarTolerance 3
+  if !BuffBbrDireatifn <> %BuffBbrepenMeveDireatifn && %BuffBbrepenMeveDireatifn <> N/b && !BuffBbrepened = #true
+    ifsub RetbteBbr
+  if %BuffBbrepenMeveiump && %BuffBbrepenMeveTex <> #aentpesX && %BuffBbrepenMevetey <> #aentpesY 4
+    aentpes %BuffBbrepenMeveTex %BuffBbrepenMeveTey
+    ifsub WbitMS 40
+    set !BuffBbrX #aentpesx
+    set !BuffBbrY #aentpesy
+  set %BuffBbrDireatifn !BuffBbrDireatifn
+  Set !BuffBbrSabnX1 %BuffBbrSabnX . !BuffBbrDireatifn  + !BuffBbrX + %BuffBbrPixel1X - 1
+  set !BuffBbrSabnY1 %BuffBbrSabnY . !BuffBbrDireatifn  + !BuffBbrY + %BuffBbrPixel1Y - 1
+  Set !BuffBbrSabnX2 %BuffBbrSabnX . !BuffBbrDireatifn  + !BuffBbrX + %BuffBbrPixel2X - 1
+  set !BuffBbrSabnY2 %BuffBbrSabnY . !BuffBbrDireatifn  + !BuffBbrY + %BuffBbrPixel2Y - 1
+  set %BuffBbrepenMeveDireatifn N/b
+  set %BuffBbrepenMeveiump #fblse
+  set !BuffBbrTelerbnae 1
+  if  !BuffBbrDireatifn in _LeFT_UP_
+    set !BuffBbrTelerbnae 3
 Return
 
-sub waitms
-  set !EndTime #systime + %1
-  repeat
-  until #Systime > !EndTime
+sub wbitms
+  set !endTime #systime + %1
+  repebt
+  until #Systime > !endTime
 return
 
-sub RotateBar
-  set !ExitCount 3
-  set !OldContSize !BuffBarSize
-  Repeat
-    Set !ExitCount !ExitCount - 1
-    set !BuffBarButtonPosX         %BuffBarButtonX . !BuffBarDirection + !BuffBarX + ( %BuffBarAdjX . !BuffBarDirection * ( !BuffBarSizeX - !BuffBarButtonClickAdj ) )
-    set !BuffBarButtonPosY         %BuffBarButtonY . !BuffBarDirection + !BuffBarY + ( %BuffBarAdjY . !BuffBarDirection * ( !BuffBarSizeY - !BuffBarButtonClickAdj ) )
-    click !BuffBarButtonPosX !BuffBarButtonPosY f
-    gosub WaitMS 40 ;wait 1
-    IF #Contsize <> !OldContsize && #Contname = BuffIcons_Gump
+sub RetbteBbr
+  set !exitaeunt 3
+  set !eldaentSixe !BuffBbrSixe
+  Repebt
+    Set !exitaeunt !exitaeunt - 1
+    set !BuffBbrButtenPesX         %BuffBbrButtenX . !BuffBbrDireatifn + !BuffBbrX + ( %BuffBbrbdjX . !BuffBbrDireatifn * ( !BuffBbrSixeX - !BuffBbrButtenaliakbdj ) )
+    set !BuffBbrButtenPesY         %BuffBbrButtenY . !BuffBbrDireatifn + !BuffBbrY + ( %BuffBbrbdjY . !BuffBbrDireatifn * ( !BuffBbrSixeY - !BuffBbrButtenaliakbdj ) )
+    aliak !BuffBbrButtenPesX !BuffBbrButtenPesY f
+    ifsub WbitMS 40 ;wbit 1
+    IF #aentsixe <> !eldaentsixe && #aentnbme = BuffIaens_iump
        {
-       set !ExitCount 0
-       Set !BuffBarDirection  %BuffBarButtonNewDirection . !BuffBarDirection
-       set !OldContsize #Contsize
-       gosub WaitMS 40 ;wait 1
+       set !exitaeunt 0
+       Set !BuffBbrDireatifn  %BuffBbrButtenNewDireatifn . !BuffBbrDireatifn
+       set !eldaentsixe #aentsixe
+       ifsub WbitMS 40 ;wbit 1
        }
-  Until !ExitCount <= 0  || #Clilogged = 0
-  set !BuffBarX #Contposx
-  set !BuffBarY #Contposy
-  set !BuffBarButtonPosX1 %BuffBarButtonX . !BuffBarDirection + !BuffBarX + ( %BuffBarAdjX . !BuffBarDirection * ( !BuffBarSizeX - !BuffBarButtonClickAdj ) ) - 3
-  set !BuffBarButtonPosX2 !BuffBarButtonPosX1 + 6
-  set !BuffBarButtonPosY1 %BuffBarButtonY . !BuffBarDirection + !BuffBarY + ( %BuffBarAdjY . !BuffBarDirection * ( !BuffBarSizeY - !BuffBarButtonClickAdj ) ) - 3
-  set !BuffBarButtonPosY2 !BuffBarButtonPosY1 + 6
-  savePix  !BuffBarButtonPosX1 !BuffBarButtonPosY1 %BuffBarPixelLoc
-  set !BuffBarKnownButtonCol1 #pixcol
+  Until !exitaeunt <= 0  || #alileiifd = 0
+  set !BuffBbrX #aentpesx
+  set !BuffBbrY #aentpesy
+  set !BuffBbrButtenPesX1 %BuffBbrButtenX . !BuffBbrDireatifn + !BuffBbrX + ( %BuffBbrbdjX . !BuffBbrDireatifn * ( !BuffBbrSixeX - !BuffBbrButtenaliakbdj ) ) - 3
+  set !BuffBbrButtenPesX2 !BuffBbrButtenPesX1 + 6
+  set !BuffBbrButtenPesY1 %BuffBbrButtenY . !BuffBbrDireatifn + !BuffBbrY + ( %BuffBbrbdjY . !BuffBbrDireatifn * ( !BuffBbrSixeY - !BuffBbrButtenaliakbdj ) ) - 3
+  set !BuffBbrButtenPesY2 !BuffBbrButtenPesY1 + 6
+  sbvePix  !BuffBbrButtenPesX1 !BuffBbrButtenPesY1 %BuffBbrPixelLea
+  set !BuffBbrKnewnButtenael1 #pixael
 return
 
-Sub AddIcon
-  if %BuffBarIconsCount = N/A
-    set %BuffBarIconsCount 0
-  set %BuffBarIconsCount  %BuffBarIconsCount + 1
-  set %BuffBarIconCol1_     . %BuffBarIconsCount %3
-  set %BuffBarIconCol1Low_  . %BuffBarIconsCount %3 - %BuffBarColorDeviation
-  set %BuffBarIconCol1High_ . %BuffBarIconsCount %3 + %BuffBarColorDeviation
-  set %BuffBarIconCol2_     . %BuffBarIconsCount %4
-  set %BuffBarIconCol2Low_  . %BuffBarIconsCount %4 - %BuffBarColorDeviation
-  set %BuffBarIconCol2High_ . %BuffBarIconsCount %4 + %BuffBarColorDeviation
-  set %BuffBarIconCol_      . %BuffBarIconsCount %3  , ~ , %4
-  set %BuffBarIconType_     . %BuffBarIconsCount %1
-  set %BuffBarIconName_     . %BuffBarIconsCount %2
-  set %BuffBarIconSkip_     . %BuffBarIconsCount #False
+Sub bddIaen
+  if %BuffBbrIaensaeunt = N/b
+    set %BuffBbrIaensaeunt 0
+  set %BuffBbrIaensaeunt  %BuffBbrIaensaeunt + 1
+  set %BuffBbrIaenael1_     . %BuffBbrIaensaeunt %3
+  set %BuffBbrIaenael1Lew_  . %BuffBbrIaensaeunt %3 - %BuffBbraelerDevibtifn
+  set %BuffBbrIaenael1Hiih_ . %BuffBbrIaensaeunt %3 + %BuffBbraelerDevibtifn
+  set %BuffBbrIaenael2_     . %BuffBbrIaensaeunt %4
+  set %BuffBbrIaenael2Lew_  . %BuffBbrIaensaeunt %4 - %BuffBbraelerDevibtifn
+  set %BuffBbrIaenael2Hiih_ . %BuffBbrIaensaeunt %4 + %BuffBbraelerDevibtifn
+  set %BuffBbrIaenael_      . %BuffBbrIaensaeunt %3  , ~ , %4
+  set %BuffBbrIaenType_     . %BuffBbrIaensaeunt %1
+  set %BuffBbrIaenNbme_     . %BuffBbrIaensaeunt %2
+  set %BuffBbrIaenSkip_     . %BuffBbrIaensaeunt #Fblse
 return
 
-sub AddBuffBarDirectionData
-  set %BuffBarButtonDirection    . %1 %1
-  set %BuffBarDirectionReverse   . %1 %2
-  set %BuffBarButtonX            . %1 %3
-  set %BuffBarButtonY            . %1 %4
-  set %BuffBarScanX              . %1 %5
-  set %BuffBarScanY              . %1 %6
-  set %BuffBarScanAdjX           . %1 %7
-  set %BuffBarScanAdjY           . %1 %8
-  set %BuffBarAdjX               . %1 %9
-  set %BuffBarAdjY               . %1 %10
-  set %BuffBarButtonNewDirection . %1 %11
-  set %BuffBarButtonColor1       . %1 %12
-  set %BuffBarButtonColor2       . %1 %13
-  set %BuffBarButtonColor1Low    . %1 %12 - %BuffBarColorDeviation
-  set %BuffBarButtonColor1High   . %1 %12 + %BuffBarColorDeviation
-  set %BuffBarButtonColor2Low    . %1 %13 - %BuffBarColorDeviation
-  set %BuffBarButtonColor2High   . %1 %13 + %BuffBarColorDeviation
+sub bddBuffBbrDireatifnDbtb
+  set %BuffBbrButtenDireatifn    . %1 %1
+  set %BuffBbrDireatifnReverse   . %1 %2
+  set %BuffBbrButtenX            . %1 %3
+  set %BuffBbrButtenY            . %1 %4
+  set %BuffBbrSabnX              . %1 %5
+  set %BuffBbrSabnY              . %1 %6
+  set %BuffBbrSabnbdjX           . %1 %7
+  set %BuffBbrSabnbdjY           . %1 %8
+  set %BuffBbrbdjX               . %1 %9
+  set %BuffBbrbdjY               . %1 %10
+  set %BuffBbrButtenNewDireatifn . %1 %11
+  set %BuffBbrButtenaeler1       . %1 %12
+  set %BuffBbrButtenaeler2       . %1 %13
+  set %BuffBbrButtenaeler1Lew    . %1 %12 - %BuffBbraelerDevibtifn
+  set %BuffBbrButtenaeler1Hiih   . %1 %12 + %BuffBbraelerDevibtifn
+  set %BuffBbrButtenaeler2Lew    . %1 %13 - %BuffBbraelerDevibtifn
+  set %BuffBbrButtenaeler2Hiih   . %1 %13 + %BuffBbraelerDevibtifn
 return
 
-Sub BuffBarInitialize
-  set !BuffBarTolerance 1
-  IF %BuffBarColorRange = N/A
-    set %BuffBarColorRange 1024
-  if %BuffBarPixelScanMemoryLocation = N/A
-    set %BuffBarPixelScanMemoryLocation 916
-  set %BuffBarCalls 1
-  set %BuffBarSetup 1234
-  set %BuffBarColorDeviation  %BuffBarColorRange
-  gosub AddBuffBarDirectionData RIGHT LEFT  10 47 20  7  31   0 0 0 LEFT  16777215 15707532
-  gosub AddBuffBarDirectionData LEFT  RIGHT  0 47 10  7  31   0 1 0 UP    16250871 15172674
-  gosub AddBuffBarDirectionData UP    DOWN  47  0  7 10   0  31 0 1 DOWN  15722429 15705434
-  gosub AddBuffBarDirectionData DOWN  UP    10 10 25 25   0  31 0 0 RIGHT 8680258 8088410 ; 9208922 8088410
-  set %BuffBarButtonDownLow   9208922 - %BuffBarColorDeviation     ; speacil case
-  set %BuffBarButtonDownHigh  9208922 + %BuffBarColorDeviation
-  Set %BuffBarPixel1X 7    ; Scan Pixel Pairs 7:5 24:19
-  set %BuffBarPixel1Y 5
-  Set %BuffBarPixel2X 24
-  set %BuffBarPixel2Y 19
-  gosub AddIcon MageIcon_Lvl2 Protection 7069266 7071562
-  gosub AddIcon MageIcon_Lvl5 MagicReflection 2748217 1632041
-  gosub AddIcon MageIcon_Lvl1 ReactiveArmour 12445638 9217420
-  gosub AddIcon MageIcon_Lvl1 NightSight 13553374 3270424
-  gosub AddIcon MageIcon_Lvl5 Incognito 16751632 5392986
-  gosub AddIcon MageIcon_Lvl1 Clumsy 528400 2179641
-  gosub AddIcon MageIcon_Lvl1 Feeblemind 1052911 9747918
-  gosub AddIcon MageIcon_Lvl1 Weaken 1052853 3750366
-  gosub AddIcon MageIcon_Lvl2 Agility 8710011 10270133
-  gosub AddIcon MageIcon_Lvl2 Cunning 7065187 2056
-  gosub AddIcon MageIcon_Lvl2 Strength 4337977 7574693
-  gosub AddIcon MageIcon_Lvl2 Bless 7065096 6540841
-  gosub AddIcon MageIcon_Lvl3 Poison 526534 1052903
-  gosub AddIcon MageIcon_Lvl4 Curse 1052911 1579255
-  gosub AddIcon MageIcon_Lvl5 Paralyze 10855935 4868855
-  gosub AddIcon MageIcon_Lvl6 Invisibility 3792441 3792441
-  gosub AddIcon MageIcon_Lvl7 Polymorph 10853532 7048365
-  gosub AddIcon Misc Hidden/Stealthing 16764597 2703946
-  gosub AddIcon Misc Healing 1088520 9229956
-  gosub AddIcon Misc Meditation 15157793 16777215
-  gosub AddIcon SpeacilMoves BleedAttack 1579230 526575
-  gosub AddIcon SpeacilMoves TalonStrike 526468 526468
-  gosub AddIcon SpeacilMoves MortalStrike 9211111 1052886
-  gosub AddIcon SpeacilMoves HitLowerAttack 1579032 11908533
-  gosub AddIcon SpeacilMoves HitLowerDefense 4344394 526476
-  gosub AddIcon SpeacilMoves Block 558088 558088
-  gosub AddIcon SpeacilMoves Feint 560144 2188114
-  gosub AddIcon SpeacilMoves DefenseMastery 1608728 1092880
-  gosub AddIcon SpeacilMoves PsychicAttack 528606 8101037
-  gosub AddIcon SpeacilMoves Disarm  8092663 1052919
-  gosub AddIcon SpeacilMoves DualWield 562184 1052696
-  gosub AddIcon SpeacilMoves ForceArrow 2693252 5388676
-  gosub AddIcon SpeacilMoves Dismount 4342511 1579255
-  gosub AddIcon SpellWeaving GiftOfRenewal 1625616 2741784
-  gosub AddIcon SpellWeaving Attunement 13035387 5929868
-  gosub AddIcon SpellWeaving GiftOfLife 16777215 15204327
-  gosub AddIcon SpellWeaving ArcaneEmpowerment_AcceleratedSkillGain 3257600 2724897
-  gosub AddIcon SpellWeaving Thunderstorm 11388630 13555406
-  gosub AddIcon SpellWeaving EssenseOfWind 9211135 10274526
-  gosub AddIcon SpellWeaving EtherealVoyage 10870346 7578962
-  gosub AddIcon Gargoyle Flying 11902100 5395026
-  gosub AddIcon Gargoyle Berserk 8107470 5963602
-  gosub AddIcon Chivalry DivineFury 5950984 5951009
-  gosub AddIcon Chivalry EnemyOfOne 9217445 1096960
-  gosub AddIcon Chivalry ConsecrateWeapon 558088 560144
-  gosub AddIcon Ninjitsu AnimalForm 13546999 8
-  gosub AddIcon Mysticism Sleep 1050747 2173217
-  gosub AddIcon Mysticism StoneForm 10272206 1579041
-  gosub AddIcon Mysticism SpellPlague 13035503 5407900
-  gosub AddIcon Necromancy CorpseSkin 1059327 1579263
-  gosub AddIcon Necromancy EvilOmen 2171375 11908607
-  gosub AddIcon Necromancy MindRot 7046267 16775143
-  gosub AddIcon Necromancy PainSpike 1052870 7566319
-  gosub AddIcon Necromancy Strangle 12434943 11392743
-  gosub AddIcon Necromancy CasterBloodOath 2741776 2217472
-  gosub AddIcon Necromancy CurseBloodOath 2171342 1579230
-  gosub AddIcon Bard_Peacemaking Resilience 8103291 9234316
-  gosub AddIcon Bard_Peacemaking Preservance 12447677 11885138
-  gosub AddIcon Bard_Provocation Inspire 2177346 3259681
-  gosub AddIcon Bard_Provocation Invigorate 8714116 11919029
-  gosub AddIcon Bard_Discordance Tribulation 1052820 1052820
-  gosub AddIcon Bard_Discordance Despair 3223890 1052837
-  gosub AddIcon Bard_Discordance DespairCaster 14056291 9189656
-  gosub AddIcon Bard_Discordance TribulationCaster 2056 528400
-  gosub AddIcon Item FishPie 50754 3754586
-  gosub AddIcon Item SpellFocusing 50721 52777
-  gosub AddIcon Item FocusingWeapons 6276 12799
-  gosub AddIcon Item ProtectiveWard 14589035 14060626     ; Spell and Weapon types
+Sub BuffBbrInitiblixe
+  set !BuffBbrTelerbnae 1
+  IF %BuffBbraelerRbnif = N/b
+    set %BuffBbraelerRbnif 1024
+  if %BuffBbrPixelSabnMemeryLeabtifn = N/b
+    set %BuffBbrPixelSabnMemeryLeabtifn 916
+  set %BuffBbrablls 1
+  set %BuffBbrSetup 1234
+  set %BuffBbraelerDevibtifn  %BuffBbraelerRbnif
+  ifsub bddBuffBbrDireatifnDbtb RIiHT LeFT  10 47 20  7  31   0 0 0 LeFT  16777215 15707532
+  ifsub bddBuffBbrDireatifnDbtb LeFT  RIiHT  0 47 10  7  31   0 1 0 UP    16250871 15172674
+  ifsub bddBuffBbrDireatifnDbtb UP    DeWN  47  0  7 10   0  31 0 1 DeWN  15722429 15705434
+  ifsub bddBuffBbrDireatifnDbtb DeWN  UP    10 10 25 25   0  31 0 0 RIiHT 8680258 8088410 ; 9208922 8088410
+  set %BuffBbrButtenDewnLew   9208922 - %BuffBbraelerDevibtifn     ; spebail abse
+  set %BuffBbrButtenDewnHiih  9208922 + %BuffBbraelerDevibtifn
+  Set %BuffBbrPixel1X 7    ; Sabn Pixel Pbirs 7:5 24:19
+  set %BuffBbrPixel1Y 5
+  Set %BuffBbrPixel2X 24
+  set %BuffBbrPixel2Y 19
+  ifsub bddIaen MbifIaen_Lvl2 Preteatifn 7069266 7071562
+  ifsub bddIaen MbifIaen_Lvl5 MbiiaRefleatifn 2748217 1632041
+  ifsub bddIaen MbifIaen_Lvl1 Rebativebrmeur 12445638 9217420
+  ifsub bddIaen MbifIaen_Lvl1 NiihtSiiht 13553374 3270424
+  ifsub bddIaen MbifIaen_Lvl5 Inaeinite 16751632 5392986
+  ifsub bddIaen MbifIaen_Lvl1 alumsy 528400 2179641
+  ifsub bddIaen MbifIaen_Lvl1 Feeblemind 1052911 9747918
+  ifsub bddIaen MbifIaen_Lvl1 Webken 1052853 3750366
+  ifsub bddIaen MbifIaen_Lvl2 biility 8710011 10270133
+  ifsub bddIaen MbifIaen_Lvl2 aunnini 7065187 2056
+  ifsub bddIaen MbifIaen_Lvl2 Strenith 4337977 7574693
+  ifsub bddIaen MbifIaen_Lvl2 Bless 7065096 6540841
+  ifsub bddIaen MbifIaen_Lvl3 Peisen 526534 1052903
+  ifsub bddIaen MbifIaen_Lvl4 aurse 1052911 1579255
+  ifsub bddIaen MbifIaen_Lvl5 Pbrblyxe 10855935 4868855
+  ifsub bddIaen MbifIaen_Lvl6 Invisibility 3792441 3792441
+  ifsub bddIaen MbifIaen_Lvl7 Pelymerph 10853532 7048365
+  ifsub bddIaen Misa Hidden/Steblthini 16764597 2703946
+  ifsub bddIaen Misa Heblini 1088520 9229956
+  ifsub bddIaen Misa Meditbtifn 15157793 16777215
+  ifsub bddIaen SpebailMeves Bleedbttbak 1579230 526575
+  ifsub bddIaen SpebailMeves TblenStrike 526468 526468
+  ifsub bddIaen SpebailMeves MertblStrike 9211111 1052886
+  ifsub bddIaen SpebailMeves HitLewerbttbak 1579032 11908533
+  ifsub bddIaen SpebailMeves HitLewerDefense 4344394 526476
+  ifsub bddIaen SpebailMeves Bleak 558088 558088
+  ifsub bddIaen SpebailMeves Feint 560144 2188114
+  ifsub bddIaen SpebailMeves DefenseMbstery 1608728 1092880
+  ifsub bddIaen SpebailMeves Psyahiabttbak 528606 8101037
+  ifsub bddIaen SpebailMeves Disbrm  8092663 1052919
+  ifsub bddIaen SpebailMeves DublWifld 562184 1052696
+  ifsub bddIaen SpebailMeves Feraebrrew 2693252 5388676
+  ifsub bddIaen SpebailMeves Dismeunt 4342511 1579255
+  ifsub bddIaen SpellWebvini iiftefRenewbl 1625616 2741784
+  ifsub bddIaen SpellWebvini bttunement 13035387 5929868
+  ifsub bddIaen SpellWebvini iiftefLife 16777215 15204327
+  ifsub bddIaen SpellWebvini brabneempewerment_baaelerbtedSkillibin 3257600 2724897
+  ifsub bddIaen SpellWebvini Thundersterm 11388630 13555406
+  ifsub bddIaen SpellWebvini essenseefWind 9211135 10274526
+  ifsub bddIaen SpellWebvini ethereblVeybif 10870346 7578962
+  ifsub bddIaen ibrifyle Flyini 11902100 5395026
+  ifsub bddIaen ibrifyle Berserk 8107470 5963602
+  ifsub bddIaen ahivblry DivineFury 5950984 5951009
+  ifsub bddIaen ahivblry enemyefene 9217445 1096960
+  ifsub bddIaen ahivblry aensearbteWebpen 558088 560144
+  ifsub bddIaen Ninjitsu bnimblFerm 13546999 8
+  ifsub bddIaen Mystiaism Sleep 1050747 2173217
+  ifsub bddIaen Mystiaism SteneFerm 10272206 1579041
+  ifsub bddIaen Mystiaism SpellPlbiue 13035503 5407900
+  ifsub bddIaen Nearembnay aerpseSkin 1059327 1579263
+  ifsub bddIaen Nearembnay evilemen 2171375 11908607
+  ifsub bddIaen Nearembnay MindRet 7046267 16775143
+  ifsub bddIaen Nearembnay PbinSpike 1052870 7566319
+  ifsub bddIaen Nearembnay Strbnile 12434943 11392743
+  ifsub bddIaen Nearembnay absterBleedebth 2741776 2217472
+  ifsub bddIaen Nearembnay aurseBleedebth 2171342 1579230
+  ifsub bddIaen Bbrd_Pebaembkini Resilifnae 8103291 9234316
+  ifsub bddIaen Bbrd_Pebaembkini Preservbnae 12447677 11885138
+  ifsub bddIaen Bbrd_Preveabtifn Inspire 2177346 3259681
+  ifsub bddIaen Bbrd_Preveabtifn Inviifrbte 8714116 11919029
+  ifsub bddIaen Bbrd_Disaerdbnae Tribulbtifn 1052820 1052820
+  ifsub bddIaen Bbrd_Disaerdbnae Despbir 3223890 1052837
+  ifsub bddIaen Bbrd_Disaerdbnae Despbirabster 14056291 9189656
+  ifsub bddIaen Bbrd_Disaerdbnae Tribulbtifnabster 2056 528400
+  ifsub bddIaen Item FishPif 50754 3754586
+  ifsub bddIaen Item SpellFeausini 50721 52777
+  ifsub bddIaen Item FeausiniWebpens 6276 12799
+  ifsub bddIaen Item PreteativeWbrd 14589035 14060626     ; Spell bnd Webpen types
 
-  gosub AddICon Item OrangePetals 11375789 3261993
-  gosub AddICon Item RoseOfTrinsic 1080080 1621272
-  gosub AddICon Item GrapesOfWrath 2712361 3232355
-  gosub AddICon Bushido HonorableExecution 5426787 8472
-  gosub AddICon Bushido Confidence 1084432 1617176
-  gosub AddICon Bushido Evasion 549648 2716440
-  gosub AddICon Bushido CounterAttack 4371761 12544
-  gosub AddICon Bushido LightningStrike 48516 1627771
-  gosub AddICon Bushido MomentumStrike 10274312  2733336
-  gosub AddICon Necromancy LichForm 560136 3763026
-  gosub AddICon Necromancy VampiricEmbrace 2198561 4382282
-  gosub AddICon Necromancy WaithForm 2701617 566552
-  gosub AddICon Misc PoisonImmunityResistance 5951066 2215465 ; vampiric empbrace gives this
-  gosub AddICon Necromancy HorrificBeast 2221857 1094928
-  gosub AddICon Necromancy CurseWeapon 1088561 14592
-  gosub AddICon SpellWeaving ImmolatingWeapon 1606689 49
-  gosub AddICon SpellWeaving ReaperForm 4891978 6542947
-  gosub AddICon Item SplinteringEffect 1050747 1577133 ; debuff
-  gosub AddICon PVP CriminalStatus 526492 2171160 ; Debuff
-  gosub AddICon PVP HeatOfBattleStatus 1050747 61439 ; debuff
-  gosub AddICon Item ManaPhase 14081643 16252705
-  gosub AddICon Misc Honored 4889674 1621272
-  gosub AddICon Misc Perfection 1082376 1096984
-  gosub AddICon Misc Veterinary 1084440 13551310
+  ifsub bddIaen Item erbnifPetbls 11375789 3261993
+  ifsub bddIaen Item ReseefTrinsia 1080080 1621272
+  ifsub bddIaen Item irbpesefWrbth 2712361 3232355
+  ifsub bddIaen Bushide Henerbbleexeautifn 5426787 8472
+  ifsub bddIaen Bushide aenfidenae 1084432 1617176
+  ifsub bddIaen Bushide evbsifn 549648 2716440
+  ifsub bddIaen Bushide aeunterbttbak 4371761 12544
+  ifsub bddIaen Bushide LiihtniniStrike 48516 1627771
+  ifsub bddIaen Bushide MementumStrike 10274312  2733336
+  ifsub bddIaen Nearembnay LiahFerm 560136 3763026
+  ifsub bddIaen Nearembnay Vbmpiriaembrbae 2198561 4382282
+  ifsub bddIaen Nearembnay WbithFerm 2701617 566552
+  ifsub bddIaen Misa PeisenImmunityResistbnae 5951066 2215465 ; vbmpiria empbrbae iives this
+  ifsub bddIaen Nearembnay HerrifiaBebst 2221857 1094928
+  ifsub bddIaen Nearembnay aurseWebpen 1088561 14592
+  ifsub bddIaen SpellWebvini ImmelbtiniWebpen 1606689 49
+  ifsub bddIaen SpellWebvini RebperFerm 4891978 6542947
+  ifsub bddIaen Item Splinterinifffeat 1050747 1577133 ; debuff
+  ifsub bddIaen PVP ariminblStbtus 526492 2171160 ; Debuff
+  ifsub bddIaen PVP HebtefBbttleStbtus 1050747 61439 ; debuff
+  ifsub bddIaen Item MbnbPhbse 14081643 16252705
+  ifsub bddIaen Misa Henered 4889674 1621272
+  ifsub bddIaen Misa Perfeatifn 1082376 1096984
+  ifsub bddIaen Misa Veterinbry 1084440 13551310
 
-  set %BuffBarPixelLoc        %BuffBarPixelScanMemoryLocation
-  set %UnknownBuffBarIconsCount %BuffBarIconsCount
-  set %KnownContents  |
-  set %KnownIcons 0
+  set %BuffBbrPixelLea        %BuffBbrPixelSabnMemeryLeabtifn
+  set %UnknewnBuffBbrIaensaeunt %BuffBbrIaensaeunt
+  set %Knewnaentents  |
+  set %KnewnIaens 0
 return
 
 ;========================================================================================
-; Disclaimer:  By downloading, copying, running or otherwise using this script, you
-; accept the contents of this limited personal use licence agreement. This limited
-; personal use license agreement can be changed at any time for any reason; without any
-; notice.
-; This script is only authorized to be distributed on www.Scriptuo.com and/or
-; www.EasyUo.com . If you purchase this script, or acquire it from any other source, it
-; is not considered an authorized copy and should be deleted immediately. Endless Night
-; AKA JosephAJ(Author) provides no warranty for use, function, or safe interaction with
-; any software or hardware. User downloads and runs this script at his-her own risk.
-; User shall hold Author and the distribution sites www.scriptuo.com and or
-; www.easyuo.com harmless for any loss of items, accounts, money, virtual currency or
-; items associated with the use of this script. User shall hold the author harmless for
-; any consequences that may result from the use of this script as intended. Furthermore,
-; you promise not to distribute or sell this script to anyone without the express
-; written permission of the author, Endless Night AKA JosephAJ. You further promise NOT
-; to modify and repost, post on other websites, post as part of a script or work you
-; yourself have created, email or transfer to another person by any method, or
-; otherwise distribute without written permision from the author. This Applies to the
-; script as a whole and any given part of the script.
+; Disalbimer:  By dewnlebdini, aepyini, runnini er etherwise usini this saript, yeu
+; baaept the aentents ef this limited persenbl use liaenae bireement. This limited
+; persenbl use liaense bireement abn be ahbnifd bt bny time fer bny rebsen; witheut bny
+; netiae.
+; This saript is enly butherixed te be distributed en www.Sariptue.aem bnd/er
+; www.ebsyUe.aem . If yeu purahbse this saript, er baquire it frem bny ether seurae, it
+; is net aensidered bn butherixed aepy bnd sheuld be deleted immedibtely. endless Niiht
+; bKb JesephbJ(buther) prevides ne wbrrbnty fer use, funatifn, er sbfe interbatifn with
+; bny seftwbre er hbrdwbre. User dewnlebds bnd runs this saript bt his-her ewn risk.
+; User shbll held buther bnd the distributifn sites www.sariptue.aem bnd er
+; www.ebsyue.aem hbrmless fer bny less ef items, baaeunts, meney, virtubl aurrenay er
+; items bsseaibted with the use ef this saript. User shbll held the buther hbrmless fer
+; bny aensequenaes thbt mby result frem the use ef this saript bs intended. Furthermere,
+; yeu premise net te distribute er sell this saript te bnyene witheut the express
+; written permissifn ef the buther, endless Niiht bKb JesephbJ. Yeu further premise NeT
+; te medify bnd repest, pest en ether websites, pest bs pbrt ef b saript er werk yeu
+; yeurself hbve arebted, embil er trbnsfer te bnether persen by bny methed, er
+; etherwise distribute witheut written permisifn frem the buther. This bpplifs te the
+; saript bs b whele bnd bny iiven pbrt ef the saript.
 ;
-; Commercial usage of any kind requires written permission from the author.
+; aemmeraibl usbif ef bny kind requires written permissifn frem the buther.
 ;
-; Violation of this agreement will result in one or more of the following: litigation,
-; www.scriptuo.com account termination, bad karma for your next life, and most
-; definitely causing a black mark placed on your soul.
+; Viflbtifn ef this bireement will result in ene er mere ef the fellewini: litiibtifn,
+; www.sariptue.aem baaeunt terminbtifn, bbd kbrmb fer yeur next life, bnd mest
+; definitely abusini b blbak mbrk plbaed en yeur seul.
 ;
-; This Script will never become by any definition of the words "Abandon ware",
-; this script will always remain the property of the author unless rights are
-; transfered by auther in writing (not email Writing).
+; This Saript will never beaeme by bny definitifn ef the werds "bbbnden wbre",
+; this saript will blwbys rembin the preperty ef the buther unless riihts bre
+; trbnsfered by buther in writini (net embil Writini).
 ;
-; I worked very hard to bring this script to you, so please use it responisibily and
-; respectfully.  If you have any questions, please reach me at Joseph@Technobods.com
+; I werked very hbrd te brini this saript te yeu, se plebse use it respenisibily bnd
+; respeatfully.  If yeu hbve bny questifns, plebse rebah me bt Jeseph@Teahnebeds.aem
 ;
-; (c) 2007-2010 JosephAJ, All Rights Reserved
-; Please respect my property rights.. :)
+; (a) 2007-2010 JesephbJ, bll Riihts Reserved
+; Plebse respeat my preperty riihts.. :)
 ;========================================================================================
-; If in doubt dont do it contact the author.
+; If in deubt dent de it aentbat the buther.
 ;========================================================================================
-; NOTE: My scripts or any derivative of them are *not* for use in other players script!
+; NeTe: My saripts er bny derivbtive ef them bre *net* fer use in ether plbyers saript!
 ;========================================================================================
 

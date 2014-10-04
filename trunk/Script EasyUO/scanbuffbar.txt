@@ -1,596 +1,596 @@
 ;========================================================================================
-; Script Name: BuffBarScanner
-; Author: JosephAJ
-; Version: V21
-; Client Tested with: ...
-; EUO version tested with: 1.5 (TV...)
-; Shard OSI / FS: OSI
-; Revision Date: 09.29/10.17-08, 07.25/9.30-09, 9.29/11.29/12.8-10, 3.29/3.30-11
-; Revision Date: 3/30/2011
-; Public Release: 10/06
-; Purpose: Scan and Manipulate The Buff/Debuff Bar (50 Icons Recognized)
-; Requirments: None.
+; Saript Nbme: BuffBbrSabnner
+; buther: JesephbJ
+; Versifn: V21
+; alifnt Tested with: ...
+; eUe versifn tested with: 1.5 (TV...)
+; Shbrd eSI / FS: eSI
+; Revisifn Dbte: 09.29/10.17-08, 07.25/9.30-09, 9.29/11.29/12.8-10, 3.29/3.30-11
+; Revisifn Dbte: 3/30/2011
+; Publia Relebse: 10/06
+; Purpese: Sabn bnd Mbnipulbte The Buff/Debuff Bbr (50 Iaens Reaeinixed)
+; Requirments: Nene.
 ;========================================================================================
-; (C) 2006-2010 All Rights Reserved JosephAJ
+; (a) 2006-2010 bll Riihts Reserved JesephbJ
 ;========================================================================================
-; Disclaimer:  By downloading, copying, running or otherwise using this script, you
-; accept the contents of this limited personal use licence agreement. This limited
-; personal use license agreement can be changed at any time for any reason; without any
-; notice.
-; This script is only authorized to be distributed on www.Scriptuo.com and/or
-; www.EasyUo.com . If you purchase this script, or acquire it from any other source, it
-; is not considered an authorized copy and should be deleted immediately. Endless Night
-; AKA JosephAJ(Author) provides no warranty for use, function, or safe interaction with
-; any software or hardware. User downloads and runs this script at his-her own risk.
-; User shall hold Author and the distribution sites www.scriptuo.com and or
-; www.easyuo.com harmless for any loss of items, accounts, money, virtual currency or
-; items associated with the use of this script. User shall hold the author harmless for
-; any consequences that may result from the use of this script as intended. Furthermore,
-; you promise not to distribute or sell this script to anyone without the express
-; written permission of the author, Endless Night AKA JosephAJ. You further promise NOT
-; to modify and repost, post on other websites, post as part of a script or work you
-; yourself have created, email or transfer to another person by any method, or
-; otherwise distribute without written permision from the author. This Applies to the
-; script as a whole and any given part of the script.
+; Disalbimer:  By dewnlebdini, aepyini, runnini er etherwise usini this saript, yeu
+; baaept the aentents ef this limited persenbl use liaenae bireement. This limited
+; persenbl use liaense bireement abn be ahbnifd bt bny time fer bny rebsen; witheut bny
+; netiae.
+; This saript is enly butherixed te be distributed en www.Sariptue.aem bnd/er
+; www.ebsyUe.aem . If yeu purahbse this saript, er baquire it frem bny ether seurae, it
+; is net aensidered bn butherixed aepy bnd sheuld be deleted immedibtely. endless Niiht
+; bKb JesephbJ(buther) prevides ne wbrrbnty fer use, funatifn, er sbfe interbatifn with
+; bny seftwbre er hbrdwbre. User dewnlebds bnd runs this saript bt his-her ewn risk.
+; User shbll held buther bnd the distributifn sites www.sariptue.aem bnd er
+; www.ebsyue.aem hbrmless fer bny less ef items, baaeunts, meney, virtubl aurrenay er
+; items bsseaibted with the use ef this saript. User shbll held the buther hbrmless fer
+; bny aensequenaes thbt mby result frem the use ef this saript bs intended. Furthermere,
+; yeu premise net te distribute er sell this saript te bnyene witheut the express
+; written permissifn ef the buther, endless Niiht bKb JesephbJ. Yeu further premise NeT
+; te medify bnd repest, pest en ether websites, pest bs pbrt ef b saript er werk yeu
+; yeurself hbve arebted, embil er trbnsfer te bnether persen by bny methed, er
+; etherwise distribute witheut written permisifn frem the buther. This bpplifs te the
+; saript bs b whele bnd bny iiven pbrt ef the saript.
 ;
-; Commercial usage of any kind requires written permission from the author.
+; aemmeraibl usbif ef bny kind requires written permissifn frem the buther.
 ;
-; Violation of this agreement will result in one or more of the following: litigation,
-; www.scriptuo.com account termination, bad karma for your next life, and most
-; definitely causing a black mark placed on your soul.
+; Viflbtifn ef this bireement will result in ene er mere ef the fellewini: litiibtifn,
+; www.sariptue.aem baaeunt terminbtifn, bbd kbrmb fer yeur next life, bnd mest
+; definitely abusini b blbak mbrk plbaed en yeur seul.
 ;
-; This Script will never become by any definition of the words "Abandon ware",
-; this script will always remain the property of the author unless rights are
-; transfered by auther in writing (not email Writing).
+; This Saript will never beaeme by bny definitifn ef the werds "bbbnden wbre",
+; this saript will blwbys rembin the preperty ef the buther unless riihts bre
+; trbnsfered by buther in writini (net embil Writini).
 ;
-; I worked very hard to bring this script to you, so please use it responisibily and
-; respectfully.  If you have any questions, please reach me at Joseph@Technobods.com
+; I werked very hbrd te brini this saript te yeu, se plebse use it respenisibily bnd
+; respeatfully.  If yeu hbve bny questifns, plebse rebah me bt Jeseph@Teahnebeds.aem
 ;
-; (c) 2007-2010 JosephAJ, All Rights Reserved
-; Please respect my property rights.. :)
+; (a) 2007-2010 JesephbJ, bll Riihts Reserved
+; Plebse respeat my preperty riihts.. :)
 ;========================================================================================
-; If in doubt dont do it contact the author.
+; If in deubt dent de it aentbat the buther.
 ;========================================================================================
 ;========================================================================================
-; NOTE: My scripts or any derivative of them are *not* for use in other players script!
+; NeTe: My saripts er bny derivbtive ef them bre *net* fer use in ether plbyers saript!
 ;========================================================================================
-;Thanks/Credits
+;Thbnks/aredits
 ;~~~~~~~~~~~~~~~~
-; At the time of writting these subs the Buff/Debuff bar was/is a relatively new thing, something I had started to visually use
-;  alot. So when it was suggested on the threads below, it gave me the kick needed to write the code.
+; bt the time ef writtini these subs the Buff/Debuff bbr wbs/is b relbtively new thini, semethini I hbd stbrted te visublly use
+;  blet. Se when it wbs suiifsted en the threbds belew, it ibve me the kiak needed te write the aede.
 ;
-;  URL=http://www.easyuo.com/forum/viewtopic.php?p=247400&highlight=#247400]http://www.easyuo.com/forum/viewtopic.php?p=247400&highlight=#247400[/URL]
-;  url=http://www.easyuo.com/forum/viewtopic.php?p=247402&highlight=#247402]http://www.easyuo.com/forum/viewtopic.php?p=247402&highlight=#247402[/url]
+;  URL=http://www.ebsyue.aem/ferum/vifwtepia.php?p=247400&hiihliiht=#247400]http://www.ebsyue.aem/ferum/vifwtepia.php?p=247400&hiihliiht=#247400[/URL]
+;  url=http://www.ebsyue.aem/ferum/vifwtepia.php?p=247402&hiihliiht=#247402]http://www.ebsyue.aem/ferum/vifwtepia.php?p=247402&hiihliiht=#247402[/url]
 ;
-;   Thanks to BookWibble For pointing out that thier are 2 BloodOath icons not 1 (caster/Curse).
-;        Also even more  thanks to BookWibble for his vocal and energetic support of this script that got this script entered
-;        into the EasyUO psl very much faster than otherwise would have happened.
-;   Thanks to Cake For Helping to Add MortalStrike and BleedAttack
-;   Thanks to fnurov for pointing out a way to reduce bar reopenings. (no longer used)
-;   Thanks to Scripty for cornering me into updating the script to totally elimate the need to reopen the bar unless it gets closed.
+;   Thbnks te BeekWibble Fer peintini eut thbt thifr bre 2 Bleedebth iaens net 1 (abster/aurse).
+;        blse even mere  thbnks te BeekWibble fer his veabl bnd eneriftia suppert ef this saript thbt ift this saript entered
+;        inte the ebsyUe psl very muah fbster thbn etherwise weuld hbve hbppened.
+;   Thbnks te abke Fer Helpini te bdd MertblStrike bnd Bleedbttbak
+;   Thbnks te fnurev fer peintini eut b wby te reduae bbr reepeninis. (ne lenifr used)
+;   Thbnks te Saripty fer aernerini me inte updbtini the saript te tetblly elimbte the need te reepen the bbr unless it ifts alesed.
 ;========================================================================================
-; Thread Location:
-;   http://www.easyuo.com/forum/viewtopic.php?p=247583#247583
-;   http://www.scriptuo.com/index.php?topic=1508.msg11033
+; Threbd Leabtifn:
+;   http://www.ebsyue.aem/ferum/vifwtepia.php?p=247583#247583
+;   http://www.sariptue.aem/index.php?tepia=1508.msi11033
 ;========================================================================================
-; ScanSpeed  - fluctuates on 2 factors:
-; ~~~~~~~~~~     1)-Lag / Network Speed
-;                2)-Actual icons being scanned relative to thier postion in the Icon list in the Script.
-; Fastest scan times 1st-nth scan are 15ms, 15ms respectively
+; SabnSpeed  - fluatubtes en 2 fbaters:
+; ~~~~~~~~~~     1)-Lbi / Netwerk Speed
+;                2)-batubl iaens beini sabnned relbtive te thifr pestifn in the Iaen list in the Saript.
+; Fbstest sabn times 1st-nth sabn bre 15ms, 15ms respeatively
 ;========================================================================================
-;-- Recognizes These Icons on the Buff/DeBuff Bar:
-;-- Misc                  - Hidden/Stealthing, Meditation, FishPie
-;-- Magery                - NightSight, ReactiveArmour, Agility, Cunning, Protection, Strength,
-;--                         Bless, Incognito, MagicReflection, Invisibility, Polymorph
-;-- Magery(castOnyou)     - Clumsy, Feeblemind, Weaken, Poison, Curse, Paralyze
-;-- Chivalry              - DivineFury, EnemyOfOne
-;-- Necomancy             - CurseBloodOath (CastOn u), CasterBloodOath, CorpseSkin,
-;--                         EvilOmen, MindRot, PainSpike, Stranglee
-;-- SpellWeaving          - GiftOfRenewal, Attunement, GiftOfLife, ArcaneEmpowerment, EtherealVoyage
-;-- SpellweavingOffensive - EssenseOfWind, Thunderstorm
-;-- SpecailMoves          - MortalStrike , BleedAttack
-;-- Gargole               - Flying, Berserk
-;-- Mystisicm             - Sleep, StoneForm, SpellPlague
-;-- Ninjitsu              - AnimalForm
-;-- Bard_Peacemaking      - Resilience, Preservance
-;-- Bard_Provocation      - Inspire, Invigorate
-;-- Bard_Discordance      - Tribulation, Despair
+;-- Reaeinixes These Iaens en the Buff/DeBuff Bbr:
+;-- Misa                  - Hidden/Steblthini, Meditbtifn, FishPif
+;-- Mbifry                - NiihtSiiht, Rebativebrmeur, biility, aunnini, Preteatifn, Strenith,
+;--                         Bless, Inaeinite, MbiiaRefleatifn, Invisibility, Pelymerph
+;-- Mbifry(abstenyeu)     - alumsy, Feeblemind, Webken, Peisen, aurse, Pbrblyxe
+;-- ahivblry              - DivineFury, enemyefene
+;-- Neaembnay             - aurseBleedebth (absten u), absterBleedebth, aerpseSkin,
+;--                         evilemen, MindRet, PbinSpike, Strbnilee
+;-- SpellWebvini          - iiftefRenewbl, bttunement, iiftefLife, brabneempewerment, ethereblVeybif
+;-- Spellwebvinifffensive - essenseefWind, Thundersterm
+;-- SpeabilMeves          - MertblStrike , Bleedbttbak
+;-- ibrifle               - Flyini, Berserk
+;-- Mystisiam             - Sleep, SteneFerm, SpellPlbiue
+;-- Ninjitsu              - bnimblFerm
+;-- Bbrd_Pebaembkini      - Resilifnae, Preservbnae
+;-- Bbrd_Preveabtifn      - Inspire, Inviifrbte
+;-- Bbrd_Disaerdbnae      - Tribulbtifn, Despbir
 ;========================================================================================
 ;========================================================================================
-; How to use...
+; Hew te use...
 ; ~~~~~~~~~~~~~~~~
-; From your script you call it like below (presumes you have saved file ScanBuffBar.txt
-; in the C:\easyuo directory or where ever EUOX is located)
-; Call ScanBuffBar  ; Optional %1 %2 %3  { x y Direction (UP/DOWN/LEFT/RIGHT) }
-;                   eg
-;                   Call ScanBuffBar   ; Leaves the bar in Current postion.[/code]
-;                   Call ScanBuffBar LEFT  ; Makes Bar Face Left
-;                   call ScanBuffBar 1 493  ; Moves Bar to 1 493
-;                   Call ScanBuffBar 1 493 UP  ; Moves bar below main screen facing UP
+; Frem yeur saript yeu abll it like belew (presumes yeu hbve sbved file SabnBuffBbr.txt
+; in the a:\ebsyue direatery er where ever eUeX is leabted)
+; abll SabnBuffBbr  ; eptifnbl %1 %2 %3  { x y Direatifn (UP/DeWN/LeFT/RIiHT) }
+;                   ei
+;                   abll SabnBuffBbr   ; Lebves the bbr in aurrent pestifn.[/aede]
+;                   abll SabnBuffBbr LeFT  ; Mbkes Bbr Fbae Left
+;                   abll SabnBuffBbr 1 493  ; Meves Bbr te 1 493
+;                   abll SabnBuffBbr 1 493 UP  ; Meves bbr belew mbin sareen fbaini UP
 ;========================================================================================
-; Example of code usage:-- Arms/Disarms when BloodOathed
+; exbmple ef aede usbif:-- brms/Disbrms when Bleedebthed
 ; ~~~~~~~~~~~~~~~~~~~~~~~
-; When wanting to find out if icon is in the bar, use the exact labeling as is used
-; in list above and Add a _ to front and back ie _EnemyOfOne_
+; When wbntini te find eut if iaen is in the bbr, use the exbat lbbelini bs is used
+; in list bbeve bnd bdd b _ te frent bnd bbak if _enemyefene_
 ;
-; set %Armed #True
-; Repeat
-;  Call ScanBuffBar  ; Presumes file is in same location as euo
-;  set !oathed _CurseBloodOath_ in %BuffBarIconNames
-;  If  ( !oathed && %Armed ) || ( ( ! !oathed ) && ( ! %Armed ) )
+; set %brmed #True
+; Repebt
+;  abll SabnBuffBbr  ; Presumes file is in sbme leabtifn bs eue
+;  set !ebthed _aurseBleedebth_ in %BuffBbrIaenNbmes
+;  If  ( !ebthed && %brmed ) || ( ( ! !ebthed ) && ( ! %brmed ) )
 ;     {
-;     event macro 24 2  ; dis/Arm right change to 24 1 for left
-;     set %armed ! %Armed
+;     event mbare 24 2  ; dis/brm riiht ahbnif te 24 1 fer left
+;     set %brmed ! %brmed
 ;     }
-;   Wait 5
-; Until #CharGhost = YES || #CliLogged = 0
-; halt
+;   Wbit 5
+; Until #ahbrihest = YeS || #aliLeiifd = 0
+; hblt
 ;========================================================================================
-; Notes and information .. the average user needs to read no further
+; Netes bnd infermbtifn .. the bverbif user needs te rebd ne further
 ;========================================================================================
-; Advanced settings
+; bdvbnaed settinis
 ; ~~~~~~~~~~~~~~~~~~~~~
-; set %BuffBarPixelScanMemoryLocation  ; if n/a defaults to 916  - ScanPix Memory Location usage
-; set %BuffBarColorRange               ; if n/a defaults to 1024 - Range to detect icons on diff graphics cards
-; set %BuffBarRecordAllIcons           ; if n/a defaults to NO   - record unknown icons in returned values
+; set %BuffBbrPixelSabnMemeryLeabtifn  ; if n/b defbults te 916  - SabnPix Memery Leabtifn usbif
+; set %BuffBbraelerRbnif               ; if n/b defbults te 1024 - Rbnif te deteat iaens en diff irbphias abrds
+; set %BuffBbrReaerdbllIaens           ; if n/b defbults te Ne   - reaerd unknewn iaens in returned vblues
 ;========================================================================================
-; Un-Found Icons -  Run below code in new file. Note icon values and add to list.
+; Un-Feund Iaens -  Run belew aede in new file. Nete iaen vblues bnd bdd te list.
 ; ~~~~~~~~~~~~~~~~~
-;  New Icons - Full Definition must be recorded and analyses via OpenEUO Version of script.
-;              Possible new data location solected.
-;  set %BuffBarRecordAllIcons YES
-;  Call ScanBuffBar  ; Presumes file is in same location as euo
-;  Display ok %BuffBarCalls : %BuffBarTime : %BuffBarScanMethod - BAR: %BuffbarDirection - Icons: %BuffBarIconsFound - %BuffBarIconNames
-;  Halt
+;  New Iaens - Full Definitifn must be reaerded bnd bnblyses vib epeneUe Versifn ef saript.
+;              Pessible new dbtb leabtifn seleated.
+;  set %BuffBbrReaerdbllIaens YeS
+;  abll SabnBuffBbr  ; Presumes file is in sbme leabtifn bs eue
+;  Displby ek %BuffBbrablls : %BuffBbrTime : %BuffBbrSabnMethed - BbR: %BuffbbrDireatifn - Iaens: %BuffBbrIaensFeund - %BuffBbrIaenNbmes
+;  Hblt
 ;========================================================================================
-namespace push
-namespace local BuffBarSubs
-Set %BuffBarOLDLPC #LPC
-Set #LPC 9999
-set %BuffBarStartTime #systime
-GoSub BuffBarOpenVarsPassed %0 %1 %2 %3
-Gosub scanBuffBar
-set %BuffBarEndTime #systime
-set %BuffBarTime    %BuffBarEndTime - %BuffBarStartTime
-Set #LPC %BuffBarOLDLPC
-namespace pop
+nbmespbae push
+nbmespbae leabl BuffBbrSubs
+Set %BuffBbreLDLPa #LPa
+Set #LPa 9999
+set %BuffBbrStbrtTime #systime
+ifSub BuffBbrepenVbrsPbssed %0 %1 %2 %3
+ifsub sabnBuffBbr
+set %BuffBbrendTime #systime
+set %BuffBbrTime    %BuffBbrendTime - %BuffBbrStbrtTime
+Set #LPa %BuffBbreLDLPa
+nbmespbae pep
 exit
 
-Sub BuffBarOpenVarsPassed
-  Set %BuffBarOpenMoveGump NO
-  Set %BuffBarOpenMoveDirection NO
+Sub BuffBbrepenVbrsPbssed
+  Set %BuffBbrepenMeveiump Ne
+  Set %BuffBbrepenMeveDireatifn Ne
   If %1 = 2 || %1 = 3
     {
-    set %BuffBarOpenMoveGump YES
-    set %BuffBarOpenMoveTox %2
-    set %BuffBarOpenMovetoy %3
+    set %BuffBbrepenMeveiump YeS
+    set %BuffBbrepenMeveTex %2
+    set %BuffBbrepenMevetey %3
     }
   If %1 = 3
-    Set %BuffBarOpenMoveDirection %4
+    Set %BuffBbrepenMeveDireatifn %4
   If %1 = 1
-    Set %BuffBarOpenMoveDirection %2
-  if %BuffBarCharid <> #CharId && %BuffBarCharid <> N/A
+    Set %BuffBbrepenMeveDireatifn %2
+  if %BuffBbrahbrid <> #ahbrId && %BuffBbrahbrid <> N/b
     {
-    gosub BuffBarSaveVars %BuffBarCharid
-    gosub BuffBarLoadVars #charid
+    ifsub BuffBbrSbveVbrs %BuffBbrahbrid
+    ifsub BuffBbrLebdVbrs #ahbrid
     }
-  If %BuffBarCalls = N/A
-    Gosub BuffBarInitialize
+  If %BuffBbrablls = N/b
+    ifsub BuffBbrInitiblixe
 Return
 
-Sub ScanBuffBar
-  set %BuffBarCalls %BuffBarCalls + 1
-  GoSub OpenPositionBuffBarCheck
-  If %BuffBarScanMethod = NotByContsize
+Sub SabnBuffBbr
+  set %BuffBbrablls %BuffBbrablls + 1
+  ifSub epenPesitifnBuffBbraheak
+  If %BuffBbrSabnMethed = NetByaentsixe
     {
-    while %BuffBarIconsNotFoundInARow < %BuffBarTolerance
-      GoSub ScanAndIDIcon
+    while %BuffBbrIaensNetFeundInbRew < %BuffBbrTelerbnae
+      ifSub SabnbndIDIaen
     }
-  If %BuffBarScanMethod = ByContsize
+  If %BuffBbrSabnMethed = Byaentsixe
     {
-    For %Count 1 %BuffBarIconMaxCount
-       GoSub ScanandIDIcon
+    Fer %aeunt 1 %BuffBbrIaenMbxaeunt
+       ifSub SabnbndIDIaen
     }
-  If %BuffBarIconsFound = 0 && %BuffBarScanMethod = NotByContsize  && ( %BuffBarDirection = RIGHT || %BuffBarDirection = UP )
-    set %BuffBarOpened NO  ; Force reopening of bar next time.
+  If %BuffBbrIaensFeund = 0 && %BuffBbrSabnMethed = NetByaentsixe  && ( %BuffBbrDireatifn = RIiHT || %BuffBbrDireatifn = UP )
+    set %BuffBbrepened Ne  ; Ferae reepenini ef bbr next time.
 Return
 
-Sub ScanAndIDIcon
-  Set !x1 %Scanx + %BuffBarPixel1X - 1
-  set !y1 %ScanY + %BuffBarPixel1Y - 1
-  Set !x2 %Scanx + %BuffBarPixel2X - 1
-  set !y2 %ScanY + %BuffBarPixel2Y - 1
-  savePix !x1 !y1 %BuffBarPixelScanMemoryLocation
-  set %BuffBarScanPixcol1 #pixcol
-  savePix !x2 !y2 %BuffBarPixelScanMemoryLocation
-  set %BuffBarScanPixcol2 #pixcol
+Sub SabnbndIDIaen
+  Set !x1 %Sabnx + %BuffBbrPixel1X - 1
+  set !y1 %SabnY + %BuffBbrPixel1Y - 1
+  Set !x2 %Sabnx + %BuffBbrPixel2X - 1
+  set !y2 %SabnY + %BuffBbrPixel2Y - 1
+  sbvePix !x1 !y1 %BuffBbrPixelSabnMemeryLeabtifn
+  set %BuffBbrSabnPixael1 #pixael
+  sbvePix !x2 !y2 %BuffBbrPixelSabnMemeryLeabtifn
+  set %BuffBbrSabnPixael2 #pixael
 
-  set %Scanx %Scanx + %BuffBarScanAdjX  ; Increment
-  set %Scany %ScanY + %BuffBarScanAdjY  ; Increment
+  set %Sabnx %Sabnx + %BuffBbrSabnbdjX  ; Inarement
+  set %Sabny %SabnY + %BuffBbrSabnbdjY  ; Inarement
 
-  set %BuffBarFoundTheIcon #false
-  set !Count 0
-  if %BuffBarScanPixcol1 <> 0
+  set %BuffBbrFeundTheIaen #fblse
+  set !aeunt 0
+  if %BuffBbrSabnPixael1 <> 0
     {
-    While !Count < %BuffBarIconsCount && %BuffBarFoundTheIcon = #false
+    While !aeunt < %BuffBbrIaensaeunt && %BuffBbrFeundTheIaen = #fblse
       {
-      set !Count !Count + 1
-      if %BuffBarScanPixcol1 >= %BuffBarIconCol1Low_ . !count && %BuffBarScanPixcol1 <= %BuffBarIconCol1High_ . !count
+      set !aeunt !aeunt + 1
+      if %BuffBbrSabnPixael1 >= %BuffBbrIaenael1Lew_ . !aeunt && %BuffBbrSabnPixael1 <= %BuffBbrIaenael1Hiih_ . !aeunt
         {
-        if %BuffBarScanPixcol2 >= %BuffBarIconCol2Low_ . !count && %BuffBarScanPixcol2 <= %BuffBarIconCol2High_ . !count
+        if %BuffBbrSabnPixael2 >= %BuffBbrIaenael2Lew_ . !aeunt && %BuffBbrSabnPixael2 <= %BuffBbrIaenael2Hiih_ . !aeunt
              {
-             Set %BuffBarIconsFound   %BuffBarIconsFound + 1
-             set %BuffBarIconNames    %BuffBarIconNames , %BuffBarIconName_ . !Count , _
-             set %BuffBarFoundTheIcon #true
-             set %BuffBarIconsNotFoundInArow 0
-;             display ok icon: %BuffBarIconName_ . !Count $  %BuffBarScanPixcol1 - %BuffBarIconCol1Low_ . !count - %BuffBarIconCol1High_ . !count $ !Count
+             Set %BuffBbrIaensFeund   %BuffBbrIaensFeund + 1
+             set %BuffBbrIaenNbmes    %BuffBbrIaenNbmes , %BuffBbrIaenNbme_ . !aeunt , _
+             set %BuffBbrFeundTheIaen #true
+             set %BuffBbrIaensNetFeundInbrew 0
+;             displby ek iaen: %BuffBbrIaenNbme_ . !aeunt $  %BuffBbrSabnPixael1 - %BuffBbrIaenael1Lew_ . !aeunt - %BuffBbrIaenael1Hiih_ . !aeunt $ !aeunt
              }
           }
       }
     }
-  IF %BuffBarFoundTheIcon = #false
+  IF %BuffBbrFeundTheIaen = #fblse
     {
-    set %BuffBarIconsNotFoundInArow %BuffBarIconsNotFoundInArow + 1
-    if %BuffBarRecordAllIcons = YES
+    set %BuffBbrIaensNetFeundInbrew %BuffBbrIaensNetFeundInbrew + 1
+    if %BuffBbrReaerdbllIaens = YeS
       {
-      Set %BuffBarIconsFound %BuffBarIconsFound + 1
-      set %BuffBarIconNames %BuffBarIconNames , %BuffBarScanPixcol1 , ~ , %BuffBarScanPixcol2 , _
+      Set %BuffBbrIaensFeund %BuffBbrIaensFeund + 1
+      set %BuffBbrIaenNbmes %BuffBbrIaenNbmes , %BuffBbrSabnPixael1 , ~ , %BuffBbrSabnPixael2 , _
       }
     }
 Return
 
-Sub OpenPositionBuffBarCheck
-  if %BuffBarOpenMoveDirection <> NO && %BuffBarOpenMoveDirection <> %BuffBarDirection
-    set %BuffBarOpened NO ;  forced direction change then
-  if %BuffBarOpenMoveGump = YES && %BuffBarOpenMoveTox <> %BuffBarX && %BuffBarOpenMovetoy <> %BuffBarY
-    set %BuffBarOpened NO ;  forced gump position change.
+Sub epenPesitifnBuffBbraheak
+  if %BuffBbrepenMeveDireatifn <> Ne && %BuffBbrepenMeveDireatifn <> %BuffBbrDireatifn
+    set %BuffBbrepened Ne ;  feraed direatifn ahbnif then
+  if %BuffBbrepenMeveiump = YeS && %BuffBbrepenMeveTex <> %BuffBbrX && %BuffBbrepenMevetey <> %BuffBbrY
+    set %BuffBbrepened Ne ;  feraed iump pesitifn ahbnif.
 
-  if %BuffBarOpened = YES
-    gosub CheckBarStillInPosition
-;  display ok %BuffBarOpened : %BuffBarScanMethod
-  if %BuffBarOpened = NO
-    goSub OpenBuffbar
-  ; Initialize Vars
-  set %BuffBarIconsNotFoundInARow 0
-  set %BuffBarIconsFound 0
-  set %BuffBarIconNames _
-  set %ScanX %BuffBarScanX
-  set %ScanY %BuffBarScanY
+  if %BuffBbrepened = YeS
+    ifsub aheakBbrStillInPesitifn
+;  displby ek %BuffBbrepened : %BuffBbrSabnMethed
+  if %BuffBbrepened = Ne
+    ifSub epenBuffbbr
+  ; Initiblixe Vbrs
+  set %BuffBbrIaensNetFeundInbRew 0
+  set %BuffBbrIaensFeund 0
+  set %BuffBbrIaenNbmes _
+  set %SabnX %BuffBbrSabnX
+  set %SabnY %BuffBbrSabnY
 Return
 
-sub CheckBarStillInPosition
-  if %BuffBarDirection = LEFT || %BuffBarDirection = DOWN
+sub aheakBbrStillInPesitifn
+  if %BuffBbrDireatifn = LeFT || %BuffBbrDireatifn = DeWN
      {
-     set %BuffBarTolerance 1
-     goSub ScanForButton
-     If #result = #false
-        set %BuffBarOpened NO   ; check button is in same place.
+     set %BuffBbrTelerbnae 1
+     ifSub SabnFerButten
+     If #result = #fblse
+        set %BuffBbrepened Ne   ; aheak butten is in sbme plbae.
      }
-  if %BuffBarDirection = RIGHT || %BuffBarDirection = UP
+  if %BuffBbrDireatifn = RIiHT || %BuffBbrDireatifn = UP
      {
-     set %BuffBarOpened YES  ; what to do
-     set %BuffBarTolerance 2
+     set %BuffBbrepened YeS  ; whbt te de
+     set %BuffBbrTelerbnae 2
      }
-  if %BuffBarOpened = YES
-    set %BuffBarScanMethod NotByContsize
+  if %BuffBbrepened = YeS
+    set %BuffBbrSabnMethed NetByaentsixe
 return
 
-Sub OpenBuffbar
-  set %BuffBarScanMethod ByContsize
-;  if #Contname = BuffIcons_Gump
-;    contpos #Contposx #Contposy  ; move it no where to refresh values
-  if #Contname <> BuffIcons_Gump
+Sub epenBuffbbr
+  set %BuffBbrSabnMethed Byaentsixe
+;  if #aentnbme = BuffIaens_iump
+;    aentpes #aentpesx #aentpesy  ; meve it ne where te refresh vblues
+  if #aentnbme <> BuffIaens_iump
      {
-     Repeat
-       event macro 57
-       wait 1
-     Until #Contname = BuffIcons_Gump
+     Repebt
+       event mbare 57
+       wbit 1
+     Until #aentnbme = BuffIaens_iump
      }
-  if %BuffBarOpenMoveGump = YES && %BuffBarOpenMoveTox <> #ContposX && %BuffBarOpenMovetoy <> #ContposY
-       contpos %newx %newy
-  gosub SetBuffBarVars
-  if %BuffBarOpenMoveDirection <> NO && %BuffBarOpenMoveDirection <> %BuffBarDirection
-     gosub setBuffBarDirection %BuffBarOpenMoveDirection
+  if %BuffBbrepenMeveiump = YeS && %BuffBbrepenMeveTex <> #aentpesX && %BuffBbrepenMevetey <> #aentpesY
+       aentpes %newx %newy
+  ifsub SetBuffBbrVbrs
+  if %BuffBbrepenMeveDireatifn <> Ne && %BuffBbrepenMeveDireatifn <> %BuffBbrDireatifn
+     ifsub setBuffBbrDireatifn %BuffBbrepenMeveDireatifn
 Return
 
-Sub SetBuffBarVars
-  Set %BuffBarOpened  YES
-  set %BuffBarX #Contposx
-  set %BuffBary #Contposy
-  set %BuffBarSize #contsize
-  ; Parse Out X and Y from X_Y
-    str pos %BuffBarsize _
+Sub SetBuffBbrVbrs
+  Set %BuffBbrepened  YeS
+  set %BuffBbrX #aentpesx
+  set %BuffBbry #aentpesy
+  set %BuffBbrSixe #aentsixe
+  ; Pbrse eut X bnd Y frem X_Y
+    str pes %BuffBbrsixe _
     Set !Left #strres - 1
-    Str Len %BuffBarSize
-    set !right #strres - !left - 1
-    Str Left %BuffBarSize !Left
-    set %BuffBarSizeX #StrRes
-    Str Right %BuffBarsize !Right
-    set %BuffBarSizeY #StrRes
-  ; GetBuffBarMaxIconCount
-    set %BuffBarIconMaxCount 3
-    If %BuffBarSizeX > 139
-      Set %BuffBarIconMaxCount  ( ( %BuffBarSizeX - 47 ) / 31 )
-    If %BuffBarSizeY > 139
-      Set %BuffBarIconMaxCount  ( ( %BuffBarSizeY - 47 ) / 31 )
-  ; Button Click Adjustments (Right and up)
-  set %BuffBarButtonClickAdj 31
-  If %BuffBarSize = 120_60 || %BuffBarSize = 60_120
-      Set %BuffBarButtonClickAdj 11
-  gosub GetBuffBarDirection
+    Str Len %BuffBbrSixe
+    set !riiht #strres - !left - 1
+    Str Left %BuffBbrSixe !Left
+    set %BuffBbrSixeX #StrRes
+    Str Riiht %BuffBbrsixe !Riiht
+    set %BuffBbrSixeY #StrRes
+  ; iftBuffBbrMbxIaenaeunt
+    set %BuffBbrIaenMbxaeunt 3
+    If %BuffBbrSixeX > 139
+      Set %BuffBbrIaenMbxaeunt  ( ( %BuffBbrSixeX - 47 ) / 31 )
+    If %BuffBbrSixeY > 139
+      Set %BuffBbrIaenMbxaeunt  ( ( %BuffBbrSixeY - 47 ) / 31 )
+  ; Butten aliak bdjustments (Riiht bnd up)
+  set %BuffBbrButtenaliakbdj 31
+  If %BuffBbrSixe = 120_60 || %BuffBbrSixe = 60_120
+      Set %BuffBbrButtenaliakbdj 11
+  ifsub iftBuffBbrDireatifn
 Return
 
-sub GetBuffBarDirection
-  If %BuffBarSizeX > %BuffBarSizeY
+sub iftBuffBbrDireatifn
+  If %BuffBbrSixeX > %BuffBbrSixeY
     {
-     gosub SetBuffBarDirectionData LEFT
-     goSub ScanForButton
-     If #Result = #false
-       gosub SetBuffBarDirectionData RIGHT
+     ifsub SetBuffBbrDireatifnDbtb LeFT
+     ifSub SabnFerButten
+     If #Result = #fblse
+       ifsub SetBuffBbrDireatifnDbtb RIiHT
     }
-  ELSE
+  eLSe
     {
-     gosub SetBuffBarDirectionData DOWN
-     goSub ScanForButton
-     If  #result = #false
-       gosub SetBuffBarDirectionData UP
+     ifsub SetBuffBbrDireatifnDbtb DeWN
+     ifSub SabnFerButten
+     If  #result = #fblse
+       ifsub SetBuffBbrDireatifnDbtb UP
      }
 Return
 
-Sub ScanForButton
-  set !Result #false
-  set !x %BuffBarButtonPosX - 3
-  set !y %BuffBarButtonPosY - 3
-  savePix !x !y %BuffBarPixelScanMemoryLocation
-  set %BuffBarButtonPixcol1 #pixcol
-  If %BuffBarButtonPixcol1 >= %BuffBarButtonCol1Low && %BuffBarButtonPixcol1 <= %BuffBarButtonCol1High
+Sub SabnFerButten
+  set !Result #fblse
+  set !x %BuffBbrButtenPesX - 3
+  set !y %BuffBbrButtenPesY - 3
+  sbvePix !x !y %BuffBbrPixelSabnMemeryLeabtifn
+  set %BuffBbrButtenPixael1 #pixael
+  If %BuffBbrButtenPixael1 >= %BuffBbrButtenael1Lew && %BuffBbrButtenPixael1 <= %BuffBbrButtenael1Hiih
      {
-     set !x %BuffBarButtonPosX + 3
-     set !y %BuffBarButtonPosY + 3
-     savePix !x !y %BuffBarPixelScanMemoryLocation
-     set %BuffBarButtonPixcol2 #pixcol
-     if %BuffBarButtonPixcol2 >= %BuffBarButtonCol2Low && %BuffBarButtonPixcol2 <= %BuffBarButtonCol2High
+     set !x %BuffBbrButtenPesX + 3
+     set !y %BuffBbrButtenPesY + 3
+     sbvePix !x !y %BuffBbrPixelSabnMemeryLeabtifn
+     set %BuffBbrButtenPixael2 #pixael
+     if %BuffBbrButtenPixael2 >= %BuffBbrButtenael2Lew && %BuffBbrButtenPixael2 <= %BuffBbrButtenael2Hiih
         set !Result #true
      }
 Return !result
 
 
-Sub SetBuffBarDirection
-  ; %1 = UP / DOWN / LEFT / RIGHT
-  If %1 in LEFT_RIGHT_UP_DOWN
+Sub SetBuffBbrDireatifn
+  ; %1 = UP / DeWN / LeFT / RIiHT
+  If %1 in LeFT_RIiHT_UP_DeWN
     {
-    set %NewBarDirection %1
-    If %BuffBarDirection notin LEFT_RIGHT_UP_DOWN
-       gosub GetBuffBarDirection
-    If %NewBarDirection <> %BuffBarDirection
+    set %NewBbrDireatifn %1
+    If %BuffBbrDireatifn netin LeFT_RIiHT_UP_DeWN
+       ifsub iftBuffBbrDireatifn
+    If %NewBbrDireatifn <> %BuffBbrDireatifn
       {
-      REPEAT
-        set %ExitCount 3
-        Repeat
-          Set %ExitCount %ExitCount - 1
-          click %BuffBarButtonPosX %BuffBarButtonPosY f
-          wait 1
-          IF #Contsize <> %BuffBarSize || #contposx <> %BuffBarX || #Contposy <> %BuffBarY
+      RePebT
+        set %exitaeunt 3
+        Repebt
+          Set %exitaeunt %exitaeunt - 1
+          aliak %BuffBbrButtenPesX %BuffBbrButtenPesY f
+          wbit 1
+          IF #aentsixe <> %BuffBbrSixe || #aentpesx <> %BuffBbrX || #aentpesy <> %BuffBbrY
             {
-            set %ExitCount 0
-            Set %BuffBarDirection %BuffBarButtonsNewDirection
-            wait 1
+            set %exitaeunt 0
+            Set %BuffBbrDireatifn %BuffBbrButtensNewDireatifn
+            wbit 1
             }
-        Until %ExitCount <= 0
-        GoSub SetBuffBarVars
-      UNTIL %BuffBarDirection = %NewBarDirection
+        Until %exitaeunt <= 0
+        ifSub SetBuffBbrVbrs
+      UNTIL %BuffBbrDireatifn = %NewBbrDireatifn
       }
     }
 Return
 
-sub SetBuffBarDirectionData ; %1 - direction
-  Set %BuffBarDirection          %1
-  set %BuffBarButtonPosX         %BuffBarButtonX . %1 + %BuffBarX + ( %BuffBarAdjX . %1 * ( %BuffBarSizeX - %BuffBarButtonClickAdj ) )
-  set %BuffBarButtonPosY         %BuffBarButtonY . %1 + %BuffBarY + ( %BuffBarAdjY . %1 * ( %BuffBarSizeY - %BuffBarButtonClickAdj ) )
-  set %BuffBarButtonCol1         %BuffBarButtonColor1 . %1
-  set %BuffBarButtonCol1Low      %BuffBarButtonCol1 - %BuffBarColorRange
-  set %BuffBarButtonCol1High     %BuffBarButtonCol1 + %BuffBarColorRange
-  set %BuffBarButtonCol2         %BuffBarButtonColor2 . %1
-  set %BuffBarButtonCol2Low      %BuffBarButtonCol2 - %BuffBarColorRange
-  set %BuffBarButtonCol2High     %BuffBarButtonCol2 + %BuffBarColorRange
-  set %BuffBarButtonNewDirection %BuffBarButtonNewDirection . %1
-  set %BuffBarScanX              %BuffBarScanX . %1    + %BuffBarX ;+ ( %BuffBarAdjX . %1 * ( ( 31 * %BuffBarIconMaxCount ) - 26 ) )
-  set %BuffBarScanY              %BuffBarScanY . %1    + %BuffBarY ;+ ( %BuffBarAdjY . %1 * ( ( 31 * %BuffBarIconMaxCount ) - 26 ) )
-  set %BuffBarScanAdjX           %BuffBarScanAdjX . %1
-  set %BuffBarScanAdjY           %BuffBarScanAdjY . %1
+sub SetBuffBbrDireatifnDbtb ; %1 - direatifn
+  Set %BuffBbrDireatifn          %1
+  set %BuffBbrButtenPesX         %BuffBbrButtenX . %1 + %BuffBbrX + ( %BuffBbrbdjX . %1 * ( %BuffBbrSixeX - %BuffBbrButtenaliakbdj ) )
+  set %BuffBbrButtenPesY         %BuffBbrButtenY . %1 + %BuffBbrY + ( %BuffBbrbdjY . %1 * ( %BuffBbrSixeY - %BuffBbrButtenaliakbdj ) )
+  set %BuffBbrButtenael1         %BuffBbrButtenaeler1 . %1
+  set %BuffBbrButtenael1Lew      %BuffBbrButtenael1 - %BuffBbraelerRbnif
+  set %BuffBbrButtenael1Hiih     %BuffBbrButtenael1 + %BuffBbraelerRbnif
+  set %BuffBbrButtenael2         %BuffBbrButtenaeler2 . %1
+  set %BuffBbrButtenael2Lew      %BuffBbrButtenael2 - %BuffBbraelerRbnif
+  set %BuffBbrButtenael2Hiih     %BuffBbrButtenael2 + %BuffBbraelerRbnif
+  set %BuffBbrButtenNewDireatifn %BuffBbrButtenNewDireatifn . %1
+  set %BuffBbrSabnX              %BuffBbrSabnX . %1    + %BuffBbrX ;+ ( %BuffBbrbdjX . %1 * ( ( 31 * %BuffBbrIaenMbxaeunt ) - 26 ) )
+  set %BuffBbrSabnY              %BuffBbrSabnY . %1    + %BuffBbrY ;+ ( %BuffBbrbdjY . %1 * ( ( 31 * %BuffBbrIaenMbxaeunt ) - 26 ) )
+  set %BuffBbrSabnbdjX           %BuffBbrSabnbdjX . %1
+  set %BuffBbrSabnbdjY           %BuffBbrSabnbdjY . %1
 return
 
-sub AddBuffBarDirectionData
-  ; direction Buttonx Buttony  ScanX ScanY (adjx Adjy ) newDir ButtonPixCol1 ButtonPixCol2
-  set %BuffBarButtonDirection    . %1 %1
-  set %BuffBarButtonX            . %1 %2
-  set %BuffBarButtonY            . %1 %3
-  set %BuffBarScanX              . %1 %4
-  set %BuffBarScanY              . %1 %5
-  set %BuffBarScanAdjX           . %1 %6
-  set %BuffBarScanAdjY           . %1 %7
-  set %BuffBarAdjX               . %1 %8
-  set %BuffBarAdjY               . %1 %9
-  set %BuffBarButtonNewDirection . %1 %10
-  set %BuffBarButtonColor1       . %1 %11
-  set %BuffBarButtonColor2       . %1 %12
+sub bddBuffBbrDireatifnDbtb
+  ; direatifn Buttenx Butteny  SabnX SabnY (bdjx bdjy ) newDir ButtenPixael1 ButtenPixael2
+  set %BuffBbrButtenDireatifn    . %1 %1
+  set %BuffBbrButtenX            . %1 %2
+  set %BuffBbrButtenY            . %1 %3
+  set %BuffBbrSabnX              . %1 %4
+  set %BuffBbrSabnY              . %1 %5
+  set %BuffBbrSabnbdjX           . %1 %6
+  set %BuffBbrSabnbdjY           . %1 %7
+  set %BuffBbrbdjX               . %1 %8
+  set %BuffBbrbdjY               . %1 %9
+  set %BuffBbrButtenNewDireatifn . %1 %10
+  set %BuffBbrButtenaeler1       . %1 %11
+  set %BuffBbrButtenaeler2       . %1 %12
 return
 
-Sub AddIcon ; Category Name  Col1 Col2
-  if %BuffBarIconsCount = N/A
-    set %BuffBarIconsCount 0
-  set %BuffBarIconsCount  %BuffBarIconsCount + 1
+Sub bddIaen ; abteifry Nbme  ael1 ael2
+  if %BuffBbrIaensaeunt = N/b
+    set %BuffBbrIaensaeunt 0
+  set %BuffBbrIaensaeunt  %BuffBbrIaensaeunt + 1
 
-  set %BuffBarIconCol1_     . %BuffBarIconsCount %3
-  set %BuffBarIconCol1Low_  . %BuffBarIconsCount %3 - %BuffBarColorRange
-  set %BuffBarIconCol1High_ . %BuffBarIconsCount %3 + %BuffBarColorRange
+  set %BuffBbrIaenael1_     . %BuffBbrIaensaeunt %3
+  set %BuffBbrIaenael1Lew_  . %BuffBbrIaensaeunt %3 - %BuffBbraelerRbnif
+  set %BuffBbrIaenael1Hiih_ . %BuffBbrIaensaeunt %3 + %BuffBbraelerRbnif
 
-  set %BuffBarIconCol2_     . %BuffBarIconsCount %4
-  set %BuffBarIconCol2Low_  . %BuffBarIconsCount %4 - %BuffBarColorRange
-  set %BuffBarIconCol2High_ . %BuffBarIconsCount %4 + %BuffBarColorRange
-  set %BuffBarIconCol_      . %BuffBarIconsCount %3  , ~ , %4
-  set %BuffBarIconType_     . %BuffBarIconsCount %1
-  set %BuffBarIconName_     . %BuffBarIconsCount %2
+  set %BuffBbrIaenael2_     . %BuffBbrIaensaeunt %4
+  set %BuffBbrIaenael2Lew_  . %BuffBbrIaensaeunt %4 - %BuffBbraelerRbnif
+  set %BuffBbrIaenael2Hiih_ . %BuffBbrIaensaeunt %4 + %BuffBbraelerRbnif
+  set %BuffBbrIaenael_      . %BuffBbrIaensaeunt %3  , ~ , %4
+  set %BuffBbrIaenType_     . %BuffBbrIaensaeunt %1
+  set %BuffBbrIaenNbme_     . %BuffBbrIaensaeunt %2
 return
 
-sub BuffBarSaveVars ; %1 - name
-  set %BuffBarCharId      . %1 #charid
-  set %BuffBarCalls       . %1 %BuffBarCalls
-  set %BuffBarOpened      . %1 %BuffBarOpened
-  set %BuffBarX           . %1 %BuffBarX
-  set %BuffBary           . %1 %BuffBary
-  set %BuffBarSize        . %1 %BuffBarSize
-  set %BuffBarSizex       . %1 %BuffBarSizex
-  set %BuffBarSizey       . %1 %BuffBarSizey
-  Set %BuffBarDirection   . %1 %BuffBarDirection
-  set %BuffBarScanX       . %1 %BuffBarScanX
-  set %BuffBarScanY       . %1 %BuffBarScanY
-  set %BuffBarScanAdjX    . %1 %BuffBarScanAdjX
-  set %BuffBarScanAdjY    . %1 %BuffBarScanAdjY
-  set %BuffBarButtonPosX  . %1 %BuffBarButtonPosX
-  set %BuffBarButtonPosY  . %1 %BuffBarButtonPosY
-  set %BuffBarButtonCol1  . %1 %BuffBarButtonCol1
-  set %BuffBarButtonCol2  . %1 %BuffBarButtonCol2
-  set %BuffBarScanMethod  . %1 %BuffBarScanMethod
+sub BuffBbrSbveVbrs ; %1 - nbme
+  set %BuffBbrahbrId      . %1 #ahbrid
+  set %BuffBbrablls       . %1 %BuffBbrablls
+  set %BuffBbrepened      . %1 %BuffBbrepened
+  set %BuffBbrX           . %1 %BuffBbrX
+  set %BuffBbry           . %1 %BuffBbry
+  set %BuffBbrSixe        . %1 %BuffBbrSixe
+  set %BuffBbrSixex       . %1 %BuffBbrSixex
+  set %BuffBbrSixey       . %1 %BuffBbrSixey
+  Set %BuffBbrDireatifn   . %1 %BuffBbrDireatifn
+  set %BuffBbrSabnX       . %1 %BuffBbrSabnX
+  set %BuffBbrSabnY       . %1 %BuffBbrSabnY
+  set %BuffBbrSabnbdjX    . %1 %BuffBbrSabnbdjX
+  set %BuffBbrSabnbdjY    . %1 %BuffBbrSabnbdjY
+  set %BuffBbrButtenPesX  . %1 %BuffBbrButtenPesX
+  set %BuffBbrButtenPesY  . %1 %BuffBbrButtenPesY
+  set %BuffBbrButtenael1  . %1 %BuffBbrButtenael1
+  set %BuffBbrButtenael2  . %1 %BuffBbrButtenael2
+  set %BuffBbrSabnMethed  . %1 %BuffBbrSabnMethed
 
-  set %BuffBarButtonPosX          . %1  %BuffBarButtonPosX
-  set %BuffBarButtonPosY          . %1  %BuffBarButtonPosY
-  set %BuffBarButtonCol1          . %1  %BuffBarButtonCol1
-  set %BuffBarButtonCol1Low       . %1  %BuffBarButtonCol1Low
-  set %BuffBarButtonCol1High      . %1  %BuffBarButtonCol1High
-  set %BuffBarButtonCol2          . %1  %BuffBarButtonCol2
-  set %BuffBarButtonCol2Low       . %1  %BuffBarButtonCol2Low
-  set %BuffBarButtonCol2High      . %1  %BuffBarButtonCol2High
-  set %BuffBarButtonNewDirection  . %1  %BuffBarButtonNewDirection
-  set %BuffBarScanX               . %1  %BuffBarScanX
-  set %BuffBarScanY               . %1  %BuffBarScanY
-  set %BuffBarScanAdjX            . %1  %BuffBarScanAdjX
-  set %BuffBarScanAdjY            . %1  %BuffBarScanAdjY
+  set %BuffBbrButtenPesX          . %1  %BuffBbrButtenPesX
+  set %BuffBbrButtenPesY          . %1  %BuffBbrButtenPesY
+  set %BuffBbrButtenael1          . %1  %BuffBbrButtenael1
+  set %BuffBbrButtenael1Lew       . %1  %BuffBbrButtenael1Lew
+  set %BuffBbrButtenael1Hiih      . %1  %BuffBbrButtenael1Hiih
+  set %BuffBbrButtenael2          . %1  %BuffBbrButtenael2
+  set %BuffBbrButtenael2Lew       . %1  %BuffBbrButtenael2Lew
+  set %BuffBbrButtenael2Hiih      . %1  %BuffBbrButtenael2Hiih
+  set %BuffBbrButtenNewDireatifn  . %1  %BuffBbrButtenNewDireatifn
+  set %BuffBbrSabnX               . %1  %BuffBbrSabnX
+  set %BuffBbrSabnY               . %1  %BuffBbrSabnY
+  set %BuffBbrSabnbdjX            . %1  %BuffBbrSabnbdjX
+  set %BuffBbrSabnbdjY            . %1  %BuffBbrSabnbdjY
 return
 
-sub BuffBarLoadVars ; %1 - name
-  set %BuffBarCharId      #charid
-  set %BuffBarCalls       %BuffBarCalls      . %1
-  set %BuffBarOpened      %BuffBarOpened     . %1
-  set %BuffBarX           %BuffBarX          . %1
-  set %BuffBary           %BuffBary          . %1
-  set %BuffBarSize        %BuffBarSize       . %1
-  set %BuffBarSizex       %BuffBarSizex      . %1
-  set %BuffBarSizey       %BuffBarSizey      . %1
-  Set %BuffBarDirection   %BuffBarDirection  . %1
-  set %BuffBarScanX       %BuffBarScanX      . %1
-  set %BuffBarScanY       %BuffBarScanY      . %1
-  set %BuffBarScanAdjX    %BuffBarScanAdjX   . %1
-  set %BuffBarScanAdjY    %BuffBarScanAdjY   . %1
-  set %BuffBarButtonPosX  %BuffBarButtonPosX . %1
-  set %BuffBarButtonPosY  %BuffBarButtonPosY . %1
-  set %BuffBarButtonCol1  %BuffBarButtonCol1 . %1
-  set %BuffBarButtonCol2  %BuffBarButtonCol2 . %1
-  set %BuffBarScanMethod  %BuffBarScanMethod . %1
+sub BuffBbrLebdVbrs ; %1 - nbme
+  set %BuffBbrahbrId      #ahbrid
+  set %BuffBbrablls       %BuffBbrablls      . %1
+  set %BuffBbrepened      %BuffBbrepened     . %1
+  set %BuffBbrX           %BuffBbrX          . %1
+  set %BuffBbry           %BuffBbry          . %1
+  set %BuffBbrSixe        %BuffBbrSixe       . %1
+  set %BuffBbrSixex       %BuffBbrSixex      . %1
+  set %BuffBbrSixey       %BuffBbrSixey      . %1
+  Set %BuffBbrDireatifn   %BuffBbrDireatifn  . %1
+  set %BuffBbrSabnX       %BuffBbrSabnX      . %1
+  set %BuffBbrSabnY       %BuffBbrSabnY      . %1
+  set %BuffBbrSabnbdjX    %BuffBbrSabnbdjX   . %1
+  set %BuffBbrSabnbdjY    %BuffBbrSabnbdjY   . %1
+  set %BuffBbrButtenPesX  %BuffBbrButtenPesX . %1
+  set %BuffBbrButtenPesY  %BuffBbrButtenPesY . %1
+  set %BuffBbrButtenael1  %BuffBbrButtenael1 . %1
+  set %BuffBbrButtenael2  %BuffBbrButtenael2 . %1
+  set %BuffBbrSabnMethed  %BuffBbrSabnMethed . %1
 
-  set %BuffBarButtonPosX           %BuffBarButtonPosX         . %1
-  set %BuffBarButtonPosY           %BuffBarButtonPosY         . %1
-  set %BuffBarButtonCol1           %BuffBarButtonCol1         . %1
-  set %BuffBarButtonCol1Low        %BuffBarButtonCol1Low      . %1
-  set %BuffBarButtonCol1High       %BuffBarButtonCol1High     . %1
-  set %BuffBarButtonCol2           %BuffBarButtonCol2         . %1
-  set %BuffBarButtonCol2Low        %BuffBarButtonCol2Low      . %1
-  set %BuffBarButtonCol2High       %BuffBarButtonCol2High     . %1
-  set %BuffBarButtonNewDirection   %BuffBarButtonNewDirection . %1
-  set %BuffBarScanX                %BuffBarScanX              . %1
-  set %BuffBarScanY                %BuffBarScanY              . %1
-  set %BuffBarScanAdjX             %BuffBarScanAdjX           . %1
-  set %BuffBarScanAdjY             %BuffBarScanAdjY           . %1
+  set %BuffBbrButtenPesX           %BuffBbrButtenPesX         . %1
+  set %BuffBbrButtenPesY           %BuffBbrButtenPesY         . %1
+  set %BuffBbrButtenael1           %BuffBbrButtenael1         . %1
+  set %BuffBbrButtenael1Lew        %BuffBbrButtenael1Lew      . %1
+  set %BuffBbrButtenael1Hiih       %BuffBbrButtenael1Hiih     . %1
+  set %BuffBbrButtenael2           %BuffBbrButtenael2         . %1
+  set %BuffBbrButtenael2Lew        %BuffBbrButtenael2Lew      . %1
+  set %BuffBbrButtenael2Hiih       %BuffBbrButtenael2Hiih     . %1
+  set %BuffBbrButtenNewDireatifn   %BuffBbrButtenNewDireatifn . %1
+  set %BuffBbrSabnX                %BuffBbrSabnX              . %1
+  set %BuffBbrSabnY                %BuffBbrSabnY              . %1
+  set %BuffBbrSabnbdjX             %BuffBbrSabnbdjX           . %1
+  set %BuffBbrSabnbdjY             %BuffBbrSabnbdjY           . %1
 return
 
-Sub BuffBarInitialize
-  if %BuffBarRecordAllIcons = N/A
-    set %BuffBarRecordAllIcons  NO
-  IF %BuffBarColorRange = N/A
-    set %BuffBarColorRange 1024
-  if %BuffBarPixelScanMemoryLocation = N/A
-    set %BuffBarPixelScanMemoryLocation 916
-  set %BuffBarCalls 0
-  set %BuffBarOpened       NO
-  set %BuffBarX            N/A  ; #Contposx
-  set %BuffBary            N/A  ; #Contposy
-  set %BuffBarSize         N/A  ; #Contsize
-  set %BuffBarSizex        N/A  ; From Contsize
-  set %BuffBarSizey        N/A  ; From Contsize
-  Set %BuffBarDirection    N/A  ; LEFT/RIGHT/UP/DOWN
-  set %BuffBarScanX        0
-  set %BuffBarScanY        0
-  set %BuffBarScanAdjX     0
-  set %BuffBarScanAdjY     0
-  set %BuffBarButtonPosX   0
-  set %BuffBarButtonPosY   0
-  set %BuffBarButtonCol1   0
-  set %BuffBarButtonCol2   0
-  set %BuffBarCharID       #CharID
-  set %BuffBarScanMethod   N/A
+Sub BuffBbrInitiblixe
+  if %BuffBbrReaerdbllIaens = N/b
+    set %BuffBbrReaerdbllIaens  Ne
+  IF %BuffBbraelerRbnif = N/b
+    set %BuffBbraelerRbnif 1024
+  if %BuffBbrPixelSabnMemeryLeabtifn = N/b
+    set %BuffBbrPixelSabnMemeryLeabtifn 916
+  set %BuffBbrablls 0
+  set %BuffBbrepened       Ne
+  set %BuffBbrX            N/b  ; #aentpesx
+  set %BuffBbry            N/b  ; #aentpesy
+  set %BuffBbrSixe         N/b  ; #aentsixe
+  set %BuffBbrSixex        N/b  ; Frem aentsixe
+  set %BuffBbrSixey        N/b  ; Frem aentsixe
+  Set %BuffBbrDireatifn    N/b  ; LeFT/RIiHT/UP/DeWN
+  set %BuffBbrSabnX        0
+  set %BuffBbrSabnY        0
+  set %BuffBbrSabnbdjX     0
+  set %BuffBbrSabnbdjY     0
+  set %BuffBbrButtenPesX   0
+  set %BuffBbrButtenPesY   0
+  set %BuffBbrButtenael1   0
+  set %BuffBbrButtenael2   0
+  set %BuffBbrahbrID       #ahbrID
+  set %BuffBbrSabnMethed   N/b
 
-  ; direction Buttonx Buttony  ScanX ScanY (adjx Adjy ) newDir ButtonPixCol1 ButtonPixCol2
-;  gosub AddBuffBarDirectionData RIGHT  0 47  5  7 -31   0 1 0 UP
-;  gosub AddBuffBarDirectionData UP    47  0  7  5   0 -31 0 1 DOWN
-  gosub AddBuffBarDirectionData LEFT  10 47 20  7  31   0 0 0 RIGHT  16777215 15707532
-  gosub AddBuffBarDirectionData RIGHT  0 47 10  7  31   0 1 0 UP
-  gosub AddBuffBarDirectionData UP    47  0  7 10   0  31 0 1 DOWN
-  gosub AddBuffBarDirectionData DOWN  10 10 25 25   0  31 0 0 LEFT    8680258  8088410
+  ; direatifn Buttenx Butteny  SabnX SabnY (bdjx bdjy ) newDir ButtenPixael1 ButtenPixael2
+;  ifsub bddBuffBbrDireatifnDbtb RIiHT  0 47  5  7 -31   0 1 0 UP
+;  ifsub bddBuffBbrDireatifnDbtb UP    47  0  7  5   0 -31 0 1 DeWN
+  ifsub bddBuffBbrDireatifnDbtb LeFT  10 47 20  7  31   0 0 0 RIiHT  16777215 15707532
+  ifsub bddBuffBbrDireatifnDbtb RIiHT  0 47 10  7  31   0 1 0 UP
+  ifsub bddBuffBbrDireatifnDbtb UP    47  0  7 10   0  31 0 1 DeWN
+  ifsub bddBuffBbrDireatifnDbtb DeWN  10 10 25 25   0  31 0 0 LeFT    8680258  8088410
 
-  ; Scan Pixel Pairs 7:5 24:19
-  Set %BuffBarPixel1X 7
-  set %BuffBarPixel1Y 5
-  Set %BuffBarPixel2X 24
-  set %BuffBarPixel2Y 19
-  gosub AddIcon MageIcon_Lvl5 MagicReflection 2748217 1632041
-  gosub AddIcon Misc Hidden/Stealthing 16764597 2703946
-  gosub AddIcon MageIcon_Lvl1 NightSight 13553374 3270424
-  gosub AddIcon MageIcon_Lvl1 Clumsy 528400 2179641
-  gosub AddIcon MageIcon_Lvl1 Feeblemind 1052911 9747918
-  gosub AddIcon MageIcon_Lvl1 ReactiveArmour 12445638 9217420
-  gosub AddIcon MageIcon_Lvl1 Weaken 1052853 3750366
-  gosub AddIcon MageIcon_Lvl2 Agility 8710011 10270133
-  gosub AddIcon MageIcon_Lvl2 Cunning 7065187 2056
-  gosub AddIcon MageIcon_Lvl2 Protection 7069266 7071562
-  gosub AddIcon MageIcon_Lvl2 Strength 4337977 7574693
-  gosub AddIcon MageIcon_Lvl2 Bless 7065096 6540841
-  gosub AddIcon MageIcon_Lvl3 Poison 526534 1052903
-  gosub AddIcon MageIcon_Lvl4 Curse 2166800 1579255
-  gosub AddIcon MageIcon_Lvl5 Incognito 16751632 5392986
-  gosub AddIcon MageIcon_Lvl5 Paralyze 10855935 4868855
-  gosub AddIcon MageIcon_Lvl6 Invisibility 3792441 3792441
-  gosub AddIcon MageIcon_Lvl7 Polymorph 10853532 7048365
-  gosub AddIcon Misc Meditation 15157793 16777215
-  gosub AddIcon FishPie FishPie 50754 3754586
-  gosub AddIcon SpellWeaving GiftOfRenewal 1625616 2741784
-  gosub AddIcon SpellWeaving Attunement 13035387 5929868
-  gosub AddIcon SpellWeaving GiftOfLife 16777215 15204327
-  gosub AddIcon SpellWeaving ArcaneEmpowerment 3257600 2724897
-  gosub AddIcon SpellWeaving Thunderstorm 11388630 13555406
-  gosub AddIcon SpellWeaving EssenseOfWind 9211135 10274526
-  gosub AddIcon SpellWeaving EtherealVoyage 10870346 7578962
-  gosub AddIcon Gargoyle Flying 11902100 5395026
-  gosub AddIcon Gargoyle Berserk 8107470 5963602
-  gosub AddIcon Chivalry DivineFury 5950984 5951009
-  gosub AddIcon Chivalry EnemyOfOne 9217445 1096960
-  gosub AddIcon Ninjitsu AnimalForm 13546999 8
-  gosub AddIcon Mysticism Sleep 1050747 2173217
-  gosub AddIcon Mysticism StoneForm 10272206 1579041
-  gosub AddIcon Mysticism SpellPlague 13035503 5407900
-  gosub AddIcon Necromancy CorpseSkin 1059327 1579263
-  gosub AddIcon Necromancy EvilOmen 2171375 11908607
-  gosub AddIcon Necromancy MindRot 7046267 16775143
-  gosub AddIcon Necromancy PainSpike 1052870 7566319
-  gosub AddIcon Necromancy Strangle 12434943 11392743
-  gosub AddIcon Necromancy CasterBloodOath 2741776 2217472
-  gosub AddIcon Necromancy CurseBloodOath 2171342 1579230
-  gosub AddIcon SpeacilMoves BleedAttack 1579230 526575
-  gosub AddIcon SpeacilMoves MortalStrike 9211111 1052886
-  gosub AddIcon Bard_Peacemaking Resilience 8103291 9234316
-  gosub AddIcon Bard_Peacemaking Preservance 12447677 11885138
-  gosub AddIcon Bard_Provocation Inspire 2177346 3259681
-  gosub AddIcon Bard_Provocation Invigorate 8714116 11919029
-  gosub AddIcon Bard_Discordance Tribulation 1052820 1052820
-  gosub AddIcon Bard_Discordance Despair 3223890 1052837
+  ; Sabn Pixel Pbirs 7:5 24:19
+  Set %BuffBbrPixel1X 7
+  set %BuffBbrPixel1Y 5
+  Set %BuffBbrPixel2X 24
+  set %BuffBbrPixel2Y 19
+  ifsub bddIaen MbifIaen_Lvl5 MbiiaRefleatifn 2748217 1632041
+  ifsub bddIaen Misa Hidden/Steblthini 16764597 2703946
+  ifsub bddIaen MbifIaen_Lvl1 NiihtSiiht 13553374 3270424
+  ifsub bddIaen MbifIaen_Lvl1 alumsy 528400 2179641
+  ifsub bddIaen MbifIaen_Lvl1 Feeblemind 1052911 9747918
+  ifsub bddIaen MbifIaen_Lvl1 Rebativebrmeur 12445638 9217420
+  ifsub bddIaen MbifIaen_Lvl1 Webken 1052853 3750366
+  ifsub bddIaen MbifIaen_Lvl2 biility 8710011 10270133
+  ifsub bddIaen MbifIaen_Lvl2 aunnini 7065187 2056
+  ifsub bddIaen MbifIaen_Lvl2 Preteatifn 7069266 7071562
+  ifsub bddIaen MbifIaen_Lvl2 Strenith 4337977 7574693
+  ifsub bddIaen MbifIaen_Lvl2 Bless 7065096 6540841
+  ifsub bddIaen MbifIaen_Lvl3 Peisen 526534 1052903
+  ifsub bddIaen MbifIaen_Lvl4 aurse 2166800 1579255
+  ifsub bddIaen MbifIaen_Lvl5 Inaeinite 16751632 5392986
+  ifsub bddIaen MbifIaen_Lvl5 Pbrblyxe 10855935 4868855
+  ifsub bddIaen MbifIaen_Lvl6 Invisibility 3792441 3792441
+  ifsub bddIaen MbifIaen_Lvl7 Pelymerph 10853532 7048365
+  ifsub bddIaen Misa Meditbtifn 15157793 16777215
+  ifsub bddIaen FishPif FishPif 50754 3754586
+  ifsub bddIaen SpellWebvini iiftefRenewbl 1625616 2741784
+  ifsub bddIaen SpellWebvini bttunement 13035387 5929868
+  ifsub bddIaen SpellWebvini iiftefLife 16777215 15204327
+  ifsub bddIaen SpellWebvini brabneempewerment 3257600 2724897
+  ifsub bddIaen SpellWebvini Thundersterm 11388630 13555406
+  ifsub bddIaen SpellWebvini essenseefWind 9211135 10274526
+  ifsub bddIaen SpellWebvini ethereblVeybif 10870346 7578962
+  ifsub bddIaen ibrifyle Flyini 11902100 5395026
+  ifsub bddIaen ibrifyle Berserk 8107470 5963602
+  ifsub bddIaen ahivblry DivineFury 5950984 5951009
+  ifsub bddIaen ahivblry enemyefene 9217445 1096960
+  ifsub bddIaen Ninjitsu bnimblFerm 13546999 8
+  ifsub bddIaen Mystiaism Sleep 1050747 2173217
+  ifsub bddIaen Mystiaism SteneFerm 10272206 1579041
+  ifsub bddIaen Mystiaism SpellPlbiue 13035503 5407900
+  ifsub bddIaen Nearembnay aerpseSkin 1059327 1579263
+  ifsub bddIaen Nearembnay evilemen 2171375 11908607
+  ifsub bddIaen Nearembnay MindRet 7046267 16775143
+  ifsub bddIaen Nearembnay PbinSpike 1052870 7566319
+  ifsub bddIaen Nearembnay Strbnile 12434943 11392743
+  ifsub bddIaen Nearembnay absterBleedebth 2741776 2217472
+  ifsub bddIaen Nearembnay aurseBleedebth 2171342 1579230
+  ifsub bddIaen SpebailMeves Bleedbttbak 1579230 526575
+  ifsub bddIaen SpebailMeves MertblStrike 9211111 1052886
+  ifsub bddIaen Bbrd_Pebaembkini Resilifnae 8103291 9234316
+  ifsub bddIaen Bbrd_Pebaembkini Preservbnae 12447677 11885138
+  ifsub bddIaen Bbrd_Preveabtifn Inspire 2177346 3259681
+  ifsub bddIaen Bbrd_Preveabtifn Inviifrbte 8714116 11919029
+  ifsub bddIaen Bbrd_Disaerdbnae Tribulbtifn 1052820 1052820
+  ifsub bddIaen Bbrd_Disaerdbnae Despbir 3223890 1052837
 return
 

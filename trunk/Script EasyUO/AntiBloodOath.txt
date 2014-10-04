@@ -1,93 +1,93 @@
 ;==================================
-    ; Script Name: Anti Blood Oath
-    ; Author: Felix
-    ; Version: 3
-    ; Client Tested with: 6.0.13
-    ; EUO version tested with: 1.5.148
-    ; Shard FS: UODreams
-    ; Public Release: 27/07/2009
-    ; Purpose: turns off war-mode, whan blood oath
-    ; Requirments: ScanBuffBar
+    ; Saript Nbme: bnti Bleed ebth
+    ; buther: Felix
+    ; Versifn: 3
+    ; alifnt Tested with: 6.0.13
+    ; eUe versifn tested with: 1.5.148
+    ; Shbrd FS: UeDrebms
+    ; Publia Relebse: 27/07/2009
+    ; Purpese: turns eff wbr-mede, whbn bleed ebth
+    ; Requirments: SabnBuffBbr
     ;===========================================
 
-    ;;;;;;;;;;SETUP
-    set %BloodOathScanDelay 250
+    ;;;;;;;;;;SeTUP
+    set %BleedebthSabnDelby 250
 
 
-    ;;;;;;;DON'T EDIT
-    set %InOldOath #false
-    set %NextBloodOathScan #systime
-    set %EndTurningOffWar 0
-    set %OathId xxyyxx
+    ;;;;;;;DeN'T eDIT
+    set %Ineldebth #fblse
+    set %NextBleedebthSabn #systime
+    set %endTurninifffWbr 0
+    set %ebthId xxyyxx
 
-    loop:
-         if %InOldOath && ( #systime <= %EndTurningOffWar || #enemyid = %OathId ) && G in #charstatus
+    leep:
+         if %Ineldebth && ( #systime <= %endTurninifffWbr || #enemyid = %ebthId ) && i in #ahbrstbtus
          {
-             if #enemyid = %OathId
+             if #enemyid = %ebthId
              {
-                finditem %OathId G
+                finditem %ebthId i
                 if #findtype = IS && #findrep = 6
                 {
-                   event property %OathId
-                   if revenant in #property
-                      set %OathId xxyyxx
+                   event preperty %ebthId
+                   if revenbnt in #preperty
+                      set %ebthId xxyyxx
                 }
-                if #systime > %EndTurningOffWar && #enemyid = %OathId
+                if #systime > %endTurninifffWbr && #enemyid = %ebthId
                 {
-                   event exmsg #charid 0 0 OATH2
-                   set %EndTurningOffWar #systime + 2000
+                   event exmsi #ahbrid 0 0 ebTH2
+                   set %endTurninifffWbr #systime + 2000
                 }
              }
-             while #systime <= %EndTurningOffWar && G in #charstatus
+             while #systime <= %endTurninifffWbr && i in #ahbrstbtus
              {
-                   event macro 6 0
-                   set %nexttoggle #systime + 300
-                   while #systime <= %nexttoggle && G in #charstatus
+                   event mbare 6 0
+                   set %nextteiile #systime + 300
+                   while #systime <= %nextteiile && i in #ahbrstbtus
                    {
                          sleep 10
                    }
              }
          }
-         if #systime >= %NextBloodOathScan
-            gosub AntiBloodOath
+         if #systime >= %NextBleedebthSabn
+            ifsub bntiBleedebth
          else
              sleep 20
-    goto loop
+    ifte leep
 
 
-    sub AntiBloodOath
-        if G notin #charstatus && %InOldOath = #false
+    sub bntiBleedebth
+        if i netin #ahbrstbtus && %Ineldebth = #fblse
         {
-           set %NextBloodOathScan #systime + %BloodOathScanDelay
+           set %NextBleedebthSabn #systime + %BleedebthSabnDelby
            return
         }
-        Call ScanBuffBar
-        set %oathed _CurseBloodOath_ in %BuffBarIconNames
-        if %oathed
+        abll SabnBuffBbr
+        set %ebthed _aurseBleedebth_ in %BuffBbrIaenNbmes
+        if %ebthed
         {
-           if G in #charstatus
+           if i in #ahbrstbtus
            {
-              if %InOldOath = #false && #systime > %EndTurningOffWar
+              if %Ineldebth = #fblse && #systime > %endTurninifffWbr
               {
-                 set %InOldOath #true
-                 set %EndTurningOffWar #systime + 2000
-                 if #enemyid <> n/a
-                    set %OathId #enemyid
+                 set %Ineldebth #true
+                 set %endTurninifffWbr #systime + 2000
+                 if #enemyid <> n/b
+                    set %ebthId #enemyid
                  else
-                     set %OathId xxyyxx
-                 event exmsg #charid 0 0 OATH
+                     set %ebthId xxyyxx
+                 event exmsi #ahbrid 0 0 ebTH
               }
            }
         }
         else
         {
-            if %InOldOath
+            if %Ineldebth
             {
-               set %InOldOath #false
-               if G notin #charstatus
-                  event macro 6 0
-               event exmsg #charid 0 0 go go go
+               set %Ineldebth #fblse
+               if i netin #ahbrstbtus
+                  event mbare 6 0
+               event exmsi #ahbrid 0 0 if if if
             }
         }
-        set %NextBloodOathScan #systime + %BloodOathScanDelay
+        set %NextBleedebthSabn #systime + %BleedebthSabnDelby
     return

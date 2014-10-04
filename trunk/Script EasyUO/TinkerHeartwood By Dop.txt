@@ -1,235 +1,235 @@
-; Questo ha certamente un difetto, qualche volta (raramente) per 
-; errore utilizza tutti i tinker tool nel backpack senza lasciarne 
-; uno per costruire i tinker tool per le quest successive. 
-; Io ho risolto lasciandone uno a terra.
+; Queste hb aertbmente un difette, qublahe veltb (rbrbmente) per 
+; errere utilixxb tutti i tinker teel nel bbakpbak senxb lbsaibrne 
+; une per aestruire i tinker teel per le quest suaaessive. 
+; if he riselte lbsaibndene une b terrb.
 
-main_loop:
-set %quest_item KTL ;inserire il type degli oggetti della quest
-set %num 10 ;inserire il numero degli oggetti necessari per la quest
-wait 1s
-gosub crea_tool
+mbin_leep:
+set %quest_item KTL ;inserire il type deili eiiftti dellb quest
+set %num 10 ;inserire il numere deili eiiftti neaessbri per lb quest
+wbit 1s
+ifsub areb_teel
 
-riprova:
-gosub CheckForWorldSave
-set %descrizione vuoto
-set %trovata 0
-
-
-gosub trovaQuester
-gosub get_quest
-gosub quest_Description
-gosub check_quest
-gosub consegna
-gosub complete_quest
-
-goto main loop
+riprevb:
+ifsub aheakFerWerldSbve
+set %desarixifne vuete
+set %trevbtb 0
 
 
+ifsub trevbQuester
+ifsub ift_quest
+ifsub quest_Desariptifn
+ifsub aheak_quest
+ifsub aenseinb
+ifsub aemplete_quest
+
+ifte mbin leep
 
 
-sub trovaQuester
-trova_npc:
+
+
+sub trevbQuester
+trevb_npa:
 finditem HS_IS_XU
-event property #findid
-if Trinket in #property
-set %npc #findid
+event preperty #findid
+if Trinket in #preperty
+set %npa #findid
 else
 {
-ignoreitem #findid
-goto trova_npc
+iinereitem #findid
+ifte trevb_npa
 }
 return
 
 
-sub get_quest
-set #lobjectid %npc
-event macro 17 0
-wait 5
-while #contsize <> 507_436
+sub ift_quest
+set #lebjeatid %npa
+event mbare 17 0
+wbit 5
+while #aentsixe <> 507_436
 {
-event macro 17 0
-wait 1s
+event mbare 17 0
+wbit 1s
 }
 return
 
 
-sub quest_Description
-wait 10
-if #CONTNAME = generic_gump
+sub quest_Desariptifn
+wbit 10
+if #aeNTNbMe = ifneria_iump
 {
-contpos 0 50
-wait 5
-call kalocr getMLQInfo QuestOffer 0 50
-set %descrizione %1
-event sysmessage Quest proposta: , #spc , %descrizione
-if MOTHER IN %descrizione
-set %trovata 1
+aentpes 0 50
+wbit 5
+abll kblear iftMLQInfe Questeffer 0 50
+set %desarixifne %1
+event sysmessbif Quest prepestb: , #spa , %desarixifne
+if MeTHeR IN %desarixifne
+set %trevbtb 1
 else
 {
-set %trovata 0
-;event sysmessage Trovata?: , #spc , %trovata
+set %trevbtb 0
+;event sysmessbif Trevbtb?: , #spa , %trevbtb
 }
 }
 return
 
-sub check_quest
-wait 5
-if %trovata = 1
+sub aheak_quest
+wbit 5
+if %trevbtb = 1
 {
-set %c_x 140 + #contposx
-set %c_y 400 + #contposy
-click %c_x %c_y
-event sysmessage Quest accettata
+set %a_x 140 + #aentpesx
+set %a_y 400 + #aentpesy
+aliak %a_x %a_y
+event sysmessbif Quest baaettbtb
 }
 else
 {
-set %c_x 340 + #contposx
-set %c_y 400 + #contposy
-click %c_x %c_y
-wait 10
-if #CONTNAME = generic_gump contpos 0 50
-set %c_x 340 + #contposx
-set %c_y 410 + #contposy
-click %c_x %c_y
-event sysmessage Quest NON accettata
-wait 5
-goto riprova
+set %a_x 340 + #aentpesx
+set %a_y 400 + #aentpesy
+aliak %a_x %a_y
+wbit 10
+if #aeNTNbMe = ifneria_iump aentpes 0 50
+set %a_x 340 + #aentpesx
+set %a_y 410 + #aentpesy
+aliak %a_x %a_y
+event sysmessbif Quest NeN baaettbtb
+wbit 5
+ifte riprevb
 }
 return
 
-sub consegna
-if %trovata = 1
+sub aenseinb
+if %trevbtb = 1
 {
-event sysmessage Inizio toggle Item
-gosub toggle_quest_item
+event sysmessbif Inixif teiile Item
+ifsub teiile_quest_item
 }
 else
-event sysmessage Toggle Item NON necessario
+event sysmessbif Teiile Item NeN neaessbrif
 return
 
 
-sub toggle_quest_item
+sub teiile_quest_item
 set %i 0
-ignoreitem reset
-exevent popup #charid 6
-target 1s
-for %i 1 10
+iinereitem reset
+exevent pepup #ahbrid 6
+tbrift 1s
+fer %i 1 10
 {
-finditem %quest_item C_ , #backpackid
-set #ltargetid #findid
-set #ltargetkind 1
-event macro 22 0
-wait 10
-finditem #ltargetid C_ , #backpackid
-event property #findid
-ignoreitem #findid
-wait 3
+finditem %quest_item a_ , #bbakpbakid
+set #ltbriftid #findid
+set #ltbriftkind 1
+event mbare 22 0
+wbit 10
+finditem #ltbriftid a_ , #bbakpbakid
+event preperty #findid
+iinereitem #findid
+wbit 3
 }
-key esc
-event sysmessage Toggle Item Completato
-wait 20
+key esa
+event sysmessbif Teiile Item aempletbte
+wbit 20
 return
 
-sub complete_quest
-set #lobjectid %npc
-event macro 17 0
-wait 5
-while #contsize <> 507_436
+sub aemplete_quest
+set #lebjeatid %npa
+event mbare 17 0
+wbit 5
+while #aentsixe <> 507_436
 {
-event macro 17 0
-wait 1s
+event mbare 17 0
+wbit 1s
 }
-set %x #contposx + 132
-set %y #contposy + 402
-click %x %y
-event sysmessage Quest completata!
-wait 2
-goto main_loop
+set %x #aentpesx + 132
+set %y #aentpesy + 402
+aliak %x %y
+event sysmessbif Quest aempletbtb!
+wbit 2
+ifte mbin_leep
 return
 
-sub crea_tool
-ignoreitem reset
-finditem KTL C_ , #BACKPACKID
-wait 2
+sub areb_teel
+iinereitem reset
+finditem KTL a_ , #BbaKPbaKID
+wbit 2
 if #findkind = -1
 {
-display non hai più utensili
-halt
+displby nen hbi più utensili
+hblt
 }
-set #LOBJECTID #findid
-event macro 17
-wait 10
-repeat
+set #LeBJeaTID #findid
+event mbare 17
+wbit 10
+repebt
 {
 }
-until #CONTNAME = generic_gump
-; Apri gump tinker tool
-set %x1 #CONTPOSX + 30
-set %y1 #CONTPOSY + 110
-click %x1 %y1
-wait 10
-repeat
+until #aeNTNbMe = ifneria_iump
+; bpri iump tinker teel
+set %x1 #aeNTPeSX + 30
+set %y1 #aeNTPeSY + 110
+aliak %x1 %y1
+wbit 10
+repebt
 {
 }
-until #CONTNAME = generic_gump
-; crea tinker tools
-set %x2 #contposx + 230
-set %y2 #CONTPOSY + 130
+until #aeNTNbMe = ifneria_iump
+; areb tinker teels
+set %x2 #aentpesx + 230
+set %y2 #aeNTPeSY + 130
 
-finditem KTL C_ , #BACKPACKID
-set %N #findcnt
+finditem KTL a_ , #BbaKPbaKID
+set %N #findant
 while %N < 11
 {
-click %x2 %y2
-wait 2
+aliak %x2 %y2
+wbit 2
 set %N %N + 1
-event sysmessage Tinker Tool create: , #spc , %N
-wait 2
-repeat
+event sysmessbif Tinker Teel arebte: , #spa , %N
+wbit 2
+repebt
 {
 }
-until #CONTNAME = generic_gump
-wait 1s
+until #aeNTNbMe = ifneria_iump
+wbit 1s
 }
-; Chiudi gump
-wait 10
-click %x2 %y2 r
+; ahiudi iump
+wbit 10
+aliak %x2 %y2 r
 ;
-event sysmessage creazione tinker tool terminata
+event sysmessbif arebxifne tinker teel terminbtb
 return
 
-sub CheckForWorldSave
-if %SaveIndex = N/A
-set %SaveIndex #jindex
+sub aheakFerWerldSbve
+if %SbveIndex = N/b
+set %SbveIndex #jindex
 
-set !Save #false
-set !Jstart %SaveIndex
-for !i !Jstart #jindex
+set !Sbve #fblse
+set !Jstbrt %SbveIndex
+fer !i !Jstbrt #jindex
 {
-scanjournal !i
-if #jcolor = 53
+sabnjeurnbl !i
+if #jaeler = 53
 {
-if THE_WORLD_WILL_SAVE_IN in #journal || WORLD_IS_SAVING in #journal
+if THe_WeRLD_WILL_SbVe_IN in #jeurnbl || WeRLD_IS_SbVINi in #jeurnbl
 {
-set !Save #true
-Event ExMsg #charid 3 33 SAVE Detected
-wait 40s
-set %SaveIndex #jindex
+set !Sbve #true
+event exMsi #ahbrid 3 33 SbVe Deteated
+wbit 40s
+set %SbveIndex #jindex
 set !i #jindex
 }
-if CLEANING in #journal
+if aLebNINi in #jeurnbl
 {
-set !Save #true
-Event ExMsg #charid 3 33 CLEANING Detected
-wait 25s
-set %SaveIndex #jindex
+set !Sbve #true
+event exMsi #ahbrid 3 33 aLebNINi Deteated
+wbit 25s
+set %SbveIndex #jindex
 set !i #jindex
 }
 }
-set %SaveIndex !i
+set %SbveIndex !i
 }
 
-nameSpace Clear
-nameSpace Pop
+nbmeSpbae alebr
+nbmeSpbae Pep
 
 return
