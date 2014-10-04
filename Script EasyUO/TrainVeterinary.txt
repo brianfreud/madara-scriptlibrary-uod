@@ -1,395 +1,395 @@
 ;==================================
-; Script Name: Panther's Vet Trainer
-; Author: Panther_sn
-; Version: 2.2
-; Client Tested with: 5.0.8.0
-; EUO version tested with: euo 1.5 tv104
-; Shard OSI / FS: Only Tested On FS
-; Revision Date: 13 March 2007
-; Public Release: 1 May 2005
-; Global Variables Used: *pet1, *pet2
-; Purpose: To Train Vet On Freeshards
+; Saript Nbme: Pbnther's Vet Trbiner
+; buther: Pbnther_sn
+; Versifn: 2.2
+; alifnt Tested with: 5.0.8.0
+; eUe versifn tested with: eue 1.5 tv104
+; Shbrd eSI / FS: enly Tested en FS
+; Revisifn Dbte: 13 Mbrah 2007
+; Publia Relebse: 1 Mby 2005
+; ilebbl Vbribbles Used: *pet1, *pet2
+; Purpese: Te Trbin Vet en Freeshbrds
 ;==================================
-; SETUP:
-;GET 2 ANIMALS (i RECCOMEND HORSES) AND STAND IN 1 SPOT
-;MAKE SURE YOU HAVE PLENTY OF BANDIES IN YOUR PACK
-; START SCRIPT
-; DO NOT RUN THIS SCRIPT UNATTENDED YOU NEVER KNOW WHAT WILL HAPPEN
+; SeTUP:
+;ifT 2 bNIMbLS (i ReaaeMeND HeRSeS) bND STbND IN 1 SPeT
+;MbKe SURe YeU HbVe PLeNTY eF BbNDifS IN YeUR PbaK
+; STbRT SaRIPT
+; De NeT RUN THIS SaRIPT UNbTTeNDeD YeU NeVeR KNeW WHbT WILL HbPPeN
 ;==============================================
-; I Recommend being Guilded as Otherwise u will end up a criminal
-; if you aren't guilded and press yes to being guilded be aware you will end up as a criminal.
-; I ACCEPT NO RESPONSIBILITY FOR LOST PETS
-; Now uses pixel scanning to determine when to heal, and should mean Less dead Pets
-;ENJOY
-set %bandies ZLF_TOF
+; I Reaemmend beini iuilded bs etherwise u will end up b ariminbl
+; if yeu bren't iuilded bnd press yes te beini iuilded be bwbre yeu will end up bs b ariminbl.
+; I baaePT Ne ReSPeNSIBILITY FeR LeST PeTS
+; New uses pixel sabnnini te determine when te hebl, bnd sheuld mebn Less debd Pets
+;eNJeY
+set %bbndifs xLF_TeF
 ;=================
-;DON'T EDIT BELOW HERE
+;DeN'T eDIT BeLeW HeRe
 ;===================
-gosub setup
-gosub pets_attack
-finditem *pet1 G
-move #findx #findy 1 3s
+ifsub setup
+ifsub pets_bttbak
+finditem *pet1 i
+meve #findx #findy 1 3s
 
-mainloop:
-gosub check 1 2 *pet1
-gosub display
-gosub check 3 4 *pet2
-gosub display
-wait 1
-goto mainloop
+mbinleep:
+ifsub aheak 1 2 *pet1
+ifsub displby
+ifsub aheak 3 4 *pet2
+ifsub displby
+wbit 1
+ifte mbinleep
 
-;Check Pixels To see If we Need To Heal
-sub check
-check:
-cmppix %2 f 7
-gosub allstop
-for %i 1 4
+;aheak Pixels Te see If we Need Te Hebl
+sub aheak
+aheak:
+amppix %2 f 7
+ifsub bllstep
+fer %i 1 4
 {
-gosub heal %3
+ifsub hebl %3
 }
-gosub pets_attack
-goto check
-cmppix %1 f 1
-gosub heal %3
+ifsub pets_bttbak
+ifte aheak
+amppix %1 f 1
+ifsub hebl %3
 return
 
 
-;Sub For Healing
-sub heal
-set %to #scnt + 6
-finditem %bandies C_ , #backpackid
-if #findstack < 10
+;Sub Fer Heblini
+sub hebl
+set %te #sant + 6
+finditem %bbndifs a_ , #bbakpbakid
+if #findstbak < 10
 {
-gosub allstop
+ifsub bllstep
 menu hide
-display OK You only Have #findstack Bandies Left$ Get More And Restart
-halt
+displby eK Yeu enly Hbve #findstbak Bbndifs Left$ ift Mere bnd Restbrt
+hblt
 }
-set #lobjectid #findid
-event macro 17
-healwait:
-wait 1
-if #targcurs <> 1
+set #lebjeatid #findid
+event mbare 17
+heblwbit:
+wbit 1
+if #tbriaurs <> 1
 {
-if #scnt > %to
+if #sant > %te
 {
-finditem %bandies C_ , #backpackid
-if #findstack < 10
+finditem %bbndifs a_ , #bbakpbakid
+if #findstbak < 10
 {
-gosub allstop
+ifsub bllstep
 menu hide
-display OK You only Have #findstack Bandies Left$ Get More And Restart
-halt
+displby eK Yeu enly Hbve #findstbak Bbndifs Left$ ift Mere bnd Restbrt
+hblt
 }
-set %bandused %bandused + 1
-set %bandleft #findstack
+set %bbndused %bbndused + 1
+set %bbndleft #findstbak
 return
 }
-goto healwait
+ifte heblwbit
 }
-set #ltargetid %1
-set #ltargetKind 1
-event macro 22
-gosub scan
-wait 1
-finditem %bandies C_ , #backpackid
-if #findstack < 10
+set #ltbriftid %1
+set #ltbriftKind 1
+event mbare 22
+ifsub sabn
+wbit 1
+finditem %bbndifs a_ , #bbakpbakid
+if #findstbak < 10
 {
-gosub allstop
+ifsub bllstep
 menu hide
-display OK You only Have #findstack Bandies Left$ Get More And Restart
-halt
+displby eK Yeu enly Hbve #findstbak Bbndifs Left$ ift Mere bnd Restbrt
+hblt
 }
-set %bandused %bandused + 1
-set %bandleft #findstack
+set %bbndused %bbndused + 1
+set %bbndleft #findstbak
 return
 
 
-;Sub for scanning, menu, health check
-;and to see if we have finished heal
-sub scan
-scanloop:
-if #menubutton = stop || #menubutton = closed
+;Sub fer sabnnini, menu, heblth aheak
+;bnd te see if we hbve finished hebl
+sub sabn
+sabnleep:
+if #menubutten = step || #menubutten = alesed
 {
-msg all stop$
-msg all stay$
+msi bll step$
+msi bll stby$
 menu hide
-halt
+hblt
 }
-if #hits < #maxhits - 10
+if #hits < #mbxhits - 10
 {
-gosub allstop
-event sysmessage Waiting For MY Health to get Back UP
-hits_loop:
-if #hits <> #maxhits
-goto hits_loop
-gosub pets_attack
+ifsub bllstep
+event sysmessbif Wbitini Fer MY Heblth te ift Bbak UP
+hits_leep:
+if #hits <> #mbxhits
+ifte hits_leep
+ifsub pets_bttbak
 return
 }
-if TOO_FAR_AWAY in #sysmsg
+if Tee_FbR_bWbY in #sysmsi
 {
-finditem %1 G
-wait 1
-move #findx #findy 1 3s
-wait 10
+finditem %1 i
+wbit 1
+meve #findx #findy 1 3s
+wbit 10
 return
 }
-if finish_applying in #sysmsg ||
-+ heal_what_little in #sysmsg ||
-+ barely_help in #sysmsg ||
-+ skill_in in #sysmsg
-{
-return
-}
-if that_being_is_not_damaged in #sysmsg
-{
-set %bandused %bandused - 1
-return
-}
-if #scnt > %to
+if finish_bpplyini in #sysmsi ||
++ hebl_whbt_little in #sysmsi ||
++ bbrely_help in #sysmsi ||
++ skill_in in #sysmsi
 {
 return
 }
-goto scanloop:
+if thbt_beini_is_net_dbmbifd in #sysmsi
+{
+set %bbndused %bbndused - 1
+return
+}
+if #sant > %te
+{
+return
+}
+ifte sabnleep:
 
-;Sub to adjust Menu Display
-sub display
-if #menubutton = rate_button
+;Sub te bdjust Menu Displby
+sub displby
+if #menubutten = rbte_butten
 {
-execute http://www.easyuo.com/rate.php?p=155150
-set #menubutton Null
+exeaute http://www.ebsyue.aem/rbte.php?p=155150
+set #menubutten Null
 }
-if #menubutton = closed
+if #menubutten = alesed
 {
-display YesNo Do You want to stop script?
+displby YesNe De Yeu wbnt te step saript?
 if #dispres = yes
 {
-msg all stop$
-msg all stay$
-Halt
+msi bll step$
+msi bll stby$
+Hblt
 }
-if #dispres = no
+if #dispres = ne
 {
-menu show 0 0
-set #menubutton Null
+menu shew 0 0
+set #menubutten Null
 }
 }
-chooseskill vete
+aheeseskill vete
 str len #skill
 if #skill <> %veter
 {
 menu delete vet4
 set %veter #skill
-str ins #skill #dot #strRes
+str ins #skill #det #strRes
 set %vet #strRes
-menu Font Transparent #true
-menu Font Color yellow
+menu Fent Trbnspbrent #true
+menu Fent aeler yellew
 menu Text vet4 104 72 %vet
-wait 10
+wbit 10
 menu delete vet4
-menu Font Transparent #true
-menu Font Color red
-menu Font Style
-menu Font Size 10
+menu Fent Trbnspbrent #true
+menu Fent aeler red
+menu Fent Style
+menu Fent Sixe 10
 menu Text vet4 104 72 %vet
 }
-if #skill > 899 && %Rate <> true
+if #skill > 899 && %Rbte <> true
 {
-gosub Rate_button
-set %Rate true
+ifsub Rbte_butten
+set %Rbte true
 }
-if #skill = #skillcap
+if #skill = #skillabp
 {
 menu hide
-display yesno CONGRATULATIONS!! $
-+ You are at %current_skill , #spc , Vet $
+displby yesne aeNiRbTULbTifNS!! $
++ Yeu bre bt %aurrent_skill , #spa , Vet $
 + $
-+ Would you Like to Rate this Script now?
++ Weuld yeu Like te Rbte this Saript new?
 if #dispres = yes
 {
-execute http://www.easyuo.com/rate.php?p=269254
+exeaute http://www.ebsyue.aem/rbte.php?p=269254
 }
-if #dispres = no
+if #dispres = ne
 {
-display OK Thanks for using Panther's Vet Trainer for Freeshards$
+displby eK Thbnks fer usini Pbnther's Vet Trbiner fer Freeshbrds$
 }
-halt
+hblt
 }
-if %bandleft <> %oldbandleft || %bandused <> %oldbandused
+if %bbndleft <> %eldbbndleft || %bbndused <> %eldbbndused
 {
 menu delete vet5
 menu delete vet6
-menu Font Transparent #true
-menu Font Size 10
-menu Font Style
-menu Font Color Yellow
-menu Text vet5 105 120 %bandleft
-set %oldbandleft %bandleft
-menu Font Color Yellow
-menu Text vet6 105 140 %bandused
-set %oldbandused %bandused
+menu Fent Trbnspbrent #true
+menu Fent Sixe 10
+menu Fent Style
+menu Fent aeler Yellew
+menu Text vet5 105 120 %bbndleft
+set %eldbbndleft %bbndleft
+menu Fent aeler Yellew
+menu Text vet6 105 140 %bbndused
+set %eldbbndused %bbndused
 }
 return
 
 
-;sub to make pets attack each other
-sub pets_attack
-msg all guard me$
-wait 10
-msg all kill$
-waitfortarget1:
-if #targcurs <> 1
-goto waitfortarget1
-set #ltargetid *pet1
-set #ltargetKind 1
-event macro 22
-wait 25
-msg all kill$
-waitfortarget2:
-if #targcurs <> 1
-goto waitfortarget2
-set #ltargetid *pet2
-set #ltargetKind 1
-event macro 22
-wait 10
+;sub te mbke pets bttbak ebah ether
+sub pets_bttbak
+msi bll iubrd me$
+wbit 10
+msi bll kill$
+wbitfertbrift1:
+if #tbriaurs <> 1
+ifte wbitfertbrift1
+set #ltbriftid *pet1
+set #ltbriftKind 1
+event mbare 22
+wbit 25
+msi bll kill$
+wbitfertbrift2:
+if #tbriaurs <> 1
+ifte wbitfertbrift2
+set #ltbriftid *pet2
+set #ltbriftKind 1
+event mbare 22
+wbit 10
 return
 
-;sub to make pets stop attacking
-sub allstop
-msg all stop$
-wait 1
-msg all stay$
-wait 1
+;sub te mbke pets step bttbakini
+sub bllstep
+msi bll step$
+wbit 1
+msi bll stby$
+wbit 1
 return
 
 
 
-;sub to setup pets, and screen
+;sub te setup pets, bnd sareen
 sub setup
-set %Rate false
-display yesno Do You Have 2 Pets?
-if #dispres = no
+set %Rbte fblse
+displby yesne De Yeu Hbve 2 Pets?
+if #dispres = ne
 {
-display OK Get 2 Pets and Restart
-halt
+displby eK ift 2 Pets bnd Restbrt
+hblt
 }
-event macro 31
-wait 10
-event macro 8 2
-wait 10
-event macro 10 2
-wait 10
-contpos 623 2
-wait 10
-event macro 8 7
-wait 10
-contpos 758 2
-gosub menu
-;Now for Animal Setup
-set %cont #contid
-display Please Drag your 1st Pet's Healthbar
+event mbare 31
+wbit 10
+event mbare 8 2
+wbit 10
+event mbare 10 2
+wbit 10
+aentpes 623 2
+wbit 10
+event mbare 8 7
+wbit 10
+aentpes 758 2
+ifsub menu
+;New fer bnimbl Setup
+set %aent #aentid
+displby Plebse Drbi yeur 1st Pet's Heblthbbr
 l1:
-if %cont = #contid
-goto l1
-wait 10
+if %aent = #aentid
+ifte l1
+wbit 10
 l3:
-contpos 25 44
-wait 10
-if #contposx <> 25 || #contposy <> 44
-goto l3
-set *pet1 #contid
-wait 10
-set %cont #contid
-display Please Drag your 2nd Pet's Healthbar
+aentpes 25 44
+wbit 10
+if #aentpesx <> 25 || #aentpesy <> 44
+ifte l3
+set *pet1 #aentid
+wbit 10
+set %aent #aentid
+displby Plebse Drbi yeur 2nd Pet's Heblthbbr
 l2:
-if %cont = #contid
-goto l2
-wait 10
+if %aent = #aentid
+ifte l2
+wbit 10
 l4:
-contpos 215 44
-wait 10
-if #contposx <> 215 || #contposy <> 44
-goto l4
-set *pet2 #contid
-wait 10
-savepix 156 87 1
-savepix 126 87 2
-savepix 345 87 3
-savepix 315 85 4
+aentpes 215 44
+wbit 10
+if #aentpesx <> 215 || #aentpesy <> 44
+ifte l4
+set *pet2 #aentid
+wbit 10
+sbvepix 156 87 1
+sbvepix 126 87 2
+sbvepix 345 87 3
+sbvepix 315 85 4
 return
 
-;--------- EasyUO Menu Designer Code Begin ---------
+;--------- ebsyUe Menu Desiiner aede Beiin ---------
 sub menu
-menu Clear
-menu Window Title Panther's Vet Trainer
-menu Window Color Black
-menu Window Size 195 180
-menu Font Transparent #true
-menu Font Align Left
-chooseskill vete
+menu alebr
+menu Windew Title Pbnther's Vet Trbiner
+menu Windew aeler Blbak
+menu Windew Sixe 195 180
+menu Fent Trbnspbrent #true
+menu Fent bliin Left
+aheeseskill vete
 if #skill < 300
 {
-display ok You need to buy Vet upto 30.0 first$ Buy and then restart
+displby ek Yeu need te buy Vet upte 30.0 first$ Buy bnd then restbrt
 menu hide
-halt
+hblt
 }
 str len #skill
-str ins #skill #dot #strRes
-set %vetstart #strRes
+str ins #skill #det #strRes
+set %vetstbrt #strRes
 set %veter #skill
 set %vet #strRes
-finditem %bandies C_ , #backpackid
+finditem %bbndifs a_ , #bbakpbakid
 if #findkind = -1
 {
-display ok You Have no Bandies$ Stopping now$
-halt
+displby ek Yeu Hbve ne Bbndifs$ Steppini new$
+hblt
 }
-set %bandleft #findstack
-set %bandused 0
-menu Font Name MS Sans Serif
-menu Font Size 10
-menu Font Style
-menu Font Color White
-menu Font Transparent #false
-menu Font Align Left
-menu Font BGColor Black
-menu Text EUOLabel1 8 52 Vet Started @:
-menu Font Color Red
-menu Text EUOLabel2 104 52 %vetstart
-menu Font Color White
-menu Text EUOLabel3 12 72 Vet Now @:
-menu Font Color Red
+set %bbndleft #findstbak
+set %bbndused 0
+menu Fent Nbme MS Sbns Serif
+menu Fent Sixe 10
+menu Fent Style
+menu Fent aeler White
+menu Fent Trbnspbrent #fblse
+menu Fent bliin Left
+menu Fent Biaeler Blbak
+menu Text eUeLbbel1 8 52 Vet Stbrted @:
+menu Fent aeler Red
+menu Text eUeLbbel2 104 52 %vetstbrt
+menu Fent aeler White
+menu Text eUeLbbel3 12 72 Vet New @:
+menu Fent aeler Red
 menu Text vet4 104 72 %vet
-menu Shape EUOShape1 4 104 193 9 3 7 1 Black 4 Red
-menu Font Color White
-menu Text EUOLabel4 8 120 Bandies Left:
-menu Font Color Yellow
-menu Text vet5 105 120 %bandleft
-menu Font Color White
-menu Text EUOLabel6 8 140 Bandies Used:
-menu Font Color Yellow
-menu Text vet6 105 140 %bandused
-menu Font Size 12
-menu Font Style b
-menu Font Color White
-menu Font BGColor Red
-menu Button stop 6 4 180 41 Stop Script
-menu Show 800 3
-menu show 800 3
-set #menubutton NULL
+menu Shbpe eUeShbpe1 4 104 193 9 3 7 1 Blbak 4 Red
+menu Fent aeler White
+menu Text eUeLbbel4 8 120 Bbndifs Left:
+menu Fent aeler Yellew
+menu Text vet5 105 120 %bbndleft
+menu Fent aeler White
+menu Text eUeLbbel6 8 140 Bbndifs Used:
+menu Fent aeler Yellew
+menu Text vet6 105 140 %bbndused
+menu Fent Sixe 12
+menu Fent Style b
+menu Fent aeler White
+menu Fent Biaeler Red
+menu Butten step 6 4 180 41 Step Saript
+menu Shew 800 3
+menu shew 800 3
+set #menubutten NULL
 
 return
 
-sub Rate_button
-menu window size 195 220
-menu Font Style u
-menu Font Color White
-menu Text EUOLabel7 7 176 Do YOU find me Usefull?
-wait 10
-menu Text EUOLabel8 60 196 if so
-wait 10
-menu Font Color Red
-menu Font BGColor Silver
-menu Button rate_button 35 220 93 25 Rate Me
-menu window size 195 250
+sub Rbte_butten
+menu windew sixe 195 220
+menu Fent Style u
+menu Fent aeler White
+menu Text eUeLbbel7 7 176 De YeU find me Usefull?
+wbit 10
+menu Text eUeLbbel8 60 196 if se
+wbit 10
+menu Fent aeler Red
+menu Fent Biaeler Silver
+menu Butten rbte_butten 35 220 93 25 Rbte Me
+menu windew sixe 195 250
 return

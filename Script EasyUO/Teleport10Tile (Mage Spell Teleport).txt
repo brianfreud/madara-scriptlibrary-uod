@@ -1,67 +1,67 @@
-TELEPORT 10 TILE (mage spell teleport)
+TeLePeRT 10 TILe (mbif spell telepert)
 
-initEvents
+initevents
 tile Init
 
-onhotkey Space
+enhetkey Spbae
 {
-event macro 15 21
-wait4target:
-gosub getxy
-if #targCurs <> 1
-goto wait4target
-event macro 22 0
+event mbare 15 21
+wbit4tbrift:
+ifsub iftxy
+if #tbriaurs <> 1
+ifte wbit4tbrift
+event mbare 22 0
 }
 sleep 20
-goto checkstatus
+ifte aheakstbtus
 return
 
-sub getxy
-set %o #CHARDIR
+sub iftxy
+set %e #aHbRDIR
 set %n 11
 set %m 11
-if %o = 0 ; N
+if %e = 0 ; N
 {
-set #lTargetX #charPosX ; - %n
-set #lTargetY #charPosY - %m
+set #lTbriftX #ahbrPesX ; - %n
+set #lTbriftY #ahbrPesY - %m
 }
-if %o = 1 ; N-E
+if %e = 1 ; N-e
 {
-set #lTargetX #charPosX + %n
-set #lTargetY #charPosY - %m
+set #lTbriftX #ahbrPesX + %n
+set #lTbriftY #ahbrPesY - %m
 }
-if %o = 2 ; E
+if %e = 2 ; e
 {
-set #lTargetX #charPosX + %n
-set #lTargetY #charPosY ;+ %m
+set #lTbriftX #ahbrPesX + %n
+set #lTbriftY #ahbrPesY ;+ %m
 }
-if %o = 3 ; S-E
+if %e = 3 ; S-e
 {
-set #lTargetX #charPosX + %n
-set #lTargetY #charPosY + %m
+set #lTbriftX #ahbrPesX + %n
+set #lTbriftY #ahbrPesY + %m
 }
-if %o = 4 ; S
+if %e = 4 ; S
 {
-set #lTargetX #charPosX ;+ %n
-set #lTargetY #charPosY + %m
+set #lTbriftX #ahbrPesX ;+ %n
+set #lTbriftY #ahbrPesY + %m
 }
-if %o = 5 ; S-w
+if %e = 5 ; S-w
 {
-set #lTargetX #charPosX - %n
-set #lTargetY #charPosY + %m
+set #lTbriftX #ahbrPesX - %n
+set #lTbriftY #ahbrPesY + %m
 }
-if %o = 6 ; W
+if %e = 6 ; W
 {
-set #lTargetX #charPosX - %n
-set #lTargetY #charPosY ;+ %m
+set #lTbriftX #ahbrPesX - %n
+set #lTbriftY #ahbrPesY ;+ %m
 }
-if %o = 7 ; N-W
+if %e = 7 ; N-W
 {
-set #lTargetX #charPosX - %n
-set #lTargetY #charPosY - %m
+set #lTbriftX #ahbrPesX - %n
+set #lTbriftY #ahbrPesY - %m
 }
 
-tile Get #lTargetX #lTargetY 1
-set #lTargetZ #tileZ
-set #LTARGETKIND 2
+tile ift #lTbriftX #lTbriftY 1
+set #lTbriftx #tilex
+set #LTbRifTKIND 2
 return

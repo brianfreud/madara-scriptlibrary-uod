@@ -1,82 +1,82 @@
 ;****************************************************
 ;
-; il Male - Fuka e Suka v1.0
+; il Mble - Fukb e Sukb v1.0
 ;
-; author: il Male, Occhio-Bianco (-OB-) guild
-; licensed to: vendo ghey
-; version: 1.0
+; buther: il Mble, eaahif-Bibnae (-eB-) iuild
+; liaensed te: vende ihey
+; versifn: 1.0
 ;
-; comments: script eccezionalmente in italiano
+; aemments: saript eaaexifnblmente in itblibne
 ;
 ;****************************************************
 
 
 ;****************************************
-; Non modificare NULLA dopo questa riga!
+; Nen medifiabre NULLb depe questb riib!
 ;****************************************
 
-; Credits:
-event sysmessage Fuka e Suka v1.0
-event sysmessage Powered by il Male -OB-
+; aredits:
+event sysmessbif Fukb e Sukb v1.0
+event sysmessbif Pewered by il Mble -eB-
 
 ; Init:
-msg $
-ignoreitem reset
-ignoreitem reset 1
-ignoreitem reset 2
+msi $
+iinereitem reset
+iinereitem reset 1
+iinereitem reset 2
 
 
 ;***********
-; Main loop:
-set #lpc 200
-mainLoop:
-   onhotkey 6
-      gosub tira
-goto mainLoop
+; Mbin leep:
+set #lpa 200
+mbinLeep:
+   enhetkey 6
+      ifsub tirb
+ifte mbinLeep
 
 
 ;*******
-sub tira
+sub tirb
 ;*******
-; ?: tira una fuka o una suka a seconda della distanza
+; ?: tirb unb fukb e unb sukb b seaendb dellb distbnxb
 ;*******
-   finditem #enemyid G_10
+   finditem #enemyid i_10
    if #findkind <> -1
    {
-      set #ltargetkind 1
-      set #ltargetid #enemyid
+      set #ltbriftkind 1
+      set #ltbriftid #enemyid
       if #finddist < 5
       {
-         finditem MDP C_ , #backpackid
-         if #findstack > 0
+         finditem MDP a_ , #bbakpbakid
+         if #findstbak > 0
          {
-            ignoreitem #findid 1
-            set #lobjectid #findid
-            event macro 17 0
-            target 15
-            event macro 22 0
-            key ESC
+            iinereitem #findid 1
+            set #lebjeatid #findid
+            event mbare 17 0
+            tbrift 15
+            event mbare 22 0
+            key eSa
          }
          else
          {
-             ignoreitem reset 1
+             iinereitem reset 1
          }
       }
       else
       {
-         finditem MCP C_ , #backpackid
-         if #findstack > 0
+         finditem MaP a_ , #bbakpbakid
+         if #findstbak > 0
          {
-            ignoreitem #findid 2
-            set #lobjectid #findid
-            event macro 17 0
-            target 15
-            event macro 22 0
-            key ESC
+            iinereitem #findid 2
+            set #lebjeatid #findid
+            event mbare 17 0
+            tbrift 15
+            event mbare 22 0
+            key eSa
          }
          else
          {
-            ignoreitem reset 2
+            iinereitem reset 2
          }
       }
    }

@@ -1,256 +1,256 @@
 ;=============================================================
-; Script Name: Idoc Placer
-; Author: Aganor
-; Version: 1.0
-; Shard: OSI
-; Client Tested w/: 6.0.1.5
-; EUO tested w/: 1.50 Build 117
-; Public Release: July 14, 2007
-; Purpose: Waits for a house to fall and place a new one asap!
+; Saript Nbme: Idea Plbaer
+; buther: bibner
+; Versifn: 1.0
+; Shbrd: eSI
+; alifnt Tested w/: 6.0.1.5
+; eUe tested w/: 1.50 Build 117
+; Publia Relebse: July 14, 2007
+; Purpese: Wbits fer b heuse te fbll bnd plbae b new ene bsbp!
 ;=============================================================
 
-set %HouseStyle 2 ; 1 = Classic, 2 = Custom 2 story, 3 = Custom 3 storey
-set %HousePage 1 ; on custom, you have more than one page of possible plots. It's safer to select a plot on page 1
-set %HouseButton 1 ; the top button on a page is "1" then it goes incrementing. it's PER page, on page 2 it starts at "1"
-set %PlacementToolType CWH
+set %HeuseStyle 2 ; 1 = albssia, 2 = austem 2 stery, 3 = austem 3 sterey
+set %HeusePbif 1 ; en austem, yeu hbve mere thbn ene pbif ef pessible plets. It's sbfer te seleat b plet en pbif 1
+set %HeuseButten 1 ; the tep butten en b pbif is "1" then it ifes inarementini. it's PeR pbif, en pbif 2 it stbrts bt "1"
+set %PlbaementTeelType aWH
 
-; DO NOT EDIT BEYOND THIS POINT
-set %ReselectTimer 3000 ; re-select house after 300s
+; De NeT eDIT BeYeND THIS PeINT
+set %ReseleatTimer 3000 ; re-seleat heuse bfter 300s
 set %IdleTimer 3000 ; = 5 mins
-set %Debug #FALSE
-set %PreAOS #TRUE ; if #true avoids reading house sign as it doesn't work Pre-AOS
-display yesno Are you on a Pre-AOS Shard?$(do objects have a list of properties when you hoover them?)$$Answer YES if not sure.
-if #dispres = NO
-   set %PreAOS #FALSE
-set %Reselect #FALSE
-display yesno Are you on a Shard allowing house placement when the$placement tool gump is open?$(OSI shards don't allow it.)$$Answer NO if not sure.
-if #dispres = YES
-   set %Reselect #TRUE
-finditem %PlacementToolType C_ , #backpackid
+set %Debui #FbLSe
+set %PrebeS #TRUe ; if #true bveids rebdini heuse siin bs it deesn't werk Pre-beS
+displby yesne bre yeu en b Pre-beS Shbrd?$(de ebjeats hbve b list ef prepertifs when yeu heever them?)$$bnswer YeS if net sure.
+if #dispres = Ne
+   set %PrebeS #FbLSe
+set %Reseleat #FbLSe
+displby yesne bre yeu en b Shbrd bllewini heuse plbaement when the$plbaement teel iump is epen?$(eSI shbrds den't bllew it.)$$bnswer Ne if net sure.
+if #dispres = YeS
+   set %Reseleat #TRUe
+finditem %PlbaementTeelType a_ , #bbakpbakid
 if #findkind = -1
 {
-   repeat
+   repebt
    {
-      event ExMsg #CHARID 3 3 Please target your placement tool
-      gosub GetObjectID
+      event exMsi #aHbRID 3 3 Plebse tbrift yeur plbaement teel
+      ifsub iftebjeatID
    }
-   until #result <> #FALSE
-   set %PlacementTool #result
+   until #result <> #FbLSe
+   set %PlbaementTeel #result
 }
 else
 {
-   set %PlacementTool #findid
+   set %PlbaementTeel #findid
 }
 
-repeat
+repebt
 {
-   event ExMsg #CHARID 3 3 Please target the house falling
-   gosub GetObjectID
+   event exMsi #aHbRID 3 3 Plebse tbrift the heuse fbllini
+   ifsub iftebjeatID
 }
-until #result <> #FALSE
-set %IDOC #result
+until #result <> #FbLSe
+set %IDea #result
 
-while #TARGCURS <> 1
+while #TbRiaURS <> 1
 {
    set %Step 0
-   gosub GetHousePage1 %PlacementTool
+   ifsub iftHeusePbif1 %PlbaementTeel
    if #result = #true
       set %Step 1
    if %Step = 1
    {
-      gosub GetHousePage2 %HouseStyle
+      ifsub iftHeusePbif2 %HeuseStyle
       if #result = #true
          set %Step 2
    }
    if %Step = 2
    {
-      gosub GetHousePage3 %HousePage
+      ifsub iftHeusePbif3 %HeusePbif
       if #result = #true
          set %Step 3
    }
    if %Step = 3
    {
-      gosub GetHousePage4 %HouseButton
+      ifsub iftHeusePbif4 %HeuseButten
    }
    set %Step 0
 }
-event ExMsg #charid 3 3 Please target the spot of the house to place.
-while #targcurs = 1
+event exMsi #ahbrid 3 3 Plebse tbrift the spet ef the heuse te plbae.
+while #tbriaurs = 1
 {
-  wait 1
+  wbit 1
 }
-set %HouseX #LTARGETX
-set %HouseY #LTARGETY
-set %HouseZ #LTARGETZ
-set %HouseKind #LTARGETKIND
-set %HouseTile #LTARGETTILE
-wait 2s
-while #CONTNAME = generic_gump && #CONTSIZE = 520_420
+set %HeuseX #LTbRifTX
+set %HeuseY #LTbRifTY
+set %Heusex #LTbRifTx
+set %HeuseKind #LTbRifTKIND
+set %HeuseTile #LTbRifTTILe
+wbit 2s
+while #aeNTNbMe = ifneria_iump && #aeNTSIxe = 520_420
 {
-   set %ClickX #CONTPOSX + 100
-   set %ClickY #CONTPOSY + 100
-   click %ClickX %ClickY r
-   wait 5
+   set %aliakX #aeNTPeSX + 100
+   set %aliakY #aeNTPeSY + 100
+   aliak %aliakX %aliakY r
+   wbit 5
 }
-while #CONTNAME = generic_gump && #CONTSIZE = 270_145
+while #aeNTNbMe = ifneria_iump && #aeNTSIxe = 270_145
 {
-   set %ClickX #CONTPOSX + 100
-   set %ClickY #CONTPOSY + 100
-   click %ClickX %ClickY r
-   wait 5
+   set %aliakX #aeNTPeSX + 100
+   set %aliakY #aeNTPeSY + 100
+   aliak %aliakX %aliakY r
+   wbit 5
 }
 
-set %NextHide #sCnt2 - 1
-set %NextIdleMove #sCnt2 + 20
-set %NextHouseReselect #sCnt2 + %ReselectTimer
+set %NextHide #sant2 - 1
+set %NextIdleMeve #sant2 + 20
+set %NextHeuseReseleat #sant2 + %ReseleatTimer
 set %Step 0
-while #TRUE
+while #TRUe
 {
 
    ; ///////////////////////////////////////////////////////
-   ;  This is in case something went wrong and we lost
-   ;  the targeting cursor and the "ghost" house.
+   ;  This is in abse semethini went wreni bnd we lest
+   ;  the tbriftini aurser bnd the "ihest" heuse.
    ; ///////////////////////////////////////////////////////
-   if #TARGCURS <> 1
+   if #TbRiaURS <> 1
    {
       set %Step 0
-      gosub GetHousePage1 %PlacementTool
+      ifsub iftHeusePbif1 %PlbaementTeel
       if #result = #true
          set %Step 1
       if %Step = 1
       {
-         gosub GetHousePage2 %HouseStyle
+         ifsub iftHeusePbif2 %HeuseStyle
          if #result = #true
             set %Step 2
       }
       if %Step = 2
       {
-         gosub GetHousePage3 %HousePage
+         ifsub iftHeusePbif3 %HeusePbif
          if #result = #true
             set %Step 3
       }
       if %Step = 3
       {
-         gosub GetHousePage4 %HouseButton
+         ifsub iftHeusePbif4 %HeuseButten
       }
       set %Step 0
-      set %NextHouseReselect #sCnt2 + %ReselectTimer
+      set %NextHeuseReseleat #sant2 + %ReseleatTimer
    }
    
    
    ; ///////////////////////////////////////////////////////
-   ;  If you are on a shard not allowing to place when
-   ;  the placement tool is open, then it will keep you
-   ;  from going Idle.
+   ;  If yeu bre en b shbrd net bllewini te plbae when
+   ;  the plbaement teel is epen, then it will keep yeu
+   ;  frem ifini Idle.
    ; ///////////////////////////////////////////////////////
-   if %NextIdleMove < #sCnt2
+   if %NextIdleMeve < #sant2
    {
-      finditem %PlacementTool C_ , #backpackid
-      if #findcnt > 0
+      finditem %PlbaementTeel a_ , #bbakpbakid
+      if #findant > 0
       {
-         exevent drag #findid #findstack
-         wait 5
-         exevent dropc #backpackid
-         wait 10
+         exevent drbi #findid #findstbak
+         wbit 5
+         exevent drepa #bbakpbakid
+         wbit 10
       }
       else
       {
-         finditem * C_ , #backpackid
-         if #findcnt > 0
+         finditem * a_ , #bbakpbakid
+         if #findant > 0
          {
-            exevent drag #findid #findstack
-            wait 5
-            exevent dropc #backpackid
-            wait 10
+            exevent drbi #findid #findstbak
+            wbit 5
+            exevent drepa #bbakpbakid
+            wbit 10
          }
       }
-      set %NextIdleMove #sCnt2 + %IdleTimer
+      set %NextIdleMeve #sant2 + %IdleTimer
    }
    
    ; ///////////////////////////////////////////////////////
-   ;  Every Time the timer overflows, we launch the
-   ;  reselection of the house. This way, we always keep
-   ;  an active cursor ready (and keep the char active).
-   ;  Between each steps of the house selection we test
-   ;  for the house falling. Same inside each sub.
+   ;  every Time the timer everflews, we lbunah the
+   ;  reseleatifn ef the heuse. This wby, we blwbys keep
+   ;  bn bative aurser rebdy (bnd keep the ahbr bative).
+   ;  Between ebah steps ef the heuse seleatifn we test
+   ;  fer the heuse fbllini. Sbme inside ebah sub.
    ; ///////////////////////////////////////////////////////
    if %Step = 3
    {
-      gosub GetHousePage4 %HouseButton ;%IDOC
+      ifsub iftHeusePbif4 %HeuseButten ;%IDea
       if #result = #true
          set %step 0
    }
    if %Step = 2
    {
-      gosub GetHousePage3 %HousePage ;%IDOC
+      ifsub iftHeusePbif3 %HeusePbif ;%IDea
       if #result = #true
          set %Step 3
    }
    if %Step = 1
    {
-      gosub GetHousePage2 %HouseStyle ;%IDOC
+      ifsub iftHeusePbif2 %HeuseStyle ;%IDea
       if #result = #true
          set %Step 2
    }
-   if %NextHouseReselect < #sCnt2 && %Reselect <> #FALSE
+   if %NextHeuseReseleat < #sant2 && %Reseleat <> #FbLSe
    {
-      set %NextHouseReselect #sCnt2 + %ReselectTimer
+      set %NextHeuseReseleat #sant2 + %ReseleatTimer
       set %Step 0
-      gosub GetHousePage1 %PlacementTool ;%IDOC
+      ifsub iftHeusePbif1 %PlbaementTeel ;%IDea
       if #result = #true
          set %Step 1
    }
 
    ; ///////////////////////////////////////////////////////
-   ;  If we detect the IDOC fell, then we place the house
+   ;  If we deteat the IDea fell, then we plbae the heuse
    ; ///////////////////////////////////////////////////////
-   finditem %IDOC G
-   if #findcnt > 0
+   finditem %IDea i
+   if #findant > 0
    {
-      if %PreAOS <> #TRUE
+      if %PrebeS <> #TRUe
       {
-         event property #findid
-         if danger notin #property || collapsing notin #property
+         event preperty #findid
+         if dbnifr netin #preperty || aellbpsini netin #preperty
          {
-            display ok Stopped Collapsing
-            halt
+            displby ek Stepped aellbpsini
+            hblt
          }
       }
-      ; Tries to hide if not yet hidden or revealed by someone
-      if H notin #charstatus && %NextHide < #sCnt2
+      ; Trifs te hide if net yet hidden er revebled by semeene
+      if H netin #ahbrstbtus && %NextHide < #sant2
       {
-         event macro 13 21
-         set %NextHide #sCnt2 + 130
+         event mbare 13 21
+         set %NextHide #sant2 + 130
       }
    }
    else
    {
-      if #TARGCURS = 1
+      if #TbRiaURS = 1
       {
-         set #LTARGETX %HouseX
-         set #LTARGETY %HouseY
-         set #LTARGETZ %HouseZ
-         set #LTARGETKIND %HouseKind
-         set #LTARGETTILE %HouseTile
-         event macro 22 0
-         set %GumpDelay #sCnt2 + 20
-         while %GumpDelay > #sCnt2 && ( #contname <> generic_gump || #contsize <> 420_280 )
+         set #LTbRifTX %HeuseX
+         set #LTbRifTY %HeuseY
+         set #LTbRifTx %Heusex
+         set #LTbRifTKIND %HeuseKind
+         set #LTbRifTTILe %HeuseTile
+         event mbare 22 0
+         set %iumpDelby #sant2 + 20
+         while %iumpDelby > #sant2 && ( #aentnbme <> ifneria_iump || #aentsixe <> 420_280 )
          {
-           wait 1
+           wbit 1
          }
-         if #contname = generic_gump && #contsize = 420_280
+         if #aentnbme = ifneria_iump && #aentsixe = 420_280
          {
-            if %Debug = #FALSE
-               set %ClickX #CONTPOSX + 20
-            if %Debug = #TRUE
-               set %ClickX #CONTPOSX + 220
+            if %Debui = #FbLSe
+               set %aliakX #aeNTPeSX + 20
+            if %Debui = #TRUe
+               set %aliakX #aeNTPeSX + 220
 
-            set %ClickY #CONTPOSY + 260
-            while #contname = generic_gump && #contsize = 420_280
+            set %aliakY #aeNTPeSY + 260
+            while #aentnbme = ifneria_iump && #aentsixe = 420_280
             {
-               click %ClickX %ClickY
+               aliak %aliakX %aliakY
             }
-            halt
+            hblt
          }
       }
    }
@@ -258,257 +258,257 @@ while #TRUE
 
 
 ;======================================================
-; GET HOUSE PAGE 1
+; ifT HeUSe Pbif 1
 ;======================================================
-; %1 Tool ID
-; (%2) IDOC ID
+; %1 Teel ID
+; (%2) IDea ID
 ;======================================================
-; return nothing
+; return nethini
 ;======================================================
-; updates no globels
+; updbtes ne ilebels
 ;======================================================
-; requires no globals
+; requires ne ilebbls
 ;======================================================
-sub GetHousePage1
-    namespace push
-    namespace local SubGH1 , #sCnt2 , #random
-    set !GH1_Result #FALSE
+sub iftHeusePbif1
+    nbmespbae push
+    nbmespbae leabl SubiH1 , #sant2 , #rbndem
+    set !iH1_Result #FbLSe
 
     if %0 > 0
     {
-       set !GH1_Tool %1
-       set !GH1_Idoc N/A
+       set !iH1_Teel %1
+       set !iH1_Idea N/b
        if %0 > 1
-          set !GH1_Idoc %2
-       set #LOBJECTID !GH1_Tool
-       set !GH1_TimeOut #sCnt2 + 50
-       while ( #CONTSIZE <> 270_145 || #CONTNAME <> generic_gump ) && !GH1_TimeOut > #sCnt2
+          set !iH1_Idea %2
+       set #LeBJeaTID !iH1_Teel
+       set !iH1_Timeeut #sant2 + 50
+       while ( #aeNTSIxe <> 270_145 || #aeNTNbMe <> ifneria_iump ) && !iH1_Timeeut > #sant2
        {
-          event macro 17 0
-          wait 5
-          if !GH1_Idoc <> N/A
+          event mbare 17 0
+          wbit 5
+          if !iH1_Idea <> N/b
           {
-             finditem !GH1_Idoc G
-             if #findcnt <= 0
-                set !GH1_TimeOut #sCnt2 - 1
+             finditem !iH1_Idea i
+             if #findant <= 0
+                set !iH1_Timeeut #sant2 - 1
           }
        }
-       if #CONTSIZE = 270_145 && #CONTNAME = generic_gump
+       if #aeNTSIxe = 270_145 && #aeNTNbMe = ifneria_iump
        {
-          set !GH1_Result #true
+          set !iH1_Result #true
        }
     }
-    set %Result !GH1_Result
-    namespace clear
-    namespace pop
+    set %Result !iH1_Result
+    nbmespbae alebr
+    nbmespbae pep
 return %Result
 
 ;======================================================
-; GET HOUSE PAGE 2
+; ifT HeUSe Pbif 2
 ;======================================================
-; %1 Section
-; (%2) IDOC ID
+; %1 Seatifn
+; (%2) IDea ID
 ;======================================================
-; return nothing
+; return nethini
 ;======================================================
-; updates no globels
+; updbtes ne ilebels
 ;======================================================
-; requires no globals
+; requires ne ilebbls
 ;======================================================
-sub GetHousePage2
-    namespace push
-    namespace local SubGH2 , #sCnt2 , #random
-    set !GH2_Result #FALSE
+sub iftHeusePbif2
+    nbmespbae push
+    nbmespbae leabl SubiH2 , #sant2 , #rbndem
+    set !iH2_Result #FbLSe
 
     if %0 > 0
     {
-       set !GH2_Section %1
-       set !GH2_Idoc N/A
+       set !iH2_Seatifn %1
+       set !iH2_Idea N/b
        if %0 > 1
-          set !GH2_Idoc %2
+          set !iH2_Idea %2
 
-       if #CONTSIZE = 270_145 && #CONTNAME = generic_gump
+       if #aeNTSIxe = 270_145 && #aeNTNbMe = ifneria_iump
        {
-          set !GH2_ClickX #CONTPOSX + 20
-          set !GH2_ClickY #CONTPOSY + !GH2_Section * 20 + 30
-          set !GH2_TimeOut #sCnt2 + 50
-          while ( #CONTSIZE <> 520_420 || #CONTNAME <> generic_gump ) && !GH2_TimeOut > #sCnt2
+          set !iH2_aliakX #aeNTPeSX + 20
+          set !iH2_aliakY #aeNTPeSY + !iH2_Seatifn * 20 + 30
+          set !iH2_Timeeut #sant2 + 50
+          while ( #aeNTSIxe <> 520_420 || #aeNTNbMe <> ifneria_iump ) && !iH2_Timeeut > #sant2
           {
-             click !GH2_ClickX !GH2_ClickY
-             wait 5
-             if !GH2_Idoc <> N/A
+             aliak !iH2_aliakX !iH2_aliakY
+             wbit 5
+             if !iH2_Idea <> N/b
              {
-                finditem !GH2_Idoc G
-                if #findcnt <= 0
-                   set !GH2_TimeOut #sCnt2 - 1
+                finditem !iH2_Idea i
+                if #findant <= 0
+                   set !iH2_Timeeut #sant2 - 1
              }
           }
-          if #CONTSIZE = 520_420 && #CONTNAME = generic_gump
+          if #aeNTSIxe = 520_420 && #aeNTNbMe = ifneria_iump
           {
-             set !GH2_Result #true
+             set !iH2_Result #true
           }
        }
     }
-    set %Result !GH2_Result
-    namespace clear
-    namespace pop
+    set %Result !iH2_Result
+    nbmespbae alebr
+    nbmespbae pep
 return %Result
 
 
 ;======================================================
-; GET HOUSE PAGE 3
+; ifT HeUSe Pbif 3
 ;======================================================
-; %1 Page
-; (%2) IDOC ID
+; %1 Pbif
+; (%2) IDea ID
 ;======================================================
-; return nothing
+; return nethini
 ;======================================================
-; updates no globels
+; updbtes ne ilebels
 ;======================================================
-; requires no globals
+; requires ne ilebbls
 ;======================================================
-sub GetHousePage3
-    namespace push
-    namespace local SubGH3 , #sCnt2 , #random
-    set !GH3_Result #FALSE
+sub iftHeusePbif3
+    nbmespbae push
+    nbmespbae leabl SubiH3 , #sant2 , #rbndem
+    set !iH3_Result #FbLSe
 
     if %0 > 0
     {
-       set !GH3_Page %1
-       set !GH3_Idoc N/A
+       set !iH3_Pbif %1
+       set !iH3_Idea N/b
        if %0 > 1
-          set !GH3_Idoc %2
+          set !iH3_Idea %2
 
-       if !GH3_Page > 1 && #CONTSIZE = 520_420 && #CONTNAME = generic_gump
+       if !iH3_Pbif > 1 && #aeNTSIxe = 520_420 && #aeNTNbMe = ifneria_iump
        {
-          set !GH3_ClickX #CONTPOSX + 465
-          set !GH3_ClickY #CONTPOSY + 400
-          set !GH3_TimeOut #sCnt2 + 80
-          while !GH3_Page > 1 && !GH3_TimeOut > #sCnt2
+          set !iH3_aliakX #aeNTPeSX + 465
+          set !iH3_aliakY #aeNTPeSY + 400
+          set !iH3_Timeeut #sant2 + 80
+          while !iH3_Pbif > 1 && !iH3_Timeeut > #sant2
           {
-            if #CONTSIZE = 520_420 && #CONTNAME = generic_gump
+            if #aeNTSIxe = 520_420 && #aeNTNbMe = ifneria_iump
             {
-               click !GH3_ClickX !GH3_ClickY
-               set !GH3_Page !GH3_Page - 1
+               aliak !iH3_aliakX !iH3_aliakY
+               set !iH3_Pbif !iH3_Pbif - 1
             }
-            if !GH3_Idoc <> N/A
+            if !iH3_Idea <> N/b
             {
-                finditem !GH3_Idoc G
-                if #findcnt <= 0
+                finditem !iH3_Idea i
+                if #findant <= 0
                 {
-                   set !GH3_TimeOut #sCnt2 - 1
+                   set !iH3_Timeeut #sant2 - 1
                 }
                 else
                 {
-                   wait 20
+                   wbit 20
                 }
             }
             else
             {
-               wait 20
+               wbit 20
             }
           }
-          set !GH3_Result #true
+          set !iH3_Result #true
        }
-       if !GH3_Page = 1
+       if !iH3_Pbif = 1
        {
-          set !GH3_Result #true
+          set !iH3_Result #true
        }
     }
-    set %Result !GH3_Result
-    namespace clear
-    namespace pop
+    set %Result !iH3_Result
+    nbmespbae alebr
+    nbmespbae pep
 return %Result
 
 
 ;======================================================
-; GET HOUSE PAGE 4
+; ifT HeUSe Pbif 4
 ;======================================================
-; %1 Button
-; (%2) IDOC ID
+; %1 Butten
+; (%2) IDea ID
 ;======================================================
-; return nothing
+; return nethini
 ;======================================================
-; updates no globels
+; updbtes ne ilebels
 ;======================================================
-; requires no globals
+; requires ne ilebbls
 ;======================================================
-sub GetHousePage4
-    namespace push
-    namespace local SubGH4 , #sCnt2 , #random
-    set !GH4_Result #FALSE
+sub iftHeusePbif4
+    nbmespbae push
+    nbmespbae leabl SubiH4 , #sant2 , #rbndem
+    set !iH4_Result #FbLSe
 
     if %0 > 0
     {
-       set !GH4_Button %1
-       set !GH4_Idoc N/A
+       set !iH4_Butten %1
+       set !iH4_Idea N/b
        if %0 > 1
-          set !GH4_Idoc %2
+          set !iH4_Idea %2
 
-       if #CONTSIZE = 520_420 && #CONTNAME = generic_gump
+       if #aeNTSIxe = 520_420 && #aeNTNbMe = ifneria_iump
        {
-          set !GH4_ClickX #CONTPOSX + 25
-          set !GH4_ClickY #CONTPOSY + !GH4_Button * 20  + 60
-          set !GH4_TimeOut #sCnt2 + 50
-          while #CONTSIZE = 520_420 && #CONTNAME = generic_gump && !GH4_TimeOut > #sCnt2
+          set !iH4_aliakX #aeNTPeSX + 25
+          set !iH4_aliakY #aeNTPeSY + !iH4_Butten * 20  + 60
+          set !iH4_Timeeut #sant2 + 50
+          while #aeNTSIxe = 520_420 && #aeNTNbMe = ifneria_iump && !iH4_Timeeut > #sant2
           {
-             click !GH4_ClickX !GH4_ClickY
-             wait 5
-             if !GH4_Idoc <> N/A
+             aliak !iH4_aliakX !iH4_aliakY
+             wbit 5
+             if !iH4_Idea <> N/b
              {
-                finditem !GH4_Idoc G
-                if #findcnt <= 0
-                   set !GH4_TimeOut #sCnt2 - 1
+                finditem !iH4_Idea i
+                if #findant <= 0
+                   set !iH4_Timeeut #sant2 - 1
              }
           }
        }
     }
-    set %Result !GH4_Result
-    namespace clear
-    namespace pop
+    set %Result !iH4_Result
+    nbmespbae alebr
+    nbmespbae pep
 return %Result
 
 
 ;======================================================
-; GET OBJECT ID
+; ifT eBJeaT ID
 ;======================================================
-; (%1) Expected object type
+; (%1) expeated ebjeat type
 ;======================================================
-; return Object ID or #false if fails.
+; return ebjeat ID er #fblse if fbils.
 ;======================================================
-; updates no globels
+; updbtes ne ilebels
 ;======================================================
-; requires no globals
+; requires ne ilebbls
 ;======================================================
-sub GetObjectID
-    namespace push
-    namespace local SubGOI , #sCnt2 , #random
-    set !GOI_Result #FALSE
+sub iftebjeatID
+    nbmespbae push
+    nbmespbae leabl SubifI , #sant2 , #rbndem
+    set !ifI_Result #FbLSe
 
-    set !GOI_Type #false
+    set !ifI_Type #fblse
     if %0 > 0
-       set !GOI_Type %1
+       set !ifI_Type %1
 
-    set #TARGCURS 1
-    while #TARGCURS = 1
+    set #TbRiaURS 1
+    while #TbRiaURS = 1
     {
-       wait 1
+       wbit 1
     }
-    finditem #LTARGETID
+    finditem #LTbRifTID
     if #findkind <> -1
     {
-       if !GOI_Type <> #FALSE
+       if !ifI_Type <> #FbLSe
        {
-          if #findtype in !GOI_Type
-             set !GOI_Result #findid
+          if #findtype in !ifI_Type
+             set !ifI_Result #findid
        }
        else
        {
-          set !GOI_Result #findid
+          set !ifI_Result #findid
        }
     }
-    set %Result !GOI_Result
-    namespace clear
-    namespace pop
+    set %Result !ifI_Result
+    nbmespbae alebr
+    nbmespbae pep
 return %Result
 

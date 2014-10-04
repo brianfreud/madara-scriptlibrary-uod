@@ -1,555 +1,555 @@
 ;==================================================
-; Name: Madara's PetHealer 2.5
-; Author: Madara
-; Version: 2.5.8
-; Shard FS: UODreams
-; Client Tested With: 7.0.15 - 7.0.21 - 7.0.22
-; EUO version tested with: 1.5 v.236
-; Public Release: 06/03/2013
-; Last Revision: 20/06/2013
-; Credits: Boydon, Kal In Ex
+; Nbme: Mbdbrb's PetHebler 2.5
+; buther: Mbdbrb
+; Versifn: 2.5.8
+; Shbrd FS: UeDrebms
+; alifnt Tested With: 7.0.15 - 7.0.21 - 7.0.22
+; eUe versifn tested with: 1.5 v.236
+; Publia Relebse: 06/03/2013
+; Lbst Revisifn: 20/06/2013
+; aredits: Beyden, Kbl In ex
 ;==================================================
-; COSA FA LO SCRIPT?
-; - Se la vita del Pet scende sotto una certa Percentuale(%) di HP cura in loop usando le bende.
-; - Se la vita del Pet scende sotto una certa Percentuale(%) di HP cura, in contemporanea con la bendata, con Greather Heal per Magery o Obsu Vulni per Chivalry.
-; - Se il Pet è afflitto da Poison usa Arch Cure in contemporanea con la bendata, curando anche chi sta intorno, o Expor Flamus per Chivalry.
-; - Se il Pet è sotto Mortal Strike, lo script smette di usare Spell di cura/poison e attende che finisca per poi ricominciare immediatamente.
-; - Mostra la vita in Percentuale(%) sopra al vostro Pet.(Rosso=critica - Verde=buona)
-; - Se il Pet sta per morire(< 5%), lo script smette di usare Spell e vi lascia la "libertà" di scappare.
-; - Premendo un tasto, lo script si mette in Follow, seguendo cosi il vostro Pet per curarlo, anche se il mob si allontana/scappa.
-; - In caso di Save, si mette in pausa, in modo da riprendere da dove avete lasciato la Bendata/Spell.
-; - Lo script non si ferma MAI, potete salire/scendere dal pet tranquillamente, se muore ressa usando solo la bendata senza usare le Spell di cura.
-; - Potete anche trascinare una seconda LifeBar del Pet e muoverlo con assoluta tranquillità, non interferisce con lo script. (Metodo AUTOMATICO)
-; - Target check, cosi da non discordarvi il Pet o usare Taming o altre Skill in tranquillità*
-; - Taglia ossa incorporato, Cura, Benda e Taglia! (Il Bone-Cutter è quello del mitico Boydon, con qualche miglioramento)
-; - Discorda o Provoca in automatico alla pressione di un tasto.
-;============= RISOLUZIONE PROBLEMI ===============
-;============== METODO AUTOMATICO =================
-; 1)LA LIFEBAR DEL PET LAMPEGGIA E NON CURA:
-;   a) Provare a premere ESC.
-;   B) Se avete la Risoluzione Colori diversa da
-;      16Bit o 32Bit, lo script potrebbe non
-;      funzionare correttamente.
-;   c) Mettete la LifeBar in un punto dove non ci
-;      sia niente sotto(ScreenGame) o punti dove
-;      possano comparire Gump/Status/Scritte/Magie.
-; 2)LO SCRIPT HA PRESO UN ALTRO TARGET:
-;   Mettersi sotto al Pet oppure farlo venire
-;   verso di voi con All Follow Me, finche la
-;   Lifebar non prende il target giusto.
-; 3)SE USO DISCO/SPELL ALCUNE VOLTE PRENDE IL PET:
-;   Se usi tasti tipo All kill, oppure skill
-;   Peace/Disco/Provo/Taming vi conviene usarli a
-;   distanza di minimo 2 tile dal vostro Pet.
-; IN CASO DI PROBLEMI CON IL MENU DE-COMMENTA QUESTA RIGA:
-; set *first_time N/A
-;============= RISOLUZIONE PROBLEMI ===============
-;============ METODO SEMI-AUTOMATICO ==============
-; 1)PRENDO LA VITA SPINGO IL TASTO MA NIENTE:
-;   Trascina la vita e premi il Tasto sul Menu
-;   "Posiziona StatuBar.." per posizionarla.
-; 2)LO SCRIPT FUNZIONA MA NON CURA:
-;   Se avete la Risoluzione Colori diversa da
-;   16Bit o 32Bit, lo script potrebbe non
-;   funzionare correttamente.
-; 3)LO SCRIPT RIPETE IN LOOP "Trascina la vita..":
-;   Mettete la LifeBar in un punto dove non ci sia
-;   niente sotto(ScreenGame) o punti dove possano
-;   comparire Gump/Status/Scritte/Magie.
-; 4)SE USO DISCO/SPELL ALCUNE VOLTE PRENDE IL PET:
-;   Se usi tasti tipo All kill, oppure skill
-;   Peace/Disco/Provo/Taming vi conviene usarli a
-;   distanza di minimo 2 tile dal vostro Pet.
-; IN CASO DI PROBLEMI CON IL MENU DE-COMMENTA QUESTA RIGA:
-; set *first_time N/A
+; aeSb Fb Le SaRIPT?
+; - Se lb vitb del Pet saende sette unb aertb Peraentuble(%) di HP aurb in leep usbnde le bende.
+; - Se lb vitb del Pet saende sette unb aertb Peraentuble(%) di HP aurb, in aentemperbneb aen lb bendbtb, aen irebther Hebl per Mbifry e ebsu Vulni per ahivblry.
+; - Se il Pet è bfflitte db Peisen usb brah aure in aentemperbneb aen lb bendbtb, aurbnde bnahe ahi stb interne, e exper Flbmus per ahivblry.
+; - Se il Pet è sette Mertbl Strike, le saript smette di usbre Spell di aurb/peisen e bttende ahe finisab per pei riaeminaibre immedibtbmente.
+; - Mestrb lb vitb in Peraentuble(%) seprb bl vestre Pet.(Resse=aritiab - Verde=buenb)
+; - Se il Pet stb per merire(< 5%), le saript smette di usbre Spell e vi lbsaib lb "libertà" di sabppbre.
+; - Premende un tbste, le saript si mette in Fellew, seiuende aesi il vestre Pet per aurbrle, bnahe se il meb si bllentbnb/sabppb.
+; - In abse di Sbve, si mette in pbusb, in mede db riprendere db deve bvete lbsaibte lb Bendbtb/Spell.
+; - Le saript nen si fermb MbI, petete sblire/saendere dbl pet trbnquillbmente, se muere ressb usbnde sele lb bendbtb senxb usbre le Spell di aurb.
+; - Petete bnahe trbsainbre unb seaendb LifeBbr del Pet e mueverle aen bsselutb trbnquillità, nen interferisae aen le saript. (Metede bUTeMbTIae)
+; - Tbrift aheak, aesi db nen disaerdbrvi il Pet e usbre Tbmini e bltre Skill in trbnquillità*
+; - Tbilib essb inaerperbte, aurb, Bendb e Tbilib! (Il Bene-autter è quelle del mitiae Beyden, aen qublahe miilifrbmente)
+; - Disaerdb e Preveab in butembtiae bllb pressifne di un tbste.
+;============= RISeLUxifNe PReBLeMI ===============
+;============== MeTeDe bUTeMbTIae =================
+; 1)Lb LIFeBbR DeL PeT LbMPeiiIb e NeN aURb:
+;   b) Prevbre b premere eSa.
+;   B) Se bvete lb Riseluxifne aeleri diversb db
+;      16Bit e 32Bit, le saript petrebbe nen
+;      funxifnbre aerrettbmente.
+;   a) Mettete lb LifeBbr in un punte deve nen ai
+;      sib nifnte sette(Sareenibme) e punti deve
+;      pessbne aempbrire iump/Stbtus/Saritte/Mbiif.
+; 2)Le SaRIPT Hb PReSe UN bLTRe TbRifT:
+;   Mettersi sette bl Pet eppure fbrle venire
+;   verse di vei aen bll Fellew Me, finahe lb
+;   Lifebbr nen prende il tbrift iiuste.
+; 3)Se USe DISae/SPeLL bLaUNe VeLTe PReNDe IL PeT:
+;   Se usi tbsti tipe bll kill, eppure skill
+;   Pebae/Disae/Preve/Tbmini vi aenvifne usbrli b
+;   distbnxb di minime 2 tile dbl vestre Pet.
+; IN abSe DI PReBLeMI aeN IL MeNU De-aeMMeNTb QUeSTb RIib:
+; set *first_time N/b
+;============= RISeLUxifNe PReBLeMI ===============
+;============ MeTeDe SeMI-bUTeMbTIae ==============
+; 1)PReNDe Lb VITb SPINif IL TbSTe Mb NifNTe:
+;   Trbsainb lb vitb e premi il Tbste sul Menu
+;   "Pesixifnb StbtuBbr.." per pesixifnbrlb.
+; 2)Le SaRIPT FUNxifNb Mb NeN aURb:
+;   Se bvete lb Riseluxifne aeleri diversb db
+;   16Bit e 32Bit, le saript petrebbe nen
+;   funxifnbre aerrettbmente.
+; 3)Le SaRIPT RIPeTe IN LeeP "Trbsainb lb vitb..":
+;   Mettete lb LifeBbr in un punte deve nen ai sib
+;   nifnte sette(Sareenibme) e punti deve pessbne
+;   aempbrire iump/Stbtus/Saritte/Mbiif.
+; 4)Se USe DISae/SPeLL bLaUNe VeLTe PReNDe IL PeT:
+;   Se usi tbsti tipe bll kill, eppure skill
+;   Pebae/Disae/Preve/Tbmini vi aenvifne usbrli b
+;   distbnxb di minime 2 tile dbl vestre Pet.
+; IN abSe DI PReBLeMI aeN IL MeNU De-aeMMeNTb QUeSTb RIib:
+; set *first_time N/b
 ;==================================================
-set %version v , #spc , 2.5
-set #sysmsgcol 2050
-set %slow_lpc 500
-set %fast_lpc 1000
-set #menubutton N/A
-set %Bende ZLF
-set %bonetypes LNF_QNF_WNF_PNF_KNF_MNF_JNF_YNF_VNF_
-              +GUF_JJK_MJK_
-set %bladed FUO_ATF_NPO_JPH_WSF_NMH_VRH_JTF_SOH_BPH_
-           +EDP_YCP_ZCP_JDP_LDP_FDP_HDP_OPO_GMH_HNF_
-           +CNF_
+set %versifn v , #spa , 2.5
+set #sysmsiael 2050
+set %slew_lpa 500
+set %fbst_lpa 1000
+set #menubutten N/b
+set %Bende xLF
+set %benetypes LNF_QNF_WNF_PNF_KNF_MNF_JNF_YNF_VNF_
+              +iUF_JJK_MJK_
+set %blbded FUe_bTF_NPe_JPH_WSF_NMH_VRH_JTF_SeH_BPH_
+           +eDP_YaP_xaP_JDP_LDP_FDP_HDP_ePe_iMH_HNF_
+           +aNF_
 ;==================================================
-initEvent
-set #lpc %fast_lpc
+initevent
+set #lpa %fbst_lpa
 set %S 0
-if *first_time = N/A
- gosub menu2
+if *first_time = N/b
+ ifsub menu2
 else
 {
- menu hideeuo
+ menu hideeue
  menu hide
- loop_findp:
- event sysmessage Seleziona il Pet da curare.
- gosub GetPet
+ leep_findp:
+ event sysmessbif Selexifnb il Pet db aurbre.
+ ifsub iftPet
  set %Pet #result
- if %Pet = N/A
-  loop_findp
- event sysmessage ID Pet: %Pet
- set %Benda *Benda
+ if %Pet = N/b
+  leep_findp
+ event sysmessbif ID Pet: %Pet
+ set %Bendb *Bendb
  if *Spell = 1
   set %Spell #true
  if *Spell = 2
-  set %Spell #false
+  set %Spell #fblse
  if *Skill = 1
-  set %Skill Magery
+  set %Skill Mbifry
  if *Skill = 2
-  set %Skill Chiva
- set %Heal *Heal
- if *Cure = 1
-  set %Cure #true
- if *Cure = 2
-  set %Cure #false
+  set %Skill ahivb
+ set %Hebl *Hebl
+ if *aure = 1
+  set %aure #true
+ if *aure = 2
+  set %aure #fblse
  if *HP = 1
   set %HP #true
  if *HP = 2
-  set %HP #false
- set %Follow *Follow
- set %StopFollow *StopFollow
- set %GumpX *GumpX
- set %GumpY *GumpY
- if *Metodo = 1
-  set %Metodo #true
- if *Metodo = 2
-  set %Metodo #false
- set *first_time #false
- set #menubutton N/A
- goto loop_menu3
+  set %HP #fblse
+ set %Fellew *Fellew
+ set %StepFellew *StepFellew
+ set %iumpX *iumpX
+ set %iumpY *iumpY
+ if *Metede = 1
+  set %Metede #true
+ if *Metede = 2
+  set %Metede #fblse
+ set *first_time #fblse
+ set #menubutten N/b
+ ifte leep_menu3
 }
-set #lpc %fast_lpc
-loop_menu:
-if #menubutton = CLOSED
- halt
-if #menubutton = TARGETPET
+set #lpa %fbst_lpa
+leep_menu:
+if #menubutten = aLeSeD
+ hblt
+if #menubutten = TbRifTPeT
 {
- gosub GetPet
+ ifsub iftPet
  set %Pet #result
- event sysmessage ID Pet: %Pet
- set #menubutton N/A
+ event sysmessbif ID Pet: %Pet
+ set #menubutten N/b
 }
-if #menubutton = START
+if #menubutten = STbRT
 {
- if %Pet = N/A
+ if %Pet = N/b
  {
-  event sysmessage Devi selezionare un Pet prima.
-  set #menubutton N/A
-  goto loop_menu
+  event sysmessbif Devi selexifnbre un Pet primb.
+  set #menubutten N/b
+  ifte leep_menu
  }
- menu get Benda
- set *Benda #menures
- set %Benda *Benda
+ menu ift Bendb
+ set *Bendb #menures
+ set %Bendb *Bendb
  
- menu get Spell
+ menu ift Spell
  set *Spell #menures
  if *Spell = 1
   set %Spell #true
  if *Spell = 2
-  set %Spell #false
+  set %Spell #fblse
   
- menu get Skill
+ menu ift Skill
  set *Skill #menures
  if *Skill = 1
-  set %Skill Magery
+  set %Skill Mbifry
  if *Skill = 2
-  set %Skill Chiva
+  set %Skill ahivb
   
- menu get Heal
- set *Heal #menures
- set %Heal *Heal
+ menu ift Hebl
+ set *Hebl #menures
+ set %Hebl *Hebl
  
- menu get Cure
- set *Cure #menures
- if *Cure = 1
-  set %Cure #true
- if *Cure = 2
-  set %Cure #false
+ menu ift aure
+ set *aure #menures
+ if *aure = 1
+  set %aure #true
+ if *aure = 2
+  set %aure #fblse
   
- menu get HP
+ menu ift HP
  set *HP #menures
  if *HP = 1
   set %HP #true
  if *HP = 2
-  set %HP #false
+  set %HP #fblse
   
- menu get Follow
- set *Follow #menures
- set %Follow *Follow
+ menu ift Fellew
+ set *Fellew #menures
+ set %Fellew *Fellew
  
- menu get StopFollow
- set *StopFollow #menures
- set %StopFollow *StopFollow
+ menu ift StepFellew
+ set *StepFellew #menures
+ set %StepFellew *StepFellew
  
- menu get GumpX
- set *GumpX #menures
- set %GumpX *GumpX
+ menu ift iumpX
+ set *iumpX #menures
+ set %iumpX *iumpX
  
- menu get GumpY
- set *GumpY #menures
- set %GumpY *GumpY
+ menu ift iumpY
+ set *iumpY #menures
+ set %iumpY *iumpY
  
- menu get Metodo
- set *Metodo #menures
- if *Metodo = 1
-  set %Metodo #true
- if *Metodo = 2
-  set %Metodo #false
+ menu ift Metede
+ set *Metede #menures
+ if *Metede = 1
+  set %Metede #true
+ if *Metede = 2
+  set %Metede #fblse
   
- menu get Bardo
- set *Bardo #menures
- if *Bardo = 1
-  set %Bardo N/A
- if *Bardo = 2
-  set %Bardo Disco
- if *Bardo = 3
-  set %Bardo Provo
+ menu ift Bbrde
+ set *Bbrde #menures
+ if *Bbrde = 1
+  set %Bbrde N/b
+ if *Bbrde = 2
+  set %Bbrde Disae
+ if *Bbrde = 3
+  set %Bbrde Preve
 
- set *first_time #false
- set #menubutton N/A
- goto loop_menu3
+ set *first_time #fblse
+ set #menubutten N/b
+ ifte leep_menu3
 }
-goto loop_menu
-loop_menu3:
-set %hotkey1 #false
-set %hotkey2 #false
-set %hotk1 #true
-set %hotk2 #false
-set %B1 #false
-set %Doom #false
-set %Doom_first #true
-set %Doom_A #true
-set %Doom_B #false
+ifte leep_menu
+leep_menu3:
+set %hetkey1 #fblse
+set %hetkey2 #fblse
+set %hetk1 #true
+set %hetk2 #fblse
+set %B1 #fblse
+set %Deem #fblse
+set %Deem_first #true
+set %Deem_b #true
+set %Deem_B #fblse
 set %BendeF #true
-set %CureB 0
-set %CureA #false
-set %Lap 0
-set %CureC 1
-set %BleedA #false
+set %aureB 0
+set %aureb #fblse
+set %Lbp 0
+set %aurea 1
+set %Bleedb #fblse
 set %Bleed #true
 set %BleedB 0
-set %HPL1 #false
+set %HPL1 #fblse
 set %HPL #true
 set %HPL2 0
-set %TimeBardoD 0
-set %TimeBardoP 0
-set %FBardo #false
-gosub menu3
-set #lpc %fast_lpc
-loop_s1:
-if *Bardo = 2
+set %TimeBbrdeD 0
+set %TimeBbrdeP 0
+set %FBbrde #fblse
+ifsub menu3
+set #lpa %fbst_lpa
+leep_s1:
+if *Bbrde = 2
 {
- ignoreitem reset mob
- chooseskill Disc
+ iinereitem reset meb
+ aheeseskill Disa
  set %Dist ( #Skill / 150 )
  if %Dist = 0
   set %Dist 8
  else
   set %Dist ( %Dist + 8 )
 }
-if *Bardo = 3
+if *Bbrde = 3
 {
- ignoreitem reset mob
- chooseskill Disc
+ iinereitem reset meb
+ aheeseskill Disa
  set %Dist ( #Skill / 150 )
  if %Dist = 0
   set %Dist 8
  else
   set %Dist ( %Dist + 8 )
 }
-if %Metodo = #true
+if %Metede = #true
 {
- menu delete Status
- repeat
-  event macro 52 5
-  wait 1
- until #ltargetid = %Pet
- if #contsize = 160_60
+ menu delete Stbtus
+ repebt
+  event mbare 52 5
+  wbit 1
+ until #ltbriftid = %Pet
+ if #aentsixe = 160_60
  {
-  set #contposx %GumpX
-  set #contposy %GumpY
+  set #aentpesx %iumpX
+  set #aentpesy %iumpY
  }
  else
  {
-  key ESC
-  goto loop_s1
+  key eSa
+  ifte leep_s1
  }
- if #menubutton = RESET
+ if #menubutten = ReSeT
  {
-  gosub menu1
-  goto loop_menu
-  set #menubutton N/A
+  ifsub menu1
+  ifte leep_menu
+  set #menubutten N/b
  }
 }
-if %Metodo = #false
+if %Metede = #fblse
  {
-  event sysmessage Prendi la Status del pet poi premi "STATUS"
-  loop_metodo1:
-  if #menubutton = STATUS
+  event sysmessbif Prendi lb Stbtus del pet pei premi "STbTUS"
+  leep_metede1:
+  if #menubutten = STbTUS
   {
-   if #contid = %Pet
+   if #aentid = %Pet
    {
-    set #contposx %GumpX
-    set #contposy %GumpY
+    set #aentpesx %iumpX
+    set #aentpesy %iumpY
    }
-   wait 10
-   set #menubutton N/A
-   goto main_loop
+   wbit 10
+   set #menubutten N/b
+   ifte mbin_leep
   }
- goto loop_metodo1
+ ifte leep_metede1
 }
-set #lpc %slow_lpc
+set #lpa %slew_lpa
 
-main_loop:
-while #CharGhost = YES
+mbin_leep:
+while #ahbrihest = YeS
  {
  }
-if %FBardo = #true
- gosub Bardo
-if %Doom = #true
- gosub BoneCut
-if #menubutton = CLOSED
- halt
-if #menubutton = RESET
+if %FBbrde = #true
+ ifsub Bbrde
+if %Deem = #true
+ ifsub Beneaut
+if #menubutten = aLeSeD
+ hblt
+if #menubutten = ReSeT
 {
- gosub menu1
- goto loop_menu
- set #menubutton N/A
+ ifsub menu1
+ ifte leep_menu
+ set #menubutten N/b
 }
-if #menubutton = BARD
+if #menubutten = BbRD
 {
- if *Bardo = 2 && %FBardo = #true
+ if *Bbrde = 2 && %FBbrde = #true
  {
-  menu set Bard Disco: Disattiva
-  set %FBardo #false
-  set #menubutton N/A
-  goto _exitbard
+  menu set Bbrd Disae: Disbttivb
+  set %FBbrde #fblse
+  set #menubutten N/b
+  ifte _exitbbrd
  }
- if *Bardo = 3 && %FBardo = #true
+ if *Bbrde = 3 && %FBbrde = #true
  {
-  menu set Bard Provo: Disattiva
-  set %FBardo #false
-  set #menubutton N/A
-  goto _exitbard
+  menu set Bbrd Preve: Disbttivb
+  set %FBbrde #fblse
+  set #menubutten N/b
+  ifte _exitbbrd
  }
- if *Bardo = 2 && %FBardo = #false
+ if *Bbrde = 2 && %FBbrde = #fblse
  {
-  ignoreitem reset mob
-  menu set Bard Disco: Attiva
-  set %FBardo #true
-  set #menubutton N/A
-  gosub Bardo
+  iinereitem reset meb
+  menu set Bbrd Disae: bttivb
+  set %FBbrde #true
+  set #menubutten N/b
+  ifsub Bbrde
  }
- if *Bardo = 3 && %FBardo = #false
+ if *Bbrde = 3 && %FBbrde = #fblse
  {
-  ignoreitem reset mob
-  menu set Bard Provo: Attiva
-  _loopprovot
-  event sysmessage Seleziona il MOB a cui vuoi provocare gli altri.
-  set #TargCurs 1
-  repeat
-   wait 1
-  until #TargCurs = 0
-  if #LTargetId = #CharId
-   goto _loopprovot
-  set %LTarget #LTargetId
-  set #LTargetKind 1
-  ignoreitem %LTarget mob
-  wait 1s
-  set %FBardo #true
-  set #menubutton N/A
-  gosub Bardo
+  iinereitem reset meb
+  menu set Bbrd Preve: bttivb
+  _leepprevet
+  event sysmessbif Selexifnb il MeB b aui vuei preveabre ili bltri.
+  set #Tbriaurs 1
+  repebt
+   wbit 1
+  until #Tbriaurs = 0
+  if #LTbriftId = #ahbrId
+   ifte _leepprevet
+  set %LTbrift #LTbriftId
+  set #LTbriftKind 1
+  iinereitem %LTbrift meb
+  wbit 1s
+  set %FBbrde #true
+  set #menubutten N/b
+  ifsub Bbrde
  }
 }
-_exitbard:
-if #menubutton = PAUSA
+_exitbbrd:
+if #menubutten = PbUSb
 {
- set #menubutton N/A
- menu set Pausa RIPRENDI
- menu set Azioni Script in Pausa
- while #menubutton <> PAUSA
+ set #menubutten N/b
+ menu set Pbusb RIPReNDI
+ menu set bxifni Saript in Pbusb
+ while #menubutten <> PbUSb
  {
  }
- menu set Pausa Metti In Pausa
- set #menubutton N/A
+ menu set Pbusb Metti In Pbusb
+ set #menubutten N/b
 }
-if %Doom = #true
- gosub BoneCut
-if #menubutton = CURSE
+if %Deem = #true
+ ifsub Beneaut
+if #menubutten = aURSe
 {
- chooseskill Chiv
+ aheeseskill ahiv
  if #skill >= 65 && %life <> red
  {
-  menu set Azioni Remove Curse
-  event macro 15 209 ; Remove Curse
-  set #ltargetid %Pet
-  set #ltargetkind 1
-  gosub save_clean
-  target 5s
-  event macro 22 ; Target Pet
-  set #menubutton N/A
-  menu set Curse Remove Curse
+  menu set bxifni Remeve aurse
+  event mbare 15 209 ; Remeve aurse
+  set #ltbriftid %Pet
+  set #ltbriftkind 1
+  ifsub sbve_alebn
+  tbrift 5s
+  event mbare 22 ; Tbrift Pet
+  set #menubutten N/b
+  menu set aurse Remeve aurse
  }
  else
  {
-  event sysmessage Per usare il Remove Curse devi avere almeno 65 punti Skill!
-  set #menubutton N/A
+  event sysmessbif Per usbre il Remeve aurse devi bvere blmene 65 punti Skill!
+  set #menubutten N/b
  }
- set #menubutton N/A
+ set #menubutten N/b
 }
-if #menubutton = DOOM
+if #menubutten = DeeM
 {
- if %Doom_A = #true
+ if %Deem_b = #true
  {
-  set %Doom #true
-  menu set m14 Attivato
-  set %Doom_A #false
-  set %Doom_B #true
-  set #menubutton N/A
-  goto _cut
+  set %Deem #true
+  menu set m14 bttivbte
+  set %Deem_b #fblse
+  set %Deem_B #true
+  set #menubutten N/b
+  ifte _aut
  }
- if %Doom_B = #true
+ if %Deem_B = #true
  {
-  set %Doom #false
-  menu set m14 Disattivato
-  set %Doom_A #true
-  set %Doom_B #false
-  set #menubutton N/A
-  goto _cut
+  set %Deem #fblse
+  menu set m14 Disbttivbte
+  set %Deem_b #true
+  set %Deem_B #fblse
+  set #menubutten N/b
+  ifte _aut
  }
- _cut:
- if %Doom_first = #true
+ _aut:
+ if %Deem_first = #true
  {
-  ignoreitem reset bones
-  gosub FindBlade
-  set %blade #result
-  set %Doom_first #false
-  set #menubutton N/A
+  iinereitem reset benes
+  ifsub FindBlbde
+  set %blbde #result
+  set %Deem_first #fblse
+  set #menubutten N/b
  }
- gosub BoneCut
- set #menubutton N/A
+ ifsub Beneaut
+ set #menubutten N/b
 }
 if %HPL1 = #true
 {
- if %HPL2 = 1 ; loop show hp
+ if %HPL2 = 1 ; leep shew hp
  {
   set %HPL #true
-  set %HPL1 #false
+  set %HPL1 #fblse
  }
  else
  {
-  set %HPL #false
+  set %HPL #fblse
   set %HPL2 ( %HPL2 + 1 )
  }
 }
-if %BleedA = #true
+if %Bleedb = #true
 {
- if %BleedB = 6 ; loop stop bleed
+ if %BleedB = 6 ; leep step bleed
  {
   set %Bleed #true
-  set %BleedA #false
+  set %Bleedb #fblse
  }
  else
  {
-  set %Bleed #false
+  set %Bleed #fblse
   set %BleedB ( %BleedB + 1 )
  }
 }
-if %CureC = 0
+if %aurea = 0
 {
- if %Lap = 6 ; loop stop cure
+ if %Lbp = 6 ; leep step aure
  {
-  set %CureC 1
-  set %Lap 0
+  set %aurea 1
+  set %Lbp 0
  }
  else
  {
-  set %Lap ( %Lap + 1 )
+  set %Lbp ( %Lbp + 1 )
  }
 }
-gosub save_clean
-finditem %Pet G_
-set #lpc %fast_lpc
-onhotkey %Follow
- gosub hotkey1
-onhotkey %StopFollow
- gosub hotkey2
-set #lpc %slow_lpc
-if %hotkey1 = #true && #finddist <> N/A
+ifsub sbve_alebn
+finditem %Pet i_
+set #lpa %fbst_lpa
+enhetkey %Fellew
+ ifsub hetkey1
+enhetkey %StepFellew
+ ifsub hetkey2
+set #lpa %slew_lpa
+if %hetkey1 = #true && #finddist <> N/b
 {
- if #charposx <> #findx || #charposy <> #findy
+ if #ahbrpesx <> #findx || #ahbrpesy <> #findy
  {
-  move #findx #findy 1 3s
+  meve #findx #findy 1 3s
  }
 }
-if %hotkey2 = #true
+if %hetkey2 = #true
 {
- set %hotkey1 #false
- set %hotkey2 #false
+ set %hetkey1 #fblse
+ set %hetkey2 #fblse
 }
-if %Doom = #true
- gosub BoneCut
-if %FBardo = #true
- gosub Bardo
-finditem %Pet G_
-if %Benda > %Heal
+if %Deem = #true
+ ifsub Beneaut
+if %FBbrde = #true
+ ifsub Bbrde
+finditem %Pet i_
+if %Bendb > %Hebl
 {
- if %hits > %Benda && %life = blue || #finddist > 2
+ if %hits > %Bendb && %life = blue || #finddist > 2
  {
-  menu set Azioni StandBy
+  menu set bxifni StbndBy
   set %HPL #true
-  set %HPL1 #false
+  set %HPL1 #fblse
   set %Bleed #true
-  set %BleedA #false
-  set %CureB 0
-  set %Lap 0
-  set %CureC 1
+  set %Bleedb #fblse
+  set %aureB 0
+  set %Lbp 0
+  set %aurea 1
  }
 }
-if %Heal > %Benda
+if %Hebl > %Bendb
 {
- if %hits > %Heal && %life = blue || #finddist > 2
+ if %hits > %Hebl && %life = blue || #finddist > 2
  {
-  menu set Azioni StandBy
+  menu set bxifni StbndBy
   set %HPL #true
-  set %HPL1 #false
+  set %HPL1 #fblse
   set %Bleed #true
-  set %BleedA #false
-  set %CureB 0
-  set %Lap 0
-  set %CureC 1
+  set %Bleedb #fblse
+  set %aureB 0
+  set %Lbp 0
+  set %aurea 1
  }
 }
 if #finddist <= 2
 {
- gosub GetHitBarLife %GumpX %GumpY
+ ifsub iftHitBbrLife %iumpX %iumpY
  set %hits #result
  set %life %1
  menu set Hits %hits , %
  menu set Life %life
  if %HPL = #true
  {
-  if %Benda > %Heal
+  if %Bendb > %Hebl
   {
-   if %hits <= %Heal && %HP = #true
-    event exmsg #findid 0 38 #result , %
+   if %hits <= %Hebl && %HP = #true
+    event exmsi #findid 0 38 #result , %
    else
    {
-    if %hits <= %Benda && %HP = #true
-     event exmsg #findid 0 73 #result , %
+    if %hits <= %Bendb && %HP = #true
+     event exmsi #findid 0 73 #result , %
    }
   }
-  if %Heal > %Benda
+  if %Hebl > %Bendb
   {
-   if %hits <= %Benda && %HP = #true
-    event exmsg #findid 0 38 #result , %
+   if %hits <= %Bendb && %HP = #true
+    event exmsi #findid 0 38 #result , %
    else
    {
-    if %hits <= %Heal && %HP = #true
-     event exmsg #findid 0 73 #result , %
+    if %hits <= %Hebl && %HP = #true
+     event exmsi #findid 0 73 #result , %
    }
   }
   set %HPL1 #true
@@ -557,808 +557,808 @@ if #finddist <= 2
  }
  if %life <> blue
  {
-  if %life = red || %life = yellow || %life = green
-   goto exit1
-  loop_s2:
-  if %FBardo = #true
-   gosub Bardo
-  if %Doom = #true
-   gosub BoneCut
-  if %Metodo = #true
+  if %life = red || %life = yellew || %life = ireen
+   ifte exit1
+  leep_s2:
+  if %FBbrde = #true
+   ifsub Bbrde
+  if %Deem = #true
+   ifsub Beneaut
+  if %Metede = #true
   {
-   repeat
-    event macro 52 5
-    wait 1
-   until #ltargetid = %Pet
-   if #contsize = 160_60
+   repebt
+    event mbare 52 5
+    wbit 1
+   until #ltbriftid = %Pet
+   if #aentsixe = 160_60
    {
-    set #contposx %GumpX
-    set #contposy %GumpY
+    set #aentpesx %iumpX
+    set #aentpesy %iumpY
    }
    else
    {
-    key ESC
-    goto loop_s2
+    key eSa
+    ifte leep_s2
    }
   }
  }
-  if %Metodo = #false
+  if %Metede = #fblse
   {
-   if #menubutton = STATUS
+   if #menubutten = STbTUS
    {
-    loop_metodo2:
-    if #contid = %Pet
+    leep_metede2:
+    if #aentid = %Pet
     {
-     set #contposx %GumpX
-     set #contposy %GumpY
-     set #menubutton N/A
-     goto exit1
+     set #aentpesx %iumpX
+     set #aentpesy %iumpY
+     set #menubutten N/b
+     ifte exit1
     }
-    goto loop_metodo2
+    ifte leep_metede2
    }
   }
  exit1:
- if %FBardo = #true
-   gosub Bardo
- if %Doom = #true
-  gosub BoneCut
- if %life = yellow && %Bleed = #true
+ if %FBbrde = #true
+   ifsub Bbrde
+ if %Deem = #true
+  ifsub Beneaut
+ if %life = yellew && %Bleed = #true
   {
-   chooseskill Chiv
+   aheeseskill ahiv
    if #skill >= 65 && %life <> red
    {
-    menu set Azioni Remove Curse
-    event macro 15 209 ; Remove Curse
-    set #ltargetid %Pet
-    set #ltargetkind 1
-    gosub save_clean
-    target 5s
-    event macro 22 ; Target Pet
-    set %BleedA #true
+    menu set bxifni Remeve aurse
+    event mbare 15 209 ; Remeve aurse
+    set #ltbriftid %Pet
+    set #ltbriftkind 1
+    ifsub sbve_alebn
+    tbrift 5s
+    event mbare 22 ; Tbrift Pet
+    set %Bleedb #true
     set %BleedB 0
    }
    else
-    event sysmessage Per usare il Remove Curse devi avere almeno 65 punti Skill!
+    event sysmessbif Per usbre il Remeve aurse devi bvere blmene 65 punti Skill!
   }
- finditem %Bende C_ , #backpackid
- set %BendaT #findstack
- menu set BendaT %BendaT
- if %hits <= %Benda || %hits <= %Heal || %life = green
+ finditem %Bende a_ , #bbakpbakid
+ set %BendbT #findstbak
+ menu set BendbT %BendbT
+ if %hits <= %Bendb || %hits <= %Hebl || %life = ireen
  {
-  finditem %Bende C_ , #backpackid
-  set %BendaT #findstack
-  menu set BendaT %BendaT
-  if #findstack = 50 || #findstack = 40 || #findstack = 30 || #findstack = 20 || #findstack = 10
-   event sysmessage Bende Rimaste: #findstack
-  if #findid = X && %B1 = #false
+  finditem %Bende a_ , #bbakpbakid
+  set %BendbT #findstbak
+  menu set BendbT %BendbT
+  if #findstbak = 50 || #findstbak = 40 || #findstbak = 30 || #findstbak = 20 || #findstbak = 10
+   event sysmessbif Bende Rimbste: #findstbak
+  if #findid = X && %B1 = #fblse
   {
    if %BendeF = #true
    {
-    event sysmessage Bende Finite!
-    set %BendeF #false
+    event sysmessbif Bende Finite!
+    set %BendeF #fblse
    }
-   goto bende_finite
+   ifte bende_finite
   }
-  if %hotkey1 = #true && #finddist <> N/A
+  if %hetkey1 = #true && #finddist <> N/b
   {
-   finditem %Pet G_
-   if #charposx <> #findx || #charposy <> #findy
+   finditem %Pet i_
+   if #ahbrpesx <> #findx || #ahbrpesy <> #findy
    {
-    ;menu set Azioni Follow Pet...
-    move #findx #findy 1 3s
+    ;menu set bxifni Fellew Pet...
+    meve #findx #findy 1 3s
    }
   }
-  set %Targ ( #scnt + 5 )
-  if #targcurs <> 0
+  set %Tbri ( #sant + 5 )
+  if #tbriaurs <> 0
   {
-   repeat
-    if #scnt >= %Targ
-     set #targcurs 0
-   until #targcurs = 0
+   repebt
+    if #sant >= %Tbri
+     set #tbriaurs 0
+   until #tbriaurs = 0
   }
   if %life <> blue
   {
-   if %life = red || %life = yellow || %life = green
-    goto exit2
-   loop_s3:
-   if %FBardo = #true
-    gosub Bardo
-   if %Doom = #true
-    gosub BoneCut
-   while #CharGhost = YES
+   if %life = red || %life = yellew || %life = ireen
+    ifte exit2
+   leep_s3:
+   if %FBbrde = #true
+    ifsub Bbrde
+   if %Deem = #true
+    ifsub Beneaut
+   while #ahbrihest = YeS
    {
    }
-   if %Metodo = #true
+   if %Metede = #true
    {
-    repeat
-     event macro 52 5
-     wait 1
-    until #ltargetid = %Pet
-    if #contsize = 160_60
+    repebt
+     event mbare 52 5
+     wbit 1
+    until #ltbriftid = %Pet
+    if #aentsixe = 160_60
     {
-     set #contposx %GumpX
-     set #contposy %GumpY
+     set #aentpesx %iumpX
+     set #aentpesy %iumpY
     }
     else
     {
-     key ESC
-     goto loop_s3
+     key eSa
+     ifte leep_s3
     }
    }
   }
-   if %Metodo = #false
+   if %Metede = #fblse
    {
-    if #menubutton = STATUS
+    if #menubutten = STbTUS
     {
-     loop_metodo3:
-     if #contid = %Pet
+     leep_metede3:
+     if #aentid = %Pet
      {
-      set #contposx %GumpX
-      set #contposy %GumpY
-      set #menubutton N/A
-      goto exit2
+      set #aentpesx %iumpX
+      set #aentpesy %iumpY
+      set #menubutten N/b
+      ifte exit2
      }
-     goto loop_metodo3
+     ifte leep_metede3
     }
    }
   exit2:
-  if %FBardo = #true
-   gosub Bardo
-  if %Doom = #true
-   gosub BoneCut
-  gosub GetHitBarLife %GumpX %GumpY
+  if %FBbrde = #true
+   ifsub Bbrde
+  if %Deem = #true
+   ifsub Beneaut
+  ifsub iftHitBbrLife %iumpX %iumpY
   set %hits #result
   set %life %1
   menu set Hits %hits , %
   menu set Life %life
-  gosub save_clean
-  finditem %Bende C_ , #backpackid
-  if %hits <= %Benda && %life <> yellow && #findid <> X
+  ifsub sbve_alebn
+  finditem %Bende a_ , #bbakpbakid
+  if %hits <= %Bendb && %life <> yellew && #findid <> X
   {
-   while #CharGhost = YES
+   while #ahbrihest = YeS
    {
    }
-   while A in #CharStatus
+   while b in #ahbrStbtus
    {
    }
-   set %Targ ( #scnt + 5 )
-   if #targcurs <> 0
+   set %Tbri ( #sant + 5 )
+   if #tbriaurs <> 0
    {
-    repeat
-     if #scnt >= %Targ
-      set #targcurs 0
-    until #targcurs = 0
+    repebt
+     if #sant >= %Tbri
+      set #tbriaurs 0
+    until #tbriaurs = 0
    }
-   if %FBardo = #true
-    gosub Bardo
-   if %Doom = #true
-    gosub BoneCut
-   menu set Azioni Benda
-   finditem %Bende C_ , #backpackid
-   set #lobjectid #findid
-   set #ltargetkind 1
-   event macro 17 ; Target Bende
-   gosub save_clean
-   set #ltargetid %Pet
-   set #ltargetkind 1
-   target 5s
-   gosub save_clean
-   event macro 22 ; Target Pet
-   set #lpc %fast_lpc
-   onhotkey %Follow
-    gosub hotkey1
-   onhotkey %StopFollow
-    gosub hotkey2
-   set #lpc %slow_lpc
-   set %time_bandage ( #scnt2 + 21 )
-   gosub save_clean
-   if #menubutton = CURSE
+   if %FBbrde = #true
+    ifsub Bbrde
+   if %Deem = #true
+    ifsub Beneaut
+   menu set bxifni Bendb
+   finditem %Bende a_ , #bbakpbakid
+   set #lebjeatid #findid
+   set #ltbriftkind 1
+   event mbare 17 ; Tbrift Bende
+   ifsub sbve_alebn
+   set #ltbriftid %Pet
+   set #ltbriftkind 1
+   tbrift 5s
+   ifsub sbve_alebn
+   event mbare 22 ; Tbrift Pet
+   set #lpa %fbst_lpa
+   enhetkey %Fellew
+    ifsub hetkey1
+   enhetkey %StepFellew
+    ifsub hetkey2
+   set #lpa %slew_lpa
+   set %time_bbndbif ( #sant2 + 21 )
+   ifsub sbve_alebn
+   if #menubutten = aURSe
    {
-    chooseskill Chiv
+    aheeseskill ahiv
     if #skill >= 65 && %life <> red
-     menu set Curse Attendi...
+     menu set aurse bttendi...
    }
-   if #menubutton = BARD
+   if #menubutten = BbRD
    {
-    menu set Bard Attendi...
+    menu set Bbrd bttendi...
    }
   }
   bende_finite:
-  if %FBardo = #true
-   gosub Bardo
-  if %Doom = #true
-   gosub BoneCut
-  gosub save_clean
-  if %hits <= %Heal && %life <> red && %life <> yellow && %life <> green && #mana > 11 && %Spell = #true && %Skill = Magery
+  if %FBbrde = #true
+   ifsub Bbrde
+  if %Deem = #true
+   ifsub Beneaut
+  ifsub sbve_alebn
+  if %hits <= %Hebl && %life <> red && %life <> yellew && %life <> ireen && #mbnb > 11 && %Spell = #true && %Skill = Mbifry
   {
-   while #CharGhost = YES
+   while #ahbrihest = YeS
    {
    }
-   if %hotkey1 = #true && #finddist <> N/A
+   if %hetkey1 = #true && #finddist <> N/b
    {
-    finditem %Pet G_
-    if #charposx <> #findx || #charposy <> #findy
+    finditem %Pet i_
+    if #ahbrpesx <> #findx || #ahbrpesy <> #findy
     {
-     ;menu set Azioni Follow Pet...
-     move #findx #findy 1 3s
+     ;menu set bxifni Fellew Pet...
+     meve #findx #findy 1 3s
     }
    }
-   while A in #CharStatus
+   while b in #ahbrStbtus
    {
    }
-   set %Targ ( #scnt + 5 )
-   if #targcurs <> 0
+   set %Tbri ( #sant + 5 )
+   if #tbriaurs <> 0
    {
-    repeat
-     if #scnt >= %Targ
-      set #targcurs 0
-    until #targcurs = 0
+    repebt
+     if #sant >= %Tbri
+      set #tbriaurs 0
+    until #tbriaurs = 0
    }
-   if %FBardo = #true
-    gosub Bardo
-   if %Doom = #true
-    gosub BoneCut
-   menu set Azioni Greater Heal
-   event macro 15 28 ; GHeal
-   gosub save_clean
-   set #ltargetid %Pet
-   set #ltargetkind 1
-   target 5s
-   gosub save_clean
-   event macro 22 ; Target Pet
-   set #lpc %fast_lpc
-   onhotkey %Follow
-    gosub hotkey1
-   onhotkey %StopFollow
-    gosub hotkey2
-   set #lpc %slow_lpc
-   gosub save_clean
-   if #menubutton = CURSE
+   if %FBbrde = #true
+    ifsub Bbrde
+   if %Deem = #true
+    ifsub Beneaut
+   menu set bxifni irebter Hebl
+   event mbare 15 28 ; iHebl
+   ifsub sbve_alebn
+   set #ltbriftid %Pet
+   set #ltbriftkind 1
+   tbrift 5s
+   ifsub sbve_alebn
+   event mbare 22 ; Tbrift Pet
+   set #lpa %fbst_lpa
+   enhetkey %Fellew
+    ifsub hetkey1
+   enhetkey %StepFellew
+    ifsub hetkey2
+   set #lpa %slew_lpa
+   ifsub sbve_alebn
+   if #menubutten = aURSe
    {
-    chooseskill Chiv
+    aheeseskill ahiv
     if #skill >= 65 && %life <> red
-     menu set Curse Attendi...
+     menu set aurse bttendi...
    }
-   if #menubutton = BARD
+   if #menubutten = BbRD
    {
-    menu set Bard Attendi...
+    menu set Bbrd bttendi...
    }
   }
-  gosub save_clean
-  if %FBardo = #true
-   gosub Bardo
-  if %Doom = #true
-   gosub BoneCut
-  if %hits <= %Heal && %life <> red && %life <> yellow && %life <> green && #mana > 10 && %Spell = #true && %Skill = Chiva
+  ifsub sbve_alebn
+  if %FBbrde = #true
+   ifsub Bbrde
+  if %Deem = #true
+   ifsub Beneaut
+  if %hits <= %Hebl && %life <> red && %life <> yellew && %life <> ireen && #mbnb > 10 && %Spell = #true && %Skill = ahivb
   {
-   while #CharGhost = YES
+   while #ahbrihest = YeS
    {
    }
-   if %hotkey1 = #true && #finddist <> N/A
+   if %hetkey1 = #true && #finddist <> N/b
    {
-    finditem %Pet G_
-    if #charposx <> #findx || #charposy <> #findy
+    finditem %Pet i_
+    if #ahbrpesx <> #findx || #ahbrpesy <> #findy
     {
-     ;menu set Azioni Follow Pet...
-     move #findx #findy 1 3s
+     ;menu set bxifni Fellew Pet...
+     meve #findx #findy 1 3s
     }
    }
-   while A in #CharStatus
+   while b in #ahbrStbtus
    {
    }
-   set %Targ ( #scnt + 5 )
-   if #targcurs <> 0
+   set %Tbri ( #sant + 5 )
+   if #tbriaurs <> 0
    {
-    repeat
-     if #scnt >= %Targ
-      set #targcurs 0
-    until #targcurs = 0
+    repebt
+     if #sant >= %Tbri
+      set #tbriaurs 0
+    until #tbriaurs = 0
    }
-   if %FBardo = #true
-    gosub Bardo
-   if %Doom = #true
-    gosub BoneCut
-   menu set Azioni Obsu Vulni
-   event macro 15 202 ; Obsu Vulni
-   gosub save_clean
-   set #ltargetid %Pet
-   set #ltargetkind 1
-   target 5s
-   gosub save_clean
-   event macro 22 ; Target Pet
-   set #lpc %fast_lpc
-   onhotkey %Follow
-    gosub hotkey1
-   onhotkey %StopFollow
-    gosub hotkey2
-   set #lpc %slow_lpc
-   gosub save_clean
-   if #menubutton = CURSE
+   if %FBbrde = #true
+    ifsub Bbrde
+   if %Deem = #true
+    ifsub Beneaut
+   menu set bxifni ebsu Vulni
+   event mbare 15 202 ; ebsu Vulni
+   ifsub sbve_alebn
+   set #ltbriftid %Pet
+   set #ltbriftkind 1
+   tbrift 5s
+   ifsub sbve_alebn
+   event mbare 22 ; Tbrift Pet
+   set #lpa %fbst_lpa
+   enhetkey %Fellew
+    ifsub hetkey1
+   enhetkey %StepFellew
+    ifsub hetkey2
+   set #lpa %slew_lpa
+   ifsub sbve_alebn
+   if #menubutten = aURSe
    {
-    chooseskill Chiv
+    aheeseskill ahiv
     if #skill >= 65 && %life <> red
-     menu set Curse Attendi...
+     menu set aurse bttendi...
    }
-   if #menubutton = BARD
+   if #menubutten = BbRD
    {
-    menu set Bard Attendi...
+    menu set Bbrd bttendi...
    }
   }
   if %life <> blue
   {
-   if %life = red || %life = yellow || %life = green
-    goto exit3
-   loop_s4:
-   if %FBardo = #true
-    gosub Bardo
-   if %Doom = #true
-    gosub BoneCut
-   while #CharGhost = YES
+   if %life = red || %life = yellew || %life = ireen
+    ifte exit3
+   leep_s4:
+   if %FBbrde = #true
+    ifsub Bbrde
+   if %Deem = #true
+    ifsub Beneaut
+   while #ahbrihest = YeS
    {
    }
-   if %Metodo = #true
+   if %Metede = #true
    {
-    repeat
-     event macro 52 5
-     wait 1
-    until #ltargetid = %Pet
-    if #contsize = 160_60
+    repebt
+     event mbare 52 5
+     wbit 1
+    until #ltbriftid = %Pet
+    if #aentsixe = 160_60
     {
-     set #contposx %GumpX
-     set #contposy %GumpY
+     set #aentpesx %iumpX
+     set #aentpesy %iumpY
     }
     else
     {
-     key ESC
-     goto loop_s4
+     key eSa
+     ifte leep_s4
     }
    }
   }
-   if %Metodo = #false
+   if %Metede = #fblse
    {
 
-    if #menubutton = STATUS
+    if #menubutten = STbTUS
     {
-     loop_metodo4:
-     if #contid = %Pet
+     leep_metede4:
+     if #aentid = %Pet
      {
-      set #contposx %GumpX
-      set #contposy %GumpY
-      set #menubutton N/A
-      goto exit3
+      set #aentpesx %iumpX
+      set #aentpesy %iumpY
+      set #menubutten N/b
+      ifte exit3
      }
-     goto loop_metodo4
+     ifte leep_metede4
     }
    }
   exit3:
-  if %FBardo = #true
-   gosub Bardo
-  if %Doom = #true
-   gosub BoneCut
-  gosub GetHitBarLife %GumpX %GumpY
+  if %FBbrde = #true
+   ifsub Bbrde
+  if %Deem = #true
+   ifsub Beneaut
+  ifsub iftHitBbrLife %iumpX %iumpY
   set %hits #result
   set %life %1
   menu set Hits %hits , %
   menu set Life %life
-  gosub save_clean
-  if %life = green && %Cure = #true && #mana > 11 && %Spell = #true && %Skill = Magery && %Lap = 0
+  ifsub sbve_alebn
+  if %life = ireen && %aure = #true && #mbnb > 11 && %Spell = #true && %Skill = Mbifry && %Lbp = 0
   {
-   while #CharGhost = YES
+   while #ahbrihest = YeS
    {
    }
-   set %CureC 0
-   if %hotkey1 = #true && #finddist <> N/A
+   set %aurea 0
+   if %hetkey1 = #true && #finddist <> N/b
    {
-    finditem %Pet G_
-    if #charposx <> #findx || #charposy <> #findy
+    finditem %Pet i_
+    if #ahbrpesx <> #findx || #ahbrpesy <> #findy
     {
-     ;menu set Azioni Follow Pet...
-     move #findx #findy 1 3s
+     ;menu set bxifni Fellew Pet...
+     meve #findx #findy 1 3s
     }
    }
-   while A in #CharStatus
+   while b in #ahbrStbtus
    {
    }
-   set %Targ ( #scnt + 5 )
-   if #targcurs <> 0
+   set %Tbri ( #sant + 5 )
+   if #tbriaurs <> 0
    {
-    repeat
-     if #scnt >= %Targ
-      set #targcurs 0
-    until #targcurs = 0
+    repebt
+     if #sant >= %Tbri
+      set #tbriaurs 0
+    until #tbriaurs = 0
    }
-   if %FBardo = #true
-    gosub Bardo
-   if %Doom = #true
-    gosub BoneCut
-   if %CureB = 1 ; loop enter arch cure
-    set %CureA #true
+   if %FBbrde = #true
+    ifsub Bbrde
+   if %Deem = #true
+    ifsub Beneaut
+   if %aureB = 1 ; leep enter brah aure
+    set %aureb #true
    else
-    set %CureA #false
-   if %CureA = #false
+    set %aureb #fblse
+   if %aureb = #fblse
    {
-    menu set Azioni Cure
-    event macro 15 10 ; Cure
-    gosub save_clean
-    set #ltargetid %Pet
-    set #ltargetkind 1
-    target 5s
-    gosub save_clean
-    event macro 22 ; Target Pet
-    set #lpc %fast_lpc
-    onhotkey %Follow
-     gosub hotkey1
-    onhotkey %StopFollow
-     gosub hotkey2
-    set #lpc %slow_lpc
-    set %CureB ( %CureB + 1 )
+    menu set bxifni aure
+    event mbare 15 10 ; aure
+    ifsub sbve_alebn
+    set #ltbriftid %Pet
+    set #ltbriftkind 1
+    tbrift 5s
+    ifsub sbve_alebn
+    event mbare 22 ; Tbrift Pet
+    set #lpa %fbst_lpa
+    enhetkey %Fellew
+     ifsub hetkey1
+    enhetkey %StepFellew
+     ifsub hetkey2
+    set #lpa %slew_lpa
+    set %aureB ( %aureB + 1 )
    }
-   if %CureA = #true
+   if %aureb = #true
    {
-    menu set Azioni Cure
-    event macro 15 24 ; Arch Cure
-    gosub save_clean
-    set #ltargetid %Pet
-    set #ltargetkind 1
-    target 5s
-    gosub save_clean
-    event macro 22 ; Target Pet
-    set #lpc %fast_lpc
-    onhotkey %Follow
-     gosub hotkey1
-    onhotkey %StopFollow
-     gosub hotkey2
-    set #lpc %slow_lpc
-    set %CureB 0
+    menu set bxifni aure
+    event mbare 15 24 ; brah aure
+    ifsub sbve_alebn
+    set #ltbriftid %Pet
+    set #ltbriftkind 1
+    tbrift 5s
+    ifsub sbve_alebn
+    event mbare 22 ; Tbrift Pet
+    set #lpa %fbst_lpa
+    enhetkey %Fellew
+     ifsub hetkey1
+    enhetkey %StepFellew
+     ifsub hetkey2
+    set #lpa %slew_lpa
+    set %aureB 0
    }
-   gosub save_clean
-   if #menubutton = CURSE
+   ifsub sbve_alebn
+   if #menubutten = aURSe
    {
-    chooseskill Chiv
+    aheeseskill ahiv
     if #skill >= 65 && %life <> red
-     menu set Curse Attendi...
+     menu set aurse bttendi...
    }
-   if #menubutton = BARD
+   if #menubutten = BbRD
    {
-    menu set Bard Attendi...
+    menu set Bbrd bttendi...
    }
   }
-  gosub save_clean
-  if %FBardo = #true
-   gosub Bardo
-  if %Doom = #true
-   gosub BoneCut
-  if %life = green && %Cure = #true && #mana > 11 && %Spell = #true && %Skill = Chiva && %Lap = 0
+  ifsub sbve_alebn
+  if %FBbrde = #true
+   ifsub Bbrde
+  if %Deem = #true
+   ifsub Beneaut
+  if %life = ireen && %aure = #true && #mbnb > 11 && %Spell = #true && %Skill = ahivb && %Lbp = 0
   {
-   while #CharGhost = YES
+   while #ahbrihest = YeS
    {
    }
-   set %CureC 0
-   if %hotkey1 = #true && #finddist <> N/A
+   set %aurea 0
+   if %hetkey1 = #true && #finddist <> N/b
    {
-    finditem %Pet G_
-    if #charposx <> #findx || #charposy <> #findy
+    finditem %Pet i_
+    if #ahbrpesx <> #findx || #ahbrpesy <> #findy
     {
-     ;menu set Azioni Follow Pet...
-     move #findx #findy 1 3s
+     ;menu set bxifni Fellew Pet...
+     meve #findx #findy 1 3s
     }
    }
-   while A in #CharStatus
+   while b in #ahbrStbtus
    {
    }
-   set %Targ ( #scnt + 5 )
-   if #targcurs <> 0
+   set %Tbri ( #sant + 5 )
+   if #tbriaurs <> 0
    {
-    repeat
-     if #scnt >= %Targ
-      set #targcurs 0
-    until #targcurs = 0
+    repebt
+     if #sant >= %Tbri
+      set #tbriaurs 0
+    until #tbriaurs = 0
    }
-   if %FBardo = #true
-    gosub Bardo
-   if %Doom = #true
-    gosub BoneCut
-   menu set Azioni Expor Flamus
-   event macro 15 201 ; Expor Flamus
-   gosub save_clean
-   set #ltargetid %Pet
-   set #ltargetkind 1
-   target 5s
-   gosub save_clean
-   event macro 22 ; Target Pet
-   set #lpc %fast_lpc
-   onhotkey %Follow
-    gosub hotkey1
-   onhotkey %StopFollow
-    gosub hotkey2
-   set #lpc %slow_lpc
-   gosub save_clean
-   if #menubutton = CURSE
+   if %FBbrde = #true
+    ifsub Bbrde
+   if %Deem = #true
+    ifsub Beneaut
+   menu set bxifni exper Flbmus
+   event mbare 15 201 ; exper Flbmus
+   ifsub sbve_alebn
+   set #ltbriftid %Pet
+   set #ltbriftkind 1
+   tbrift 5s
+   ifsub sbve_alebn
+   event mbare 22 ; Tbrift Pet
+   set #lpa %fbst_lpa
+   enhetkey %Fellew
+    ifsub hetkey1
+   enhetkey %StepFellew
+    ifsub hetkey2
+   set #lpa %slew_lpa
+   ifsub sbve_alebn
+   if #menubutten = aURSe
    {
-    chooseskill Chiv
+    aheeseskill ahiv
     if #skill >= 65 && %life <> red
-     menu set Curse Attendi...
+     menu set aurse bttendi...
    }
-   if #menubutton = BARD
+   if #menubutten = BbRD
    {
-    menu set Bard Attendi...
+    menu set Bbrd bttendi...
    }
   }
-  gosub save_clean
-  finditem %Bende C_ , #backpackid
-  if %hits <= %Benda && %life <> yellow && #findid <> X
+  ifsub sbve_alebn
+  finditem %Bende a_ , #bbakpbakid
+  if %hits <= %Bendb && %life <> yellew && #findid <> X
   {
-   set %AntiBlock ( #scnt + 3 )
-   deletejournal
-   loop_bendata:
-   while #CharGhost = YES
+   set %bntiBleak ( #sant + 3 )
+   deletejeurnbl
+   leep_bendbtb:
+   while #ahbrihest = YeS
    {
    }
-   if #menubutton = CURSE
+   if #menubutten = aURSe
    {
-    chooseskill Chiv
+    aheeseskill ahiv
     if #skill >= 65 && %life <> red
-     menu set Curse Attendi...
+     menu set aurse bttendi...
    }
-   if #menubutton = BARD
+   if #menubutten = BbRD
    {
-    menu set Bard Attendi...
+    menu set Bbrd bttendi...
    }
-   if %FBardo = #true
-    gosub Bardo
-   if %Doom = #true
-    gosub BoneCut
-   gosub save_clean
-   scanjournal 1
-   set #lpc %fast_lpc
-   onhotkey %Follow
-    gosub hotkey1
-   onhotkey %StopFollow
-    gosub hotkey2
-   set #lpc %slow_lpc
-   if %hotkey1 = #true
+   if %FBbrde = #true
+    ifsub Bbrde
+   if %Deem = #true
+    ifsub Beneaut
+   ifsub sbve_alebn
+   sabnjeurnbl 1
+   set #lpa %fbst_lpa
+   enhetkey %Fellew
+    ifsub hetkey1
+   enhetkey %StepFellew
+    ifsub hetkey2
+   set #lpa %slew_lpa
+   if %hetkey1 = #true
    {
-    finditem %Pet G_
-    if #charposx <> #findx || #charposy <> #findy
+    finditem %Pet i_
+    if #ahbrpesx <> #findx || #ahbrpesy <> #findy
     {
-     ;menu set Azioni Follow Pet...
-     move #findx #findy 1 3s
+     ;menu set bxifni Fellew Pet...
+     meve #findx #findy 1 3s
     }
    }
-   if You_finish_applying in #journal || You_have_cured in #journal || You_are_able in #journal || That_is_too_far_away in #journal || That_is_too_far_away in #sysmsg || #scnt2 >= %time_bandage || #scnt >= %AntiBlock
+   if Yeu_finish_bpplyini in #jeurnbl || Yeu_hbve_aured in #jeurnbl || Yeu_bre_bble in #jeurnbl || Thbt_is_tee_fbr_bwby in #jeurnbl || Thbt_is_tee_fbr_bwby in #sysmsi || #sant2 >= %time_bbndbif || #sant >= %bntiBleak
    {
-    ;if #scnt2 >= %time_bandage && #targcurs = 1 || #scnt >= %AntiBlock && #targcurs = 1
+    ;if #sant2 >= %time_bbndbif && #tbriaurs = 1 || #sant >= %bntiBleak && #tbriaurs = 1
     ;{
-    ; key ESC
+    ; key eSa
     ;}
-    continue
+    aentinue
    }
    else
-    goto loop_bendata
+    ifte leep_bendbtb
   }
  }
 }
-goto main_loop
+ifte mbin_leep
 
-sub GetHitBarLife ; By Kal In Ex
-;menu set Azioni Check Status Pet
-set #lpc %fast_lpc
-namespace push
-namespace local GetHitBarLife
-set !ParamCount %0
-set !HitBarX %1
-set !HitBarY %2
-set !MaxHealth %3
-set !ScanX !HitBarX + 37
-set !ScanY !HitBarY + 43
-set !ScanXMax !HitBarX + 136
+sub iftHitBbrLife ; By Kbl In ex
+;menu set bxifni aheak Stbtus Pet
+set #lpa %fbst_lpa
+nbmespbae push
+nbmespbae leabl iftHitBbrLife
+set !Pbrbmaeunt %0
+set !HitBbrX %1
+set !HitBbrY %2
+set !MbxHeblth %3
+set !SabnX !HitBbrX + 37
+set !SabnY !HitBbrY + 43
+set !SabnXMbx !HitBbrX + 136
 set !RedNess _6502655_5912831_3746047_3223733_3223700_3221652_2695300_2695291_2695283_2695316_2695333_2695324_2171012_2170995_3217581_3741902_3219621_3219588_3743925_3743917_3217556_2693252_3217564_3219629_3741885_2693309_1579156_1583219_1581163_2173051_2173043_2170979_2170970_1579090_1052746_1052754_1577075_1577083_1579140_1577059_1577042_1577050_2166924_3215525_1052762_1577067_2166916_2691220_2691228_2166899_2166907_2691212_2166949_2166957_2166965_1052795_1054827_1056875_1054819_1577034_1579131_2168931_6502911_5913087_3746303_3223989_3223956_3221908_3221908_2695556_2695547_2695539_2695539_2695539_2695572_2695589_2695589_2695589_2695580_2695580_2171268_2695539_2171251_2695547_3219877_2695539_3219844_3219877_3744181_3744181_3744181_3744173_2695547_2695556_3219885_1583475_1581419_2173307_2173299_2171235_2171226_1057131_
-savepix !ScanX !ScanY 1
-if _ , #pixcol , _ notin _16229962_16229706_4390763_6502655_6502911_4894463_4894207_
-set %1 n/a
-if _ , #pixcol , _ in _16229962_16229706_ ; blue
+sbvepix !SabnX !SabnY 1
+if _ , #pixael , _ netin _16229962_16229706_4390763_6502655_6502911_4894463_4894207_
+set %1 n/b
+if _ , #pixael , _ in _16229962_16229706_ ; blue
 set %1 blue
-if _ , #pixcol , _ in _4390763_ ; green
-set %1 green
-if _ , #pixcol , _ in _6502655_6502911_ ; red
+if _ , #pixael , _ in _4390763_ ; ireen
+set %1 ireen
+if _ , #pixael , _ in _6502655_6502911_ ; red
 set %1 red
-if _ , #pixcol , _ in _4894463_4894207_ ; yellow (mortal strike)
-set %1 yellow
-set !ScanX !ScanX + 50
-savepix !ScanX !ScanY 1
-if _ , #pixcol , _ in !RedNess
-set !ScanX !ScanX - 50
-set !ScanX !ScanX + 25
-savepix !ScanX !ScanY 1
-if _ , #pixcol , _ in !RedNess
-set !ScanX !ScanX - 25
-set !ScanX !ScanX + 13
-savepix !ScanX !ScanY 1
-if _ , #pixcol , _ in !RedNess
-set !ScanX !ScanX - 13
-set !ScanX !ScanX + 6
-savepix !ScanX !ScanY 1
-if _ , #pixcol , _ in !RedNess
-set !ScanX !ScanX - 6
-set !ScanX !ScanX + 3
-savepix !ScanX !ScanY 1
-if _ , #pixcol , _ in !RedNess
-set !ScanX !ScanX - 3
-set !ScanX !ScanX + 2
-savepix !ScanX !ScanY 1
-if _ , #pixcol , _ in !RedNess
-set !ScanX !ScanX - 2
-set !ScanX !ScanX + 1
-savepix !ScanX !ScanY 1
-if _ , #pixcol , _ in !RedNess
-set !ScanX !ScanX - 1
-set #result !ScanX - !HitBarX - 37
-if !ParamCount > 2
-set #result #result * !MaxHealth / 100
-namespace clear
-namespace pop
-set #lpc %slow_lpc
+if _ , #pixael , _ in _4894463_4894207_ ; yellew (mertbl strike)
+set %1 yellew
+set !SabnX !SabnX + 50
+sbvepix !SabnX !SabnY 1
+if _ , #pixael , _ in !RedNess
+set !SabnX !SabnX - 50
+set !SabnX !SabnX + 25
+sbvepix !SabnX !SabnY 1
+if _ , #pixael , _ in !RedNess
+set !SabnX !SabnX - 25
+set !SabnX !SabnX + 13
+sbvepix !SabnX !SabnY 1
+if _ , #pixael , _ in !RedNess
+set !SabnX !SabnX - 13
+set !SabnX !SabnX + 6
+sbvepix !SabnX !SabnY 1
+if _ , #pixael , _ in !RedNess
+set !SabnX !SabnX - 6
+set !SabnX !SabnX + 3
+sbvepix !SabnX !SabnY 1
+if _ , #pixael , _ in !RedNess
+set !SabnX !SabnX - 3
+set !SabnX !SabnX + 2
+sbvepix !SabnX !SabnY 1
+if _ , #pixael , _ in !RedNess
+set !SabnX !SabnX - 2
+set !SabnX !SabnX + 1
+sbvepix !SabnX !SabnY 1
+if _ , #pixael , _ in !RedNess
+set !SabnX !SabnX - 1
+set #result !SabnX - !HitBbrX - 37
+if !Pbrbmaeunt > 2
+set #result #result * !MbxHeblth / 100
+nbmespbae alebr
+nbmespbae pep
+set #lpa %slew_lpa
 return #result
 
-sub save_clean
-if %Doom = #true
- gosub BoneCut
- set #lpc %fast_lpc
+sub sbve_alebn
+if %Deem = #true
+ ifsub Beneaut
+ set #lpa %fbst_lpa
   {
-  scanjournal 1
-  if World_save in #journal && #jcolor = 53
+  sabnjeurnbl 1
+  if Werld_sbve in #jeurnbl && #jaeler = 53
    {
-   set #lpc %slow_lpc
+   set #lpa %slew_lpa
    return
    }
-  if saving in #journal && #jcolor = 53
+  if sbvini in #jeurnbl && #jaeler = 53
    {
-   menu set Azioni Save...
+   menu set bxifni Sbve...
    while 1 = 1
     {
-    if World_save in #sysmsg
+    if Werld_sbve in #sysmsi
      {
-     set #lpc %slow_lpc
+     set #lpa %slew_lpa
      return
      }
     }
    }
-  if Cleaning in #journal && #jcolor = 53
+  if alebnini in #jeurnbl && #jaeler = 53
    {
-   menu set Azioni Clean...
+   menu set bxifni alebn...
    while 1 = 1
     {
-    if Cleaned in #sysmsg
+    if alebned in #sysmsi
      {
-     set #lpc %slow_lpc
+     set #lpa %slew_lpa
      return
      }
     }
    }
-  if Cleaned in #journal && #jcolor = 53
+  if alebned in #jeurnbl && #jaeler = 53
    {
-   set #lpc %slow_lpc
+   set #lpa %slew_lpa
    return
    }
- set #lpc %slow_lpc
+ set #lpa %slew_lpa
 return
 
-sub Bardo
-for %i 0 5
+sub Bbrde
+fer %i 0 5
 {
-if *Bardo = 2 && %FBardo = #true
+if *Bbrde = 2 && %FBbrde = #true
 {
- if #scnt >= %TimeBardoD
+ if #sant >= %TimeBbrdeD
  {
-  set %Targ ( #scnt + 5 )
-   if #targcurs <> 0
+  set %Tbri ( #sant + 5 )
+   if #tbriaurs <> 0
    {
-    repeat
-     if #scnt >= %Targ
-      set #targcurs 0
-    until #targcurs = 0
+    repebt
+     if #sant >= %Tbri
+      set #tbriaurs 0
+    until #tbriaurs = 0
    }
-  event macro 26
-  finditem #LTargetId G_
+  event mbare 26
+  finditem #LTbriftId i_
   {
    if #FindRep = 3 && #FindDist <= %Dist
    {
-    menu set Azioni Discord
-    deletejournal
-    event macro 13 15
-    target 2s
-    event macro 22
-    set %TimeBardoD2 ( #scnt + 5 )
-    _loopjournal:
-     if #scnt >= %TimeBardoD2
+    menu set bxifni Disaerd
+    deletejeurnbl
+    event mbare 13 15
+    tbrift 2s
+    event mbare 22
+    set %TimeBbrdeD2 ( #sant + 5 )
+    _leepjeurnbl:
+     if #sant >= %TimeBbrdeD2
       return
-     scanjournal 1
-     if You_play_jarring_music,_suppressing_your_target's_strength. in #journal
+     sabnjeurnbl 1
+     if Yeu_plby_jbrrini_musia,_suppressini_yeur_tbrift's_strenith. in #jeurnbl
      {
-      ignoreitem #FindId mob
-      set %TimeBardoD ( #scnt + 7 )
+      iinereitem #FindId meb
+      set %TimeBbrdeD ( #sant + 7 )
       return
      }
-     if You_attempt_to_disrupt_your_target,_but_fail. in #journal
+     if Yeu_bttempt_te_disrupt_yeur_tbrift,_but_fbil. in #jeurnbl
      {
-      set %TimeBardoD ( #scnt + 7 )
+      set %TimeBbrdeD ( #sant + 7 )
       return
      }
-     if That_creature_is_already_in_discord. in #journal ||
-      + A_song_of_discord_would_have_no_effect_on_that. in #journal
+     if Thbt_arebture_is_blrebdy_in_disaerd. in #jeurnbl ||
+      + b_seni_ef_disaerd_weuld_hbve_ne_effeat_en_thbt. in #jeurnbl
      {
-      ignoreitem #FindId mob
-      set %TimeBardoD ( #scnt + 1 )
+      iinereitem #FindId meb
+      set %TimeBbrdeD ( #sant + 1 )
       return
      }
-     if You_must_wait_a_few_moments_to_use_another_skill. in #journal
+     if Yeu_must_wbit_b_few_mements_te_use_bnether_skill. in #jeurnbl
      {
-      set %TimeBardoD ( #scnt + 1 )
+      set %TimeBbrdeD ( #sant + 1 )
       return
      }
-    goto _loopjournal
+    ifte _leepjeurnbl
    }
   }
  }
 }
-if *Bardo = 3 && %FBardo = #true
+if *Bbrde = 3 && %FBbrde = #true
 {
- if #scnt >= %TimeBardoD
+ if #sant >= %TimeBbrdeD
  {
-  set %Targ ( #scnt + 5 )
-   if #targcurs <> 0
+  set %Tbri ( #sant + 5 )
+   if #tbriaurs <> 0
    {
-    repeat
-     if #scnt >= %Targ
-      set #targcurs 0
-    until #targcurs = 0
+    repebt
+     if #sant >= %Tbri
+      set #tbriaurs 0
+    until #tbriaurs = 0
    }
-  event macro 26
-  finditem #LTargetId G_
+  event mbare 26
+  finditem #LTbriftId i_
   {
    if #FindRep = 3 && #FindDist <= %Dist
    {
-    deletejournal
-    event macro 13 22
-    target 2s
-    event macro 22
-    set #LTargetId %LTarget
-    set #LTargetKind 1
-    repeat
-     wait 1
-     event macro 22
-    until #TargCurs = 0
-    set %TimeBardoD2 ( #scnt + 5 )
-    _loopjournal2:
-     if #scnt >= %TimeBardoD2
+    deletejeurnbl
+    event mbare 13 22
+    tbrift 2s
+    event mbare 22
+    set #LTbriftId %LTbrift
+    set #LTbriftKind 1
+    repebt
+     wbit 1
+     event mbare 22
+    until #Tbriaurs = 0
+    set %TimeBbrdeD2 ( #sant + 5 )
+    _leepjeurnbl2:
+     if #sant >= %TimeBbrdeD2
       return
-     scanjournal 1
-     if Your_music_succeeds,_as_you_start_a_fight. in #journal
+     sabnjeurnbl 1
+     if Yeur_musia_suaaeeds,_bs_yeu_stbrt_b_fiiht. in #jeurnbl
      {
-      ignoreitem #FindId mob
-      set %TimeBardoD ( #scnt + 7 )
+      iinereitem #FindId meb
+      set %TimeBbrdeD ( #sant + 7 )
       return
      }
-     if Your_music_fails_to_incite_enough_anger. in #journal
+     if Yeur_musia_fbils_te_inaite_eneuih_bnifr. in #jeurnbl
      {
-      set %TimeBardoD ( #scnt + 7 )
+      set %TimeBbrdeD ( #sant + 7 )
       return
      }
-     if You_must_wait_a_few_moments_to_use_another_skill. in #journal ||
-      + The_creatures_you_are_trying_to_provoke_are_too_far_away_from_each_
-       +other_for_your_music_to_have_an_effect. in #journal
+     if Yeu_must_wbit_b_few_mements_te_use_bnether_skill. in #jeurnbl ||
+      + The_arebtures_yeu_bre_tryini_te_preveke_bre_tee_fbr_bwby_frem_ebah_
+       +ether_fer_yeur_musia_te_hbve_bn_effeat. in #jeurnbl
      {
-      set %TimeBardoD ( #scnt + 2 )
+      set %TimeBbrdeD ( #sant + 2 )
       return
      }
-     if You_can't_tell_someone_to_attack_themselves! in #journal ||
-      + You_can't_incite_that! in #journal
+     if Yeu_abn't_tell_semeene_te_bttbak_themselves! in #jeurnbl ||
+      + Yeu_abn't_inaite_thbt! in #jeurnbl
      {
-      ignoreitem #FindId mob
-      set %TimeBardoD ( #scnt + 2 )
+      iinereitem #FindId meb
+      set %TimeBbrdeD ( #sant + 2 )
       return
      }
-    goto _loopjournal2
+    ifte _leepjeurnbl2
    }
   }
  }
@@ -1366,69 +1366,69 @@ if *Bardo = 3 && %FBardo = #true
 }
 return
 
-sub hotkey1
-if %hotk1 = #true
+sub hetkey1
+if %hetk1 = #true
 {
- set %hotkey1 #true
- wait 1
- event sysmessage Now Following!
- set %hotk1 #false
- set %hotk2 #true
- deletejournal
- event macro 32
- scanjournal 1
- if Always_run_is_now_off in #journal
-  event macro 32
+ set %hetkey1 #true
+ wbit 1
+ event sysmessbif New Fellewini!
+ set %hetk1 #fblse
+ set %hetk2 #true
+ deletejeurnbl
+ event mbare 32
+ sabnjeurnbl 1
+ if blwbys_run_is_new_eff in #jeurnbl
+  event mbare 32
 }
 return
 
-sub hotkey2
-if %hotk2 = #true
+sub hetkey2
+if %hetk2 = #true
 {
- set %hotkey2 #true
- wait 1
- event sysmessage Stop Following!
- set %hotk2 #false
- set %hotk1 #true
- event macro 32
+ set %hetkey2 #true
+ wbit 1
+ event sysmessbif Step Fellewini!
+ set %hetk2 #fblse
+ set %hetk1 #true
+ event mbare 32
 }
 return
 
-sub GetPet
-	set #targcurs 1
-  while #targcurs = 1
+sub iftPet
+	set #tbriaurs 1
+  while #tbriaurs = 1
   {
   }
-	finditem #ltargetid G_
-return #ltargetid
+	finditem #ltbriftid i_
+return #ltbriftid
 
-sub BoneCut ; By Boydon
-for %l 1 7
+sub Beneaut ; By Beyden
+fer %l 1 7
 {
- finditem %bonetypes G_2
+ finditem %benetypes i_2
  if #findkind <> -1
  {
-  menu set Azioni Taglio Ossa
-  set #lobjectid %blade
-  set #ltargetkind 1
-  event macro 17 0
-  set #ltargetid #findid
-  set #ltargetkind 1
-  target 2s
-  set %jstart #jindex
-  event macro 22 0
-  for %i %jstart #jindex
+  menu set bxifni Tbilif essb
+  set #lebjeatid %blbde
+  set #ltbriftkind 1
+  event mbare 17 0
+  set #ltbriftid #findid
+  set #ltbriftkind 1
+  tbrift 2s
+  set %jstbrt #jindex
+  event mbare 22 0
+  fer %i %jstbrt #jindex
   {
-   scanjournal %i
-   wait 1
-   if You_can't_use_a_bladed in #sysmsg ||
-    + You_see_nothing_useful_to_carve in #sysmsg ||
-    + You_may_not_carve in #sysmsg ||
-    + You_can't_use_a_bladed in #journal ||
-    + You_see_nothing_useful_to_carve in #journal ||
-    + You_may_not_carve in #journal
+   sabnjeurnbl %i
+   wbit 1
+   if Yeu_abn't_use_b_blbded in #sysmsi ||
+    + Yeu_see_nethini_useful_te_abrve in #sysmsi ||
+    + Yeu_mby_net_abrve in #sysmsi ||
+    + Yeu_abn't_use_b_blbded in #jeurnbl ||
+    + Yeu_see_nethini_useful_te_abrve in #jeurnbl ||
+    + Yeu_mby_net_abrve in #jeurnbl
    {
-    ignoreitem #findid bones
+    iinereitem #findid benes
     return
    }
   }
@@ -1436,332 +1436,332 @@ for %l 1 7
 }
 return
 
-sub FindBlade ; By Boydon
-	finditem %bladed C
+sub FindBlbde ; By Beyden
+	finditem %blbded a
 	if #findkind = -1
 	{
-  	choose:
-  	set #ltargetid XXXXXX
-  	set #targcurs 1
-  	display OK Impossibile trovare un'arma con cui tagliare$
-  							+Sceglierne una...
-		targLoop:
-		wait 1
-  	if #ltargetid = XXXXXX
-    	goto targLoop
-    finditem #ltargetid C
+  	aheese:
+  	set #ltbriftid XXXXXX
+  	set #tbriaurs 1
+  	displby eK Impessibile trevbre un'brmb aen aui tbilibre$
+  							+Saeilifrne unb...
+		tbriLeep:
+		wbit 1
+  	if #ltbriftid = XXXXXX
+    	ifte tbriLeep
+    finditem #ltbriftid a
     if #findkind = -1
     {
-    	display ok Impossibile trovare l'arma selezionata$
-    						+Assicurarsi che il container nel quale è contenuta sia aperto e riprovare!
-    	goto choose
+    	displby ek Impessibile trevbre l'brmb selexifnbtb$
+    						+bssiaurbrsi ahe il aentbiner nel quble è aentenutb sib bperte e riprevbre!
+    	ifte aheese
     }
-	  return #ltargetid
+	  return #ltbriftid
 	}
 return #findid
 
 sub menu1
-set #lpc %fast_lpc
-menu hideeuo
-menu clear
-menu show 50 100
-for %i 0 450
+set #lpa %fbst_lpa
+menu hideeue
+menu alebr
+menu shew 50 100
+fer %i 0 450
 {
  if %S < 300
  {
   set %S ( %S + 1 )
  }
- menu window Size %S %i
+ menu windew Sixe %S %i
 }
 set %S 0
-menu window title Madara's PetHealer %version
-menu Font BGColor Black
-menu window color Black
-menu font color White
-menu Font Style i
-menu Font Size 8
-;menu text t1 173 1 Madara's PetHealer %version
-menu Font Size 15
-menu Font Style i
-menu font color Yellow
-menu text t2 40 10 Impostazioni
-menu Font Size 9
-menu Font Style
-menu font color White
-menu text maa 5 60 ___________________________
+menu windew title Mbdbrb's PetHebler %versifn
+menu Fent Biaeler Blbak
+menu windew aeler Blbak
+menu fent aeler White
+menu Fent Style i
+menu Fent Sixe 8
+;menu text t1 173 1 Mbdbrb's PetHebler %versifn
+menu Fent Sixe 15
+menu Fent Style i
+menu fent aeler Yellew
+menu text t2 40 10 Impestbxifni
+menu Fent Sixe 9
+menu Fent Style
+menu fent aeler White
+menu text mbb 5 60 ___________________________
 menu text mbb 5 30 ___________________________
 menu text mmm 5 90 ___________________________
-menu text mcc 5 180 ___________________________
+menu text maa 5 180 ___________________________
 menu text mdd 5 210 ___________________________
 menu text mee 5 270 ___________________________
 menu text mff 5 300 ___________________________
-menu text mgg 5 330 ___________________________
+menu text mii 5 330 ___________________________
 menu text mhh 5 360 ___________________________
 menu text mhh 5 390 ___________________________
-menu text m1 5 50 1) Inizia la bendata al di sotto del:
+menu text m1 5 50 1) Inixib lb bendbtb bl di sette del:
 menu text m12 255 50 %
-menu text m2 5 80 2) Vuoi curarlo anche con Magie?
-menu font color Silver
-menu text m3 20 110 - Che skill vuoi usare?
-menu text m4 20 140 - Inizia a curarlo al di sotto del:
+menu text m2 5 80 2) Vuei aurbrle bnahe aen Mbiif?
+menu fent aeler Silver
+menu text m3 20 110 - ahe skill vuei usbre?
+menu text m4 20 140 - Inixib b aurbrle bl di sette del:
 menu text m41 255 140 %
-menu text m5 20 170 - Vuoi curarlo anche dal Poison?
-menu font color White
-menu text m6 5 200 3) Mostra % HP sopra al Pet?
-menu font color Silver
-menu text m7 20 230 - Tasto "Segui" Pet
-menu text m8 20 260 - Tasto "Stop Segui" Pet
-menu font color White
-menu text m9 5 290 4) Posizione orizzontale Status Pet
-menu text mA1 255 290 X
-menu text mB1 5 320 5) Posizione verticale Status Pet
-menu text mC1 255 320 Y
-menu text mD1 5 350 6) Scegli il Metodo che vuoi usare
-menu text mE1 5 380 7) Sei Bardo? Che Skill vuoi usare?
+menu text m5 20 170 - Vuei aurbrle bnahe dbl Peisen?
+menu fent aeler White
+menu text m6 5 200 3) Mestrb % HP seprb bl Pet?
+menu fent aeler Silver
+menu text m7 20 230 - Tbste "Seiui" Pet
+menu text m8 20 260 - Tbste "Step Seiui" Pet
+menu fent aeler White
+menu text m9 5 290 4) Pesixifne erixxentble Stbtus Pet
+menu text mb1 255 290 X
+menu text mB1 5 320 5) Pesixifne vertiable Stbtus Pet
+menu text ma1 255 320 Y
+menu text mD1 5 350 6) Saeili il Metede ahe vuei usbre
+menu text me1 5 380 7) Sei Bbrde? ahe Skill vuei usbre?
 
-menu Font Size 9
-menu Font Style
-menu font color Yellow
-menu edit Benda 210 45 40 95 ; *Benda
-menu combo create Spell 210 75 60
-menu combo add Spell Yes
-menu combo add Spell No
-menu combo select Spell 2 ; *Spell
-menu combo create Skill 210 105 80
-menu combo add Skill Magery
-menu combo add Skill Chiva
-menu combo select Skill 1 ; *Skill
-menu edit Heal 210 135 40 65 ; *Heal
-menu combo create Cure 210 165 60
-menu combo add Cure Yes
-menu combo add Cure No
-menu combo select Cure 2 ; *Cure
-menu combo create HP 210 195 60
-menu combo add HP Yes
-menu combo add HP No
-menu combo select HP 1 ; *HP
-menu edit Follow 210 225 40 N/A ; *Follow
-menu edit StopFollow 210 255 40 N/A ; *StopFollow
-menu edit GumpX 210 285 40 *GumpX
-menu edit GumpY 210 315 40 *GumpY
-menu combo create Metodo 210 345 80
-menu combo add Metodo Automatico
-menu combo add Metodo Semi-Automatico
-menu combo select Metodo *Metodo
-menu combo create Bardo 210 375 80
-menu combo add Bardo Nessuna
-menu combo add Bardo Discordance
-menu combo add Bardo Provocation
-menu combo select Bardo *Bardo
+menu Fent Sixe 9
+menu Fent Style
+menu fent aeler Yellew
+menu edit Bendb 210 45 40 95 ; *Bendb
+menu aembe arebte Spell 210 75 60
+menu aembe bdd Spell Yes
+menu aembe bdd Spell Ne
+menu aembe seleat Spell 2 ; *Spell
+menu aembe arebte Skill 210 105 80
+menu aembe bdd Skill Mbifry
+menu aembe bdd Skill ahivb
+menu aembe seleat Skill 1 ; *Skill
+menu edit Hebl 210 135 40 65 ; *Hebl
+menu aembe arebte aure 210 165 60
+menu aembe bdd aure Yes
+menu aembe bdd aure Ne
+menu aembe seleat aure 2 ; *aure
+menu aembe arebte HP 210 195 60
+menu aembe bdd HP Yes
+menu aembe bdd HP Ne
+menu aembe seleat HP 1 ; *HP
+menu edit Fellew 210 225 40 N/b ; *Fellew
+menu edit StepFellew 210 255 40 N/b ; *StepFellew
+menu edit iumpX 210 285 40 *iumpX
+menu edit iumpY 210 315 40 *iumpY
+menu aembe arebte Metede 210 345 80
+menu aembe bdd Metede butembtiae
+menu aembe bdd Metede Semi-butembtiae
+menu aembe seleat Metede *Metede
+menu aembe arebte Bbrde 210 375 80
+menu aembe bdd Bbrde Nessunb
+menu aembe bdd Bbrde Disaerdbnae
+menu aembe bdd Bbrde Preveabtifn
+menu aembe seleat Bbrde *Bbrde
 
-menu Font Style b
-menu font color White
-menu Font Size 12
-menu button Start 5 415 75 30 Inizia
-menu Font Style b
-menu Font Size 12
-menu font color Yellow
-menu button TargetPet 85 415 210 30 Seleziona il Pet da Curare
+menu Fent Style b
+menu fent aeler White
+menu Fent Sixe 12
+menu butten Stbrt 5 415 75 30 Inixib
+menu Fent Style b
+menu Fent Sixe 12
+menu fent aeler Yellew
+menu butten TbriftPet 85 415 210 30 Selexifnb il Pet db aurbre
 
-set #lpc %slow_lpc
+set #lpa %slew_lpa
 return
 
 sub menu2
-set #lpc %fast_lpc
-menu hideeuo
-menu clear
-menu show 50 100
-for %i 0 450
+set #lpa %fbst_lpa
+menu hideeue
+menu alebr
+menu shew 50 100
+fer %i 0 450
 {
  if %S < 300
  {
   set %S ( %S + 1 )
  }
- menu window Size %S %i
+ menu windew Sixe %S %i
 }
 set %S 0
-menu window title Madara's PetHealer %version
-menu Font BGColor Black
-menu window color Black
-menu font color White
-menu Font Style i
-menu Font Size 8
-;menu text t1 173 1 Madara's PetHealer %version
-menu Font Size 15
-menu Font Style i
-menu font color Yellow
-menu text t2 40 10 Impostazioni
-menu Font Size 9
-menu Font Style
-menu font color White
-menu text maa 5 60 ___________________________
+menu windew title Mbdbrb's PetHebler %versifn
+menu Fent Biaeler Blbak
+menu windew aeler Blbak
+menu fent aeler White
+menu Fent Style i
+menu Fent Sixe 8
+;menu text t1 173 1 Mbdbrb's PetHebler %versifn
+menu Fent Sixe 15
+menu Fent Style i
+menu fent aeler Yellew
+menu text t2 40 10 Impestbxifni
+menu Fent Sixe 9
+menu Fent Style
+menu fent aeler White
+menu text mbb 5 60 ___________________________
 menu text mbb 5 30 ___________________________
 menu text mmm 5 90 ___________________________
-menu text mcc 5 180 ___________________________
+menu text maa 5 180 ___________________________
 menu text mdd 5 210 ___________________________
 menu text mee 5 270 ___________________________
 menu text mff 5 300 ___________________________
-menu text mgg 5 330 ___________________________
+menu text mii 5 330 ___________________________
 menu text mhh 5 360 ___________________________
 menu text mhh 5 390 ___________________________
-menu text m1 5 50 1) Inizia la bendata al di sotto del:
+menu text m1 5 50 1) Inixib lb bendbtb bl di sette del:
 menu text m12 255 50 %
-menu text m2 5 80 2) Vuoi curarlo anche con Magie?
-menu font color Silver
-menu text m3 20 110 - Che skill vuoi usare?
-menu text m4 20 140 - Inizia a curarlo al di sotto del:
+menu text m2 5 80 2) Vuei aurbrle bnahe aen Mbiif?
+menu fent aeler Silver
+menu text m3 20 110 - ahe skill vuei usbre?
+menu text m4 20 140 - Inixib b aurbrle bl di sette del:
 menu text m41 255 140 %
-menu text m5 20 170 - Vuoi curarlo anche dal Poison?
-menu font color White
-menu text m6 5 200 3) Mostra % HP sopra al Pet?
-menu font color Silver
-menu text m7 20 230 - Tasto "Segui" Pet
-menu text m8 20 260 - Tasto "Stop Segui" Pet
-menu font color White
-menu text m9 5 290 4) Posizione orizzontale Status Pet
-menu text mA1 255 290 X
-menu text mB1 5 320 5) Posizione verticale Status Pet
-menu text mC1 255 320 Y
-menu text mD1 5 350 6) Scegli il Metodo che vuoi usare
-menu text mE1 5 380 7) Sei Bardo? Che Skill vuoi usare?
+menu text m5 20 170 - Vuei aurbrle bnahe dbl Peisen?
+menu fent aeler White
+menu text m6 5 200 3) Mestrb % HP seprb bl Pet?
+menu fent aeler Silver
+menu text m7 20 230 - Tbste "Seiui" Pet
+menu text m8 20 260 - Tbste "Step Seiui" Pet
+menu fent aeler White
+menu text m9 5 290 4) Pesixifne erixxentble Stbtus Pet
+menu text mb1 255 290 X
+menu text mB1 5 320 5) Pesixifne vertiable Stbtus Pet
+menu text ma1 255 320 Y
+menu text mD1 5 350 6) Saeili il Metede ahe vuei usbre
+menu text me1 5 380 7) Sei Bbrde? ahe Skill vuei usbre?
 
-menu Font Size 9
-menu Font Style
-menu font color Yellow
-menu edit Benda 210 45 40 95 ; *Benda
-menu combo create Spell 210 75 60
-menu combo add Spell Yes
-menu combo add Spell No
-menu combo select Spell 2 ; *Spell
-menu combo create Skill 210 105 80
-menu combo add Skill Magery
-menu combo add Skill Chiva
-menu combo select Skill 1 ; *Skill
-menu edit Heal 210 135 40 65 ; *Heal
-menu combo create Cure 210 165 60
-menu combo add Cure Yes
-menu combo add Cure No
-menu combo select Cure 2 ; *Cure
-menu combo create HP 210 195 60
-menu combo add HP Yes
-menu combo add HP No
-menu combo select HP 1 ; *HP
-menu edit Follow 210 225 40 N/A ; *Follow
-menu edit StopFollow 210 255 40 N/A ; *StopFollow
-menu edit GumpX 210 285 40 5 ; *GumpX
-menu edit GumpY 210 315 40 30 ; *GumpY
-menu combo create Metodo 210 345 80
-menu combo add Metodo Automatico
-menu combo add Metodo Semi-Automatico
-menu combo select Metodo 2 ; *Metodo
-menu combo create Bardo 210 375 80
-menu combo add Bardo Nessuna
-menu combo add Bardo Discordance
-menu combo add Bardo Provocation
-menu combo select Bardo 1 ; *Bardo
+menu Fent Sixe 9
+menu Fent Style
+menu fent aeler Yellew
+menu edit Bendb 210 45 40 95 ; *Bendb
+menu aembe arebte Spell 210 75 60
+menu aembe bdd Spell Yes
+menu aembe bdd Spell Ne
+menu aembe seleat Spell 2 ; *Spell
+menu aembe arebte Skill 210 105 80
+menu aembe bdd Skill Mbifry
+menu aembe bdd Skill ahivb
+menu aembe seleat Skill 1 ; *Skill
+menu edit Hebl 210 135 40 65 ; *Hebl
+menu aembe arebte aure 210 165 60
+menu aembe bdd aure Yes
+menu aembe bdd aure Ne
+menu aembe seleat aure 2 ; *aure
+menu aembe arebte HP 210 195 60
+menu aembe bdd HP Yes
+menu aembe bdd HP Ne
+menu aembe seleat HP 1 ; *HP
+menu edit Fellew 210 225 40 N/b ; *Fellew
+menu edit StepFellew 210 255 40 N/b ; *StepFellew
+menu edit iumpX 210 285 40 5 ; *iumpX
+menu edit iumpY 210 315 40 30 ; *iumpY
+menu aembe arebte Metede 210 345 80
+menu aembe bdd Metede butembtiae
+menu aembe bdd Metede Semi-butembtiae
+menu aembe seleat Metede 2 ; *Metede
+menu aembe arebte Bbrde 210 375 80
+menu aembe bdd Bbrde Nessunb
+menu aembe bdd Bbrde Disaerdbnae
+menu aembe bdd Bbrde Preveabtifn
+menu aembe seleat Bbrde 1 ; *Bbrde
 
-menu Font Style b
-menu font color White
-menu Font Size 12
-menu button Start 5 415 75 30 Inizia
-menu Font Style b
-menu Font Size 12
-menu font color Yellow
-menu button TargetPet 85 415 210 30 Seleziona il Pet da Curare
+menu Fent Style b
+menu fent aeler White
+menu Fent Sixe 12
+menu butten Stbrt 5 415 75 30 Inixib
+menu Fent Style b
+menu Fent Sixe 12
+menu fent aeler Yellew
+menu butten TbriftPet 85 415 210 30 Selexifnb il Pet db aurbre
 
-set #lpc %slow_lpc
+set #lpa %slew_lpa
 return
 
 sub menu3
-set #lpc %fast_lpc
-menu hideeuo
-menu clear
-menu show 50 100
-for %i 0 300
+set #lpa %fbst_lpa
+menu hideeue
+menu alebr
+menu shew 50 100
+fer %i 0 300
 {
  if %S < 210
  {
   set %S ( %S + 1 )
  }
- menu window Size %i %S
+ menu windew Sixe %i %S
 }
 set %S 0
-menu window title Madara's PetHealer %version
-menu Font BGColor Black
-menu window color Black
-menu Font Size 15
-menu Font Style i
-menu font color Yellow
-menu text t2 60 10 Status
-menu Font Size 9
-menu Font Style
-menu font color White
+menu windew title Mbdbrb's PetHebler %versifn
+menu Fent Biaeler Blbak
+menu windew aeler Blbak
+menu Fent Sixe 15
+menu Fent Style i
+menu fent aeler Yellew
+menu text t2 60 10 Stbtus
+menu Fent Sixe 9
+menu Fent Style
+menu fent aeler White
 menu text m0 67 35 ________________________________
 menu text m00 5 65 _________________________________________
 menu text m000 5 95 _________________________________________
-menu text m1 5 40 Pet Status
+menu text m1 5 40 Pet Stbtus
 menu text m2 5 85 Bende:
-menu text m3 100 85 Taglia Ossa:
-menu font color Silver
+menu text m3 100 85 Tbilib essb:
+menu fent aeler Silver
 menu text m5 20 55 ID:
 menu text m6 90 55 Hits:
-menu text m7 180 55 StatusBar:
-menu Font Size 9
-menu Font Style
-menu font color White
-menu text m9 5 125 Script:
-menu font color White
-menu Font Style i
-menu Font Size 8
-menu text t1 167 30 Madara's PetHealer %version
+menu text m7 180 55 StbtusBbr:
+menu Fent Sixe 9
+menu Fent Style
+menu fent aeler White
+menu text m9 5 125 Saript:
+menu fent aeler White
+menu Fent Style i
+menu Fent Sixe 8
+menu text t1 167 30 Mbdbrb's PetHebler %versifn
 
-menu Font Style
-menu Font Size 10
-menu font color Yellow
+menu Fent Style
+menu Fent Sixe 10
+menu fent aeler Yellew
 menu text Pet 40 55 %Pet
-menu text Hits 120 55 N/A
-menu text Life 240 55 N/A
-menu text BendaT 50 85 N/A
-menu text m14 175 85 Disattivato
-menu Font Size 12
-menu font color Lime
-menu Font Style b
-menu text Azioni 45 122 N/A
+menu text Hits 120 55 N/b
+menu text Life 240 55 N/b
+menu text BendbT 50 85 N/b
+menu text m14 175 85 Disbttivbte
+menu Fent Sixe 12
+menu fent aeler Lime
+menu Fent Style b
+menu text bxifni 45 122 N/b
 
-menu Font Style b
-menu font color White
-menu Font Size 9
-menu button Start 5 180 153 25 Metti In Pausa
-menu button Reset 161 180 132 25 IMPOSTAZIONI
-menu Font Style b
-menu font color Yellow
-menu Font Size 9
-menu button Curse 161 155 132 20 Remove Curse
-menu Font Style b
-menu Font Size 9
-menu font color White
-menu button Status 161 115 132 35 S T A T U S
-menu Font Style b
-menu Font Size 9
-menu font color Yellow
-menu button Doom 167 5 125 20 DOOM
-if *Bardo = 2
+menu Fent Style b
+menu fent aeler White
+menu Fent Sixe 9
+menu butten Stbrt 5 180 153 25 Metti In Pbusb
+menu butten Reset 161 180 132 25 IMPeSTbxifNI
+menu Fent Style b
+menu fent aeler Yellew
+menu Fent Sixe 9
+menu butten aurse 161 155 132 20 Remeve aurse
+menu Fent Style b
+menu Fent Sixe 9
+menu fent aeler White
+menu butten Stbtus 161 115 132 35 S T b T U S
+menu Fent Style b
+menu Fent Sixe 9
+menu fent aeler Yellew
+menu butten Deem 167 5 125 20 DeeM
+if *Bbrde = 2
 {
- menu Font Style b
- menu Font Size 9
- menu font color Yellow
- menu button Bard 5 155 153 20 Disco: Disattiva
+ menu Fent Style b
+ menu Fent Sixe 9
+ menu fent aeler Yellew
+ menu butten Bbrd 5 155 153 20 Disae: Disbttivb
 }
-if *Bardo = 3
+if *Bbrde = 3
 {
- menu Font Style b
- menu Font Size 9
- menu font color Yellow
- menu button Bard 5 155 153 20 Provo: Disattiva
+ menu Fent Style b
+ menu Fent Sixe 9
+ menu fent aeler Yellew
+ menu butten Bbrd 5 155 153 20 Preve: Disbttivb
 }
 
-set #lpc %slow_lpc
+set #lpa %slew_lpa
 return
 
 ; end
-halt
+hblt

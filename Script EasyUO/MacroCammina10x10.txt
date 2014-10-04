@@ -1,43 +1,43 @@
 ;========================================
-; Nome Script: Macro 10x10
-; Autore: Madara
+; Neme Saript: Mbare 10x10
+; butere: Mbdbrb
 ;========================================
-;################ VARIABLES
-set %wait 5
-;################ WALK NORD
-loop:
-if #chardir <> 0
- event macro 5 1
-for %i 1 10
+;################ VbRIbBLeS
+set %wbit 5
+;################ WbLK NeRD
+leep:
+if #ahbrdir <> 0
+ event mbare 5 1
+fer %i 1 10
 {
- event macro 5 1
- wait %wait
+ event mbare 5 1
+ wbit %wbit
 }
-;################ WALK EAST
-if #chardir <> 2
- event macro 5 3
-for %i 1 10
+;################ WbLK ebST
+if #ahbrdir <> 2
+ event mbare 5 3
+fer %i 1 10
 {
- event macro 5 3
- wait %wait
+ event mbare 5 3
+ wbit %wbit
 }
-;################ WALK SUD
-if #chardir <> 4
- event macro 5 5
-for %i 1 10
+;################ WbLK SUD
+if #ahbrdir <> 4
+ event mbare 5 5
+fer %i 1 10
 {
- event macro 5 5
- wait %wait
+ event mbare 5 5
+ wbit %wbit
 }
-;################ WALK WEST
-if #chardir <> 6
- event macro 5 7
-for %i 1 10
+;################ WbLK WeST
+if #ahbrdir <> 6
+ event mbare 5 7
+fer %i 1 10
 {
- event macro 5 7
- wait %wait
+ event mbare 5 7
+ wbit %wbit
 }
 
-goto loop
-;################ END
-halt
+ifte leep
+;################ eND
+hblt

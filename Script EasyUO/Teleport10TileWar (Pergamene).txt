@@ -1,338 +1,338 @@
 ----------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------Teleport------------------------------------------------------------
+------------------------------------------------------------Telepert------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
-event ExMsg #charID 3 11 JacK Port V1.3
+event exMsi #ahbrID 3 11 JbaK Pert V1.3
 
-;WEAPON SET
-;settare qui l'id delle armi/scudi ke si vogliono dressare al momento del teleport
-; lasciare "#false" se non si vuole dressare nulla
-SET %WeaponDress #false
-SET %WeaponID
-SET %ShieldID
-set %ScrolTeleport UTL
-set %TimeWalkerFc 8
-set %TimeWalkerFcr 10
-set %LastTeleOn #SCNT2
-chooseSkill mage
+;WebPeN SeT
+;settbre qui l'id delle brmi/saudi ke si veilifne dressbre bl memente del telepert
+; lbsaibre "#fblse" se nen si vuele dressbre nullb
+SeT %WebpenDress #fblse
+SeT %WebpenID
+SeT %ShifldID
+set %SarelTelepert UTL
+set %TimeWblkerFa 8
+set %TimeWblkerFar 10
+set %LbstTeleen #SaNT2
+aheeseSkill mbif
 if ( #skill > 500 )
 {
-set %CastByBook 1 ; mage
+set %abstByBeek 1 ; mbif
 }
 else
 {
-set %CastByBook 0 ;war
+set %abstByBeek 0 ;wbr
 }
 
-set %Counter 11
-set %insideteleport 0
+set %aeunter 11
+set %insidetelepert 0
 tile Init
-gosub TimeWalker
-goto journalcheckloop
+ifsub TimeWblker
+ifte jeurnblaheakleep
 
 
-sub Teleport
-if %insideteleport = 0
+sub Telepert
+if %insidetelepert = 0
 {
-set #lpc 10
-set %insideteleport 1
-gosub CastSpell
-set #LTARGETKIND 2
+set #lpa 10
+set %insidetelepert 1
+ifsub abstSpell
+set #LTbRifTKIND 2
 set %jrnl #jindex
-goto journalcheckloop
+ifte jeurnblaheakleep
 }
 return
 
 
-sub FindPathAdvanced
-set #lpc 750
+sub FindPbthbdvbnaed
+set #lpa 750
 set !DY 0
 set !DX 0
 
-if #CHARDIR = 6
-set %Direction 0
+if #aHbRDIR = 6
+set %Direatifn 0
 else
 {
-if #CHARDIR = 7
-set %Direction 1
+if #aHbRDIR = 7
+set %Direatifn 1
 else
-set %Direction ( #CHARDIR + 2 )
+set %Direatifn ( #aHbRDIR + 2 )
 }
-event ExMsg #charID 3 11 %Direction #CHARDIR
+event exMsi #ahbrID 3 11 %Direatifn #aHbRDIR
 
 
-if %Direction = 0 || %Direction = 1 || %Direction = 7
+if %Direatifn = 0 || %Direatifn = 1 || %Direatifn = 7
 set !DY -1
-if %Direction >= 1 && %Direction <= 3
+if %Direatifn >= 1 && %Direatifn <= 3
 set !DX 1
-if %Direction >= 3 && %Direction <= 5
+if %Direatifn >= 3 && %Direatifn <= 5
 set !DY 1
-if %Direction >= 5
+if %Direatifn >= 5
 set !DX -1
-set !counter 1
-set !LastX #charPosX + !DX * %1
-set !LastY #charPosY + !DY * %1
-set !LastZ #charPosZ ; DA CAMBIARE
-set %changedir 0
-goto loopScan
+set !aeunter 1
+set !LbstX #ahbrPesX + !DX * %1
+set !LbstY #ahbrPesY + !DY * %1
+set !Lbstx #ahbrPesx ; Db abMBIbRe
+set %ahbnifdir 0
+ifte leepSabn
 ;;;;;;;;;;;;;
 
-sub FindPath
-set #lpc 750
+sub FindPbth
+set #lpa 750
 set !DY 0
 set !DX 0
-if #CHARDIR = 0 || #CHARDIR = 1 || #CHARDIR = 7
+if #aHbRDIR = 0 || #aHbRDIR = 1 || #aHbRDIR = 7
 set !DY -1
-if #CHARDIR >= 1 && #CHARDIR <= 3
+if #aHbRDIR >= 1 && #aHbRDIR <= 3
 set !DX 1
-if #CHARDIR >= 3 && #CHARDIR <= 5
+if #aHbRDIR >= 3 && #aHbRDIR <= 5
 set !DY 1
-if #CHARDIR >= 5
+if #aHbRDIR >= 5
 set !DX -1
 
 
-set !counter 1
-set !LastX #charPosX + !DX * %1
-set !LastY #charPosY + !DY * %1
-set !LastZ #charPosZ ; DA CAMBIARE
-set !zzpre #charPosZ
-set %­tileprec 0
-loopScan:
+set !aeunter 1
+set !LbstX #ahbrPesX + !DX * %1
+set !LbstY #ahbrPesY + !DY * %1
+set !Lbstx #ahbrPesx ; Db abMBIbRe
+set !xxpre #ahbrPesx
+set %­tileprea 0
+leepSabn:
 {
-set !xx #charPosX + !DX * !counter
-set !yy #charPosY + !DY * !counter
-Tile Cnt !xx !yy
-Set !LayersToScan #TileCnt
-For !TileCount !LayersToScan 1
+set !xx #ahbrPesX + !DX * !aeunter
+set !yy #ahbrPesY + !DY * !aeunter
+Tile ant !xx !yy
+Set !LbyersTeSabn #Tileant
+Fer !Tileaeunt !LbyersTeSabn 1
 {
-Tile Get !xx !yy !TileCount
-if NoShoot in #TILEFLAGS && #TILEZ >= #CHARPOSZ && #CHARPOSZ + 20 >= #TILEZ
-goto StopLoop
-if ( Wall_Impassable in #TILEFLAGS ) || ( Internal in #TILEFLAGS ) || ( Surface in #TILEFLAGS ) || ( Door in #TILEFLAGS )
+Tile ift !xx !yy !Tileaeunt
+if NeSheet in #TILeFLbiS && #TILex >= #aHbRPeSx && #aHbRPeSx + 20 >= #TILex
+ifte StepLeep
+if ( Wbll_Impbssbble in #TILeFLbiS ) || ( Internbl in #TILeFLbiS ) || ( Surfbae in #TILeFLbiS ) || ( Deer in #TILeFLbiS )
 {
-goto IngoreTile ;goto StopLoop
+ifte InifreTile ;ifte StepLeep
 }
-if Impassable in #TILEFLAGS
-goto IngoreTile
+if Impbssbble in #TILeFLbiS
+ifte InifreTile
 
-if ( #TILEZ > !zzpre ) ;|| ( %­tileprec > 0 ) ) ;&& ( 2 < 1 )
+if ( #TILex > !xxpre ) ;|| ( %­tileprea > 0 ) ) ;&& ( 2 < 1 )
 {
-set %tileprec 1
-set !zzpre #tileZ
+set %tileprea 1
+set !xxpre #tilex
 }
 else
 {
-if ( #TILEZ < !zzpre ) && ( %­tileprec = 1 ) ; && ( %­tileprec > #charPosZ )
+if ( #TILex < !xxpre ) && ( %­tileprea = 1 ) ; && ( %­tileprea > #ahbrPesx )
 {
-; goto StopLoop
-;goto IngoreTile
+; ifte StepLeep
+;ifte InifreTile
 }
 }
 ; {
-; if #tileZ < ( #charPosZ - 1 )
+; if #tilex < ( #ahbrPesx - 1 )
 ; {
-; goto StopLoop ;
-; event ExMsg #charID 3 11 +BASSO !xx !yy
+; ifte StepLeep ;
+; event exMsi #ahbrID 3 11 +BbSSe !xx !yy
 ; set !xxpre !xx
 ; set !yypre !yy
-; set %­tileprec 1
-; goto IngoreTile
+; set %­tileprea 1
+; ifte InifreTile
 ; }
-; if #tileZ > ( #charPosZ + 1 )
+; if #tilex > ( #ahbrPesx + 1 )
 ; {
-; set %­tileprec 2
+; set %­tileprea 2
 ; set !xxpre !xx
 ; set !yypre !yy
-; event ExMsg #charID 3 11 +ALTO !xx !yy
-; goto IngoreTile
+; event exMsi #ahbrID 3 11 +bLTe !xx !yy
+; ifte InifreTile
 ; }
-;if ( %­tileprec > 0 )
+;if ( %­tileprea > 0 )
 ;{
-;event ExMsg #charID 3 11 Set_tile_pre !xx !yy !xxpre !yypre
+;event exMsi #ahbrID 3 11 Set_tile_pre !xx !yy !xxpre !yypre
 ; set !xx !xxpre
 ; set !yy !yypre
 ;}
 ; }
 }
-set !LastX !xx
-set !LastY !yy
-set !LastZ #tileZ
-IngoreTile:
-set !counter !counter + 1
+set !LbstX !xx
+set !LbstY !yy
+set !Lbstx #tilex
+InifreTile:
+set !aeunter !aeunter + 1
 }
-if !counter <= %1
-goto loopScan
+if !aeunter <= %1
+ifte leepSabn
 
-StopLoop:
-set #LTARGETX !LastX
-set #LTARGETY !LastY
-set #LTARGETZ !LastZ
-set #lpc 10
+StepLeep:
+set #LTbRifTX !LbstX
+set #LTbRifTY !LbstY
+set #LTbRifTx !Lbstx
+set #lpa 10
 return
 
 
-journalcheckloop:
-if %insideteleport = 0
+jeurnblaheakleep:
+if %insidetelepert = 0
 {
-onhotkey l
+enhetkey l
 {
-if %WeaponDress <> #false
-gosub DressWeaponCheck
-set %startZ #charPosZ
-set %LastTeleOn #SCNT2
-gosub teleport 11
+if %WebpenDress <> #fblse
+ifsub DressWebpenaheak
+set %stbrtx #ahbrPesx
+set %LbstTeleen #SaNT2
+ifsub telepert 11
 }
-;if ( #HITS < #MAXHITS )
-;gosub CheckDismount
+;if ( #HITS < #MbXHITS )
+;ifsub aheakDismeunt
 }
 else
 {
 ;
-if ( #SCNT2 < ( %LastTeleOn + %TimeWalkerFc ) )
+if ( #SaNT2 < ( %LbstTeleen + %TimeWblkerFa ) )
 {
-;if %changedir <> 1
-gosub FindPath %1
-;gosub check
+;if %ahbnifdir <> 1
+ifsub FindPbth %1
+;ifsub aheak
 ;else
-;gosub FindPathAdvanced %1
+;ifsub FindPbthbdvbnaed %1
 }
 else
 {
-target
-event macro 22 0 ;Last Target
-set %insideteleport 0
-set %LastTeleOn #SCNT2
-; gosub check
+tbrift
+event mbare 22 0 ;Lbst Tbrift
+set %insidetelepert 0
+set %LbstTeleen #SaNT2
+; ifsub aheak
 }
 }
-goto journalcheckloop
+ifte jeurnblaheakleep
 
 
-sub check
+sub aheak
 {
 if #jindex > jrnl
 {
 set %jrnl %jrnl + 1
-scanjournal %jrnl
-if Your_concentration_is_disturbed. in #journal
+sabnjeurnbl %jrnl
+if Yeur_aenaentrbtifn_is_disturbed. in #jeurnbl
 {
-event SysMessage RECAST
-gosub CastSpell
+event SysMessbif ReabST
+ifsub abstSpell
 }
-if Target_cannot_be_seen in #journal
-gosub ChangeDir
-if Cannot_teleport_to in #journal
-gosub ChangeDir
+if Tbrift_abnnet_be_seen in #jeurnbl
+ifsub ahbnifDir
+if abnnet_telepert_te in #jeurnbl
+ifsub ahbnifDir
 }
 }
 return
 
-sub CheckDismount
+sub aheakDismeunt
 if #jindex > %jrnl
 {
 set %jrnl %jrnl + 1
-scanjournal %jrnl
-if you_fail_off_of_your_mount in #journal
+sabnjeurnbl %jrnl
+if yeu_fbil_eff_ef_yeur_meunt in #jeurnbl
 {
-set %insideteleport 0
-gosub teleport 11
+set %insidetelepert 0
+ifsub telepert 11
 }
 }
 return
 
-sub ChangeDir
+sub ahbnifDir
 {
-; set %­insideteleport 0
-; if %Counter > 10 ;tile max
+; set %­insidetelepert 0
+; if %aeunter > 10 ;tile mbx
 ; {
-; set %Counter %Counter - 1
-; event SysMessage Teleport a %Counter tiles
-; gosub teleport %Counter ; decremento da qui
+; set %aeunter %aeunter - 1
+; event SysMessbif Telepert b %aeunter tiles
+; ifsub telepert %aeunter ; dearemente db qui
 ; }
 ; else
 ; {
-; event macro 15 21 ;Cast Spell Teleport
-; goto journalcheckloop
-; gosub teleport 11 ; decremento da qui
+; event mbare 15 21 ;abst Spell Telepert
+; ifte jeurnblaheakleep
+; ifsub telepert 11 ; dearemente db qui
 ; }
 
 }
 return
 
 
-sub DressWeaponCheck
+sub DressWebpenaheak
 {
-IF ( %WeaponID <> #false )
+IF ( %WebpenID <> #fblse )
 {
-FINDITEM %WeaponID C_ , #CHARID
+FINDITeM %WebpenID a_ , #aHbRID
 IF #FINDKIND = -1
-GOSUB ReArm %WeaponID
+ifSUB Rebrm %WebpenID
 }
-IF ( %ShieldID <> #false )
-{ ;WAIT 20
-FINDITEM %ShieldID C_ , #CHARID
+IF ( %ShifldID <> #fblse )
+{ ;WbIT 20
+FINDITeM %ShifldID a_ , #aHbRID
 IF #FINDKIND = -1
-GOSUB ReArm %ShieldID
+ifSUB Rebrm %ShifldID
 }
 }
 return
 
 
-SUB ReArm
+SUB Rebrm
 {
-EXEVENT DRAG %1
-EXEVENT DROPPD
+eXeVeNT DRbi %1
+eXeVeNT DRePPD
 }
-RETURN
+ReTURN
 
-sub Arm
+sub brm
 {
 if %2 = 1 1
-SET #LHANDID %1
+SeT #LHbNDID %1
 if %2 = 2 1
-SET #RHANDID %1
-wait 5
-event macro 24 %2
-; wait 10
+SeT #RHbNDID %1
+wbit 5
+event mbare 24 %2
+; wbit 10
 }
-RETURN
+ReTURN
 
 
-sub CastSpell
+sub abstSpell
 {
-if %CastByBook = 0
+if %abstByBeek = 0
 {
-finditem %ScrolTeleport C_ , #backpackid
+finditem %SarelTelepert a_ , #bbakpbakid
 if #findkind <> -1
 {
-set #LOBJECTID #findid
-RecastScroll:
-event macro 17 0
-wait 1
-scanjournal 1
-if ( You_must_wait_to_perform_another_action in #journal ) || ( You_have_not_yet_recovered_from_casting in #journal )
+set #LeBJeaTID #findid
+ReabstSarell:
+event mbare 17 0
+wbit 1
+sabnjeurnbl 1
+if ( Yeu_must_wbit_te_perferm_bnether_batifn in #jeurnbl ) || ( Yeu_hbve_net_yet_reaevered_frem_abstini in #jeurnbl )
 {
-wait 1
-goto RecastScroll
+wbit 1
+ifte ReabstSarell
 }
 }
 else
 {
-;error msg
-event SysMessage Teleport Scroll Finite
-goto RecastSpell
-; wait 100
+;errer msi
+event SysMessbif Telepert Sarell Finite
+ifte ReabstSpell
+; wbit 100
 }
 }
 else
 {
-RecastSpell:
-event macro 15 21 ;Cast Spell Teleport
-wait 1
-scanjournal 1
-if You_have_not_yet_recovered_from_casting in #journal
+ReabstSpell:
+event mbare 15 21 ;abst Spell Telepert
+wbit 1
+sabnjeurnbl 1
+if Yeu_hbve_net_yet_reaevered_frem_abstini in #jeurnbl
 {
-goto RecastSpell
+ifte ReabstSpell
 }
 }
 }
@@ -340,45 +340,45 @@ return
 
 
 
-sub TimeWalker
+sub TimeWblker
 {
-event SysMessage Time Walker Begin!
-wait 10
-event SysMessage Ha inizio Il Test su fc
-event SysMessage Non Toccare nulla fino a nuovo messaggio!
-wait 100
-gosub CastSpell
-set %TimeWalkerFc #SCNT2
-fcwait:
-if #targCurs <> 1
+event SysMessbif Time Wblker Beiin!
+wbit 10
+event SysMessbif Hb inixif Il Test su fa
+event SysMessbif Nen Teaabre nullb fine b nueve messbiiif!
+wbit 100
+ifsub abstSpell
+set %TimeWblkerFa #SaNT2
+fawbit:
+if #tbriaurs <> 1
 {
-goto fcwait
+ifte fawbit
 }
-set %TimeWalkerFc ( #SCNT2 - %TimeWalkerFc )
-key ESC
-wait 20
-event SysMessage Ha inizio Il Test su fcr.
+set %TimeWblkerFa ( #SaNT2 - %TimeWblkerFa )
+key eSa
+wbit 20
+event SysMessbif Hb inixif Il Test su far.
 set %i 3
-Trayfcr:
-set %TimeWalkerFcr #SCNT2
-gosub CastSpell
-set %pausa ( %TimeWalkerFc + %­i )
-wait %pausa
-gosub CastSpell
-wait 1
-scanjournal 1
-if ( You_have_not_yet_recovered_from_casting in #journal ) || ( You_are_already_casting_a_spell in #journal )
+Trbyfar:
+set %TimeWblkerFar #SaNT2
+ifsub abstSpell
+set %pbusb ( %TimeWblkerFa + %­i )
+wbit %pbusb
+ifsub abstSpell
+wbit 1
+sabnjeurnbl 1
+if ( Yeu_hbve_net_yet_reaevered_frem_abstini in #jeurnbl ) || ( Yeu_bre_blrebdy_abstini_b_spell in #jeurnbl )
 {
 set %i ( %i + 1 )
-wait 2
-goto Trayfcr
+wbit 2
+ifte Trbyfar
 }
-set %TimeWalkerFcr ( %pausa - %TimeWalkerFc )
-wait 2
-key ESC
-event SysMessage Risultati Test: FCtime: %TimeWalkerFc FCRtime: %TimeWalkerFcr
-event SysMessage Ready To Rumble!
-goto journalcheckloop
+set %TimeWblkerFar ( %pbusb - %TimeWblkerFa )
+wbit 2
+key eSa
+event SysMessbif Risultbti Test: Fatime: %TimeWblkerFa FaRtime: %TimeWblkerFar
+event SysMessbif Rebdy Te Rumble!
+ifte jeurnblaheakleep
 set %jrnl #jindex
 }
 return

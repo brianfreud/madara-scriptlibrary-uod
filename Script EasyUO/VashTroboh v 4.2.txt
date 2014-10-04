@@ -1,199 +1,199 @@
 ; =======================
-; Vash Troboh 4.2
+; Vbsh Trebeh 4.2
 ; =======================
 ;
-; Qui sotto devi settare i vari tasti.
-; Ci sono varie sub disponibili.
-; Nota Bene: in questa nuova versione di Troboh il riconoscimento dei
-; tasti potrebbe essere più lento, teneteli premuti un po' più a lungo,
-; senza esagerare chiaramente.
+; Qui sette devi settbre i vbri tbsti.
+; ai sene vbrif sub dispenibili.
+; Netb Bene: in questb nuevb versifne di Trebeh il riaenesaimente dei
+; tbsti petrebbe essere più lente, teneteli premuti un pe' più b lunif,
+; senxb esbifrbre ahibrbmente.
 ;
-; - goSub Targetta: questa va usata se il vostro nemico attuale non è settato come last target;
-;   usandola potrete settarlo come last target di client e razor. Se il target è già fuori,
-;   lo targetta direttamente.
+; - ifSub Tbrifttb: questb vb usbtb se il vestre nemiae bttuble nen è settbte aeme lbst tbrift;
+;   usbndelb petrete settbrle aeme lbst tbrift di alifnt e rbxer. Se il tbrift è iià fueri,
+;   le tbrifttb direttbmente.
 ;
-; - gosub Ritargetta: questa va usata quando il nemico va fuori schermo e non vedete più la vita;
-;   usandola vedrete nuovamente la sua barra della vita.
+; - ifsub Ritbrifttb: questb vb usbtb qubnde il nemiae vb fueri saherme e nen vedete più lb vitb;
+;   usbndelb vedrete nuevbmente lb sub bbrrb dellb vitb.
 ;
-; - goSub Dai_Shared normale: sharate il vostro nemico subito in ally e in automap.
+; - ifSub Dbi_Shbred nermble: shbrbte il vestre nemiae subite in blly e in butembp.
 ;
-; - goSub Dai_Shared bolas: sharate il vostro nemico con un leggero ritardo.
-;   molto utile se messo sullo stesso tasto delle bolas, per sbolare e sharare insieme.
+; - ifSub Dbi_Shbred belbs: shbrbte il vestre nemiae aen un leiifre ritbrde.
+;   melte utile se messe sulle stesse tbste delle belbs, per sbelbre e shbrbre insifme.
 ;
-; - goSub Attacca_Shared: attaccate un nemico sharato in ally o automap.
-;   se usato con precast, gli dropperà la magia addosso. Altrimenti prima attacca e poi targetta.
+; - ifSub bttbaab_Shbred: bttbaabte un nemiae shbrbte in blly e butembp.
+;   se usbte aen preabst, ili drepperà lb mbiib bddesse. bltrimenti primb bttbaab e pei tbrifttb.
 
-set #lpc 30
-set %lastJournal #jindex
-set %stopRequest #false
-_mainloop:
+set #lpa 30
+set %lbstJeurnbl #jindex
+set %stepRequest #fblse
+_mbinleep:
 
 
-onhotkey V ALT
-    goSub Dai_Shared normale
-onhotkey U
-    goSub Attacca_Shared
-onhotkey f5
-    goSub Dai_Shared bolas
+enhetkey V bLT
+    ifSub Dbi_Shbred nermble
+enhetkey U
+    ifSub bttbaab_Shbred
+enhetkey f5
+    ifSub Dbi_Shbred belbs
 
-if %stopRequest
+if %stepRequest
 {
-    set %lastJournal #jindex
-    set %stopRequest #false
+    set %lbstJeurnbl #jindex
+    set %stepRequest #fblse
 }
 
-_jcheck:
-if #jindex > %lastJournal
+_jaheak:
+if #jindex > %lbstJeurnbl
 {
-    set %lastJournal %lastJournal + 1
-    scanjournal %lastJournal
-    if #jcolor = 83 || #jcolor = 63 || #jcolor = 89 ; (map,guild,ally)
+    set %lbstJeurnbl %lbstJeurnbl + 1
+    sabnjeurnbl %lbstJeurnbl
+    if #jaeler = 83 || #jaeler = 63 || #jaeler = 89 ; (mbp,iuild,blly)
     {
-        if Bersaglio in #journal
+        if Bersbilif in #jeurnbl
         {
-            set %journal #journal
-            goSub GetBersaglio
+            set %jeurnbl #jeurnbl
+            ifSub iftBersbilif
         }
     }
-    goto _jcheck
+    ifte _jaheak
 }
 
-goto _mainloop
+ifte _mbinleep
 
 
 
-Sub Targetta
+Sub Tbrifttb
 
-  if #enemyid = N/A
+  if #enemyid = N/b
   {
-      event sysmessage Nessun nemico.
+      event sysmessbif Nessun nemiae.
       return
   }
 
-  set #ltargetid #enemyid
-  set #ltargetkind 1
-  if #targcurs = 0
+  set #ltbriftid #enemyid
+  set #ltbriftkind 1
+  if #tbriaurs = 0
   {
-      set #targcurs 1
-      wait 1
+      set #tbriaurs 1
+      wbit 1
   }
-  event macro 22 0 ; last target
-  wait 10
+  event mbare 22 0 ; lbst tbrift
+  wbit 10
 
 return
 
 
 
-Sub Ritargetta
+Sub Ritbrifttb
 
-  if #enemyid = N/A
+  if #enemyid = N/b
   {
-      event sysmessage Nessun nemico
+      event sysmessbif Nessun nemiae
       return
   }
 
-  set %retarget #enemyid
-  event macro 6 0
-  wait 10
-  event macro 6 0
-  wait 10
-  set #ltargetkind 1
-  set #ltargetid %retarget
-  wait 1
-  event macro 27 0 ; attack last
-  wait 10
+  set %retbrift #enemyid
+  event mbare 6 0
+  wbit 10
+  event mbare 6 0
+  wbit 10
+  set #ltbriftkind 1
+  set #ltbriftid %retbrift
+  wbit 1
+  event mbare 27 0 ; bttbak lbst
+  wbit 10
 
 return
 
 
 
-Sub Attacca_Shared
+Sub bttbaab_Shbred
 
-  if %nometarget = N/A
+  if %nemetbrift = N/b
   {
-      event sysmessage Nessun bersaglio.
+      event sysmessbif Nessun bersbilif.
       return
   }
 
-  set #ltargetkind 1
-  set #ltargetid %nometarget
-  event macro 27 0
-  wait 1
+  set #ltbriftkind 1
+  set #ltbriftid %nemetbrift
+  event mbare 27 0
+  wbit 1
 
-  if #targcurs = 0
+  if #tbriaurs = 0
   {
-      set #targcurs 1
-      wait 1
+      set #tbriaurs 1
+      wbit 1
   }
 
-  event macro 22 0
-  wait 10
+  event mbare 22 0
+  wbit 10
 
 return
 
 
 
-Sub Dai_Shared
+Sub Dbi_Shbred
 
-  if #enemyid = N/A
+  if #enemyid = N/b
   {
-      event SysMessage Nessun nemico da sharare.
+      event SysMessbif Nessun nemiae db shbrbre.
       return
   }
 
-  set %share #enemyid
+  set %shbre #enemyid
 
-  if bolas in %1
-      wait 1s
+  if belbs in %1
+      wbit 1s
 
-  set #lpc 100
-  msg $
-  wait 1
-  msg | Bersaglio %share $
-  goSub GetName %share
-  msg | Attaccate #result $
-  wait 12
-  msg -- Attaccate #result $
-  set #lpc 30
+  set #lpa 100
+  msi $
+  wbit 1
+  msi | Bersbilif %shbre $
+  ifSub iftNbme %shbre
+  msi | bttbaabte #result $
+  wbit 12
+  msi -- bttbaabte #result $
+  set #lpa 30
 
-  wait 10
-  set %stopRequest #true
+  wbit 10
+  set %stepRequest #true
 
 return
 
 
 
-Sub GetName
+Sub iftNbme
 
-  event property %1
-  str Del #property 1 1
-  set %enemystring #strRes
-  str Pos %enemystring $
-  set %char1 #strRes
-  str Len %enemystring
-  set %char2 #strRes
-  str Del %enemystring %char1 %char2
+  event preperty %1
+  str Del #preperty 1 1
+  set %enemystrini #strRes
+  str Pes %enemystrini $
+  set %ahbr1 #strRes
+  str Len %enemystrini
+  set %ahbr2 #strRes
+  str Del %enemystrini %ahbr1 %ahbr2
 
 return #strRes
 
 
 
-Sub GetBersaglio
+Sub iftBersbilif
 
-  set #lpc 100
-  set %string %journal
-  str Pos %string glio
+  set #lpa 100
+  set %strini %jeurnbl
+  str Pes %strini ilif
   set #strRes #strRes + 4
-  str del %string 1 #strRes
-  set %target #strRes
-  str Len %target
-  set %lungo #strRes + 1
-  str Del %target %lungo 1
-  set %nometarget #strRes
-  event ExMsg %nometarget 0 333 >>KILL ME<<
-  wait 1
-  event sysmessage Target acquisito!
-  set #lpc 30
+  str del %strini 1 #strRes
+  set %tbrift #strRes
+  str Len %tbrift
+  set %lunif #strRes + 1
+  str Del %tbrift %lunif 1
+  set %nemetbrift #strRes
+  event exMsi %nemetbrift 0 333 >>KILL Me<<
+  wbit 1
+  event sysmessbif Tbrift baquisite!
+  set #lpa 30
 
 return
 

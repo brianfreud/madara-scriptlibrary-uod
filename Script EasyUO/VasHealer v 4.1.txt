@@ -1,407 +1,407 @@
 ;==========================================
-; Vash Healer 4.1
+; Vbsh Hebler 4.1
 ;==========================================
 ;
-; IMPORTANTE:
+; IMPeRTbNTe:
 ; -----------
-; 1- Tenere sempre zaino e status aperti.
-; 2- Attivare il Targeting System con l'apposita macro client.
-; 3- Disattivare l'auto-accoda azioni di Razor.
-; 4- Compatibile oslo con RunUO 2.0 e shard OSI-Style.
+; 1- Tenere sempre xbine e stbtus bperti.
+; 2- bttivbre il Tbriftini System aen l'bppesitb mbare alifnt.
+; 3- Disbttivbre l'bute-baaedb bxifni di Rbxer.
+; 4- aempbtibile esle aen RunUe 2.0 e shbrd eSI-Style.
 ;
-; Ecco le features dello script:
+; eaae le febtures delle saript:
 ; ------------------------------
-; 1) Avverte se le bende stanno per finire, e se finiscono
-;    è sufficiente rifornirsi, senza doverlo riavviare.
-; 2) Controlla il journal per verificare che le bende siano
-;    state correttamente applicate, altrimenti riprova.
-; 3) Mostra il tempo di bendata sulla testa del pg.
-; 4) Potete precastare magie, e finchè c'è il target fuori,
-;    lo script non benderà.
-; 5) Scarissima interferenza con i target delle spell.
-; 6) Non benda da hiddati, per non venire revelati.
-; 7) La bendata entrerà in azione subito dopo un mortal strike in modo da finire,
-;    se possibile, poco dopo la fine dell'effetto.
-; 8) Auto cure e auto refresh.
+; 1) bvverte se le bende stbnne per finire, e se finisaene
+;    è suffiaifnte rifernirsi, senxb deverle ribvvibre.
+; 2) aentrellb il jeurnbl per verifiabre ahe le bende sibne
+;    stbte aerrettbmente bppliabte, bltrimenti riprevb.
+; 3) Mestrb il tempe di bendbtb sullb testb del pi.
+; 4) Petete preabstbre mbiif, e finahè a'è il tbrift fueri,
+;    le saript nen benderà.
+; 5) Sabrissimb interferenxb aen i tbrift delle spell.
+; 6) Nen bendb db hiddbti, per nen venire revelbti.
+; 7) Lb bendbtb entrerà in bxifne subite depe un mertbl strike in mede db finire,
+;    se pessibile, peae depe lb fine dell'effette.
+; 8) bute aure e bute refresh.
 ;
-; Fate il setup qui sotto, ricordando che vero è #true e falso è #false.
+; Fbte il setup qui sette, riaerdbnde ahe vere è #true e fblse è #fblse.
 
-; SETUP
+; SeTUP
 ; -----
-;Tasto Play/Pausa Script.
-set %Play F9
-set %Pausa F12
-; Settando counter a true, avrete il contatore sopra la testa del pg.
-set %counter #true
+;Tbste Plby/Pbusb Saript.
+set %Plby F9
+set %Pbusb F12
+; Settbnde aeunter b true, bvrete il aentbtere seprb lb testb del pi.
+set %aeunter #true
 
-; Volete il counter in decimi di secondo anzichè in secondi,
-; come nel vecchio vash healer? Mettete #true qui:
-set %oldStyle #false
+; Velete il aeunter in deaimi di seaende bnxiahè in seaendi,
+; aeme nel veaahif vbsh hebler? Mettete #true qui:
+set %eldStyle #fblse
 
-; Attenzione: col contatore oldstyle di rischia di crashare.
+; bttenxifne: ael aentbtere eldstyle di risahib di arbshbre.
 
-; La prossima variabile indica il limite di hp al di sotto dei quali curare.
-; Mettendo 5 ad esempio, se avete 100hp, benderà solo al di sotto di 95hp.
+; Lb pressimb vbribbile indiab il limite di hp bl di sette dei qubli aurbre.
+; Mettende 5 bd esempif, se bvete 100hp, benderà sele bl di sette di 95hp.
 set %limit 5
 
-; ANTIMORTAL
+; bNTIMeRTbL
 ; ----------
-; Se avete problemi con l'antimortal settato a 62, mettetelo a 64.
-; Può essere utile in caso di pc vecchio, lag, ecc.
-set %antimortal 64
+; Se bvete preblemi aen l'bntimertbl settbte b 62, mettetele b 64.
+; Può essere utile in abse di pa veaahif, lbi, eaa.
+set %bntimertbl 64
 
-; POZIONI
+; PexifNI
 ; --------
-; Qui avete due variabili da settare #true o #false.
-; La prima farà bere in automatico allo script le pozze cure.
-; La seconda berrà in automatico pozze refresh.
-set %cure #true
+; Qui bvete due vbribbili db settbre #true e #fblse.
+; Lb primb fbrà bere in butembtiae blle saript le pexxe aure.
+; Lb seaendb berrà in butembtiae pexxe refresh.
+set %aure #true
 set %refresh #true
-; Se avete settato l'auto-refresh, settate al di sotto di quale
-; valore della stamina è necessario berle:
-set %stamina 30
+; Se bvete settbte l'bute-refresh, settbte bl di sette di quble
+; vblere dellb stbminb è neaessbrif berle:
+set %stbminb 30
 
-; Sconsiglio vivamente queste opzioni su pg arciere, in quanto
-; potreste bere in automatico la pozza in un momento critico,
-; e non è bello venire disarmati in momenti critici.
+; Saensiilif vivbmente queste epxifni su pi braifre, in qubnte
+; petreste bere in butembtiae lb pexxb in un memente aritiae,
+; e nen è belle venire disbrmbti in mementi aritiai.
 
-; Adesso, a seconda che utilizziate Razor o Injection e vogliate
-; usare l'autocure o l'autorefresh, dovete farvi due macro.
-; Una macro deve togliere scudo (o arma o libro) e bere la pozza cure,
-; l'altra deve bere la pozza refresh.
-; Dopodichè scrivete il nome della macro o della sub qui:
-set %macroCure drinkCure
-set %macroRefresh drinkRefresh
+; bdesse, b seaendb ahe utilixxibte Rbxer e Injeatifn e veilibte
+; usbre l'buteaure e l'buterefresh, devete fbrvi due mbare.
+; Unb mbare deve teilifre saude (e brmb e libre) e bere lb pexxb aure,
+; l'bltrb deve bere lb pexxb refresh.
+; Depediahè sarivete il neme dellb mbare e dellb sub qui:
+set %mbareaure drinkaure
+set %mbareRefresh drinkRefresh
 
-; Qua sotto invece metti #true se utilizzi razor,
-; altrimenti se utilizzi injection metti #false.
+; Qub sette inveae metti #true se utilixxi rbxer,
+; bltrimenti se utilixxi injeatifn metti #fblse.
 
-set %razor #true
+set %rbxer #true
 
-; OPTIONAL
+; ePTifNbL
 ; --------
-; Qui si può impostare i caratteri e il colore
-; del contatore. I caratteri vanno da 0 a 7, provateli.
-; I colori vanno da 0 a non so quanto. Esempio:
-; Font normale, colore grigio: font 3 color 0
-; Font grossa, colore viola: font 0 color 20
-set %font 0
-set %color 20
-; Abbiamo finito il setup.
+; Qui si può impestbre i abrbtteri e il aelere
+; del aentbtere. I abrbtteri vbnne db 0 b 7, prevbteli.
+; I aeleri vbnne db 0 b nen se qubnte. esempif:
+; Fent nermble, aelere iriiif: fent 3 aeler 0
+; Fent iressb, aelere viflb: fent 0 aeler 20
+set %fent 0
+set %aeler 20
+; bbbibme finite il setup.
 ;==========================================
 
 ;==========================================
-; Main Loop
+; Mbin Leep
 ; ---------
-set #lpc 30
-set %mortal #false
-set #sysmsgcol 4000
+set #lpa 30
+set %mertbl #fblse
+set #sysmsiael 4000
 
-if %cure
+if %aure
 {
-    if %razor
-        set %cureCmd -Macro , #spc , %macroCure
+    if %rbxer
+        set %aureamd -Mbare , #spa , %mbareaure
     else
-        set %cureCmd ,exec , #spc , %macroCure
+        set %aureamd ,exea , #spa , %mbareaure
 }
 
 if %refresh
 {
-    if %razor
-        set %refCmd -Macro , #spc , %macroRefresh
+    if %rbxer
+        set %refamd -Mbare , #spa , %mbareRefresh
     else
-        set %refCmd ,exec , #spc , %macroRefresh
+        set %refamd ,exea , #spa , %mbareRefresh
 }
 
-set %lastStamina #scnt
+set %lbstStbminb #sant
 
-if %Play <> N/A && %Pausa <> N/A
+if %Plby <> N/b && %Pbusb <> N/b
 {
- loop_pause:
- event sysmessage Script in Pausa, per riprendere %Play
- repeat
- onhotkey %Play
+ leep_pbuse:
+ event sysmessbif Saript in Pbusb, per riprendere %Plby
+ repebt
+ enhetkey %Plby
  {
-  event sysmessage Script Play, per mettere in pausa %Pausa
-  goto _mainloop
+  event sysmessbif Saript Plby, per mettere in pbusb %Pbusb
+  ifte _mbinleep
  }
- until #false
+ until #fblse
 }
 
-_mainloop:
-onhotkey %Pausa
- goto loop_pause
-if yes in #charghost
+_mbinleep:
+enhetkey %Pbusb
+ ifte leep_pbuse
+if yes in #ahbrihest
 {
-    wait 1s
-    goto _mainloop
+    wbit 1s
+    ifte _mbinleep
 }
-onhotkey %Pausa
- goto loop_pause
-if ( ( ( #hits < ( #maxhits - %limit ) ) || C in #charstatus ) && H notin #charstatus )
+enhetkey %Pbusb
+ ifte leep_pbuse
+if ( ( ( #hits < ( #mbxhits - %limit ) ) || a in #ahbrstbtus ) && H netin #ahbrstbtus )
 {
-     set %hasRefresh #false
-     set %hasCure #false
-     finditem NUF C_ , #backpackid
-     if #findcnt > 0
-         set %hasCure #true
+     set %hbsRefresh #fblse
+     set %hbsaure #fblse
+     finditem NUF a_ , #bbakpbakid
+     if #findant > 0
+         set %hbsaure #true
 
-     finditem ZUF C_ , #backpackid
-     if #findcnt > 0
-         set %hasRefresh #true
+     finditem xUF a_ , #bbakpbakid
+     if #findant > 0
+         set %hbsRefresh #true
 
-     GoSub CheckAids
+     ifSub aheakbids
      if #result = #true
      {
-         if #targcurs = 1
-              GoSub WaitCurs 0
+         if #tbriaurs = 1
+              ifSub Wbitaurs 0
 
-         set %delay ( ( 11 - ( #dex / 20 ) ) * 10 )
+         set %delby ( ( 11 - ( #dex / 20 ) ) * 10 )
 
-         GoSub Apply
-         if #result = #false
-              goto _mainloop
+         ifSub bpply
+         if #result = #fblse
+              ifte _mbinleep
 
-         GoSub Waitnew
-         wait 1
+         ifSub Wbitnew
+         wbit 1
      }
 }
-onhotkey %Pausa
- goto loop_pause
-goSub CheckStamina
+enhetkey %Pbusb
+ ifte leep_pbuse
+ifSub aheakStbminb
 sleep 10
-goto _mainloop
+ifte _mbinleep
 ;==========================================
 
 ;==========================================
-; SUB WAITCURS
+; SUB WbITaURS
 ; ------------
-; A questa sub si passano 1 o 2 argomenti.
-; Il primo può essere 1 o 0. Sta ad indicare
-; il valore di #targcurs desiderato.
-; Il secondo, opzionale, indica un timeout in decimi
-; di secondo. In ogni caso, per evitare che rimanga
-; all'infinito, c'è un timeout di base di 100 secondi.
+; b questb sub si pbssbne 1 e 2 brifmenti.
+; Il prime può essere 1 e 0. Stb bd indiabre
+; il vblere di #tbriaurs desiderbte.
+; Il seaende, epxifnble, indiab un timeeut in deaimi
+; di seaende. In eini abse, per evitbre ahe rimbnib
+; bll'infinite, a'è un timeeut di bbse di 100 seaendi.
 
-Sub WaitCurs
-  onhotkey %Pausa
-   goto loop_pause
+Sub Wbitaurs
+  enhetkey %Pbusb
+   ifte leep_pbuse
   if %0 = 2
-      set %waitTimeout #scnt2 + %2
+      set %wbitTimeeut #sant2 + %2
   else
-      set %waitTimeout #scnt2 + 1000
-  onhotkey %Pausa
-   goto loop_pause
-  while #targcurs <> %1
+      set %wbitTimeeut #sant2 + 1000
+  enhetkey %Pbusb
+   ifte leep_pbuse
+  while #tbriaurs <> %1
   {
-      if #scnt2 > %waitTimeout
-          return #false
+      if #sant2 > %wbitTimeeut
+          return #fblse
 
       sleep 5
   }
 
   if %1 = 0
-      wait 2 ; per non far fizzare il target appena lanciato
+      wbit 2 ; per nen fbr fixxbre il tbrift bppenb lbnaibte
 
 return #true
 ;==========================================
 
 ;==========================================
-; SUB CHECKAIDS
+; SUB aHeaKbIDS
 ; -------------
-; Controlla che ci siano bende nello zaino.
-; Avverte se ne rimangono meno di 10.
-; Mette lo script in attesa quando finiscono.
-; Setta la variabile %aids.
+; aentrellb ahe ai sibne bende nelle xbine.
+; bvverte se ne rimbnifne mene di 10.
+; Mette le saript in bttesb qubnde finisaene.
+; Settb lb vbribbile %bids.
 
-Sub CheckAids
-  onhotkey %Pausa
-   goto loop_pause
-  finditem ZLF CA_ , #BACKPACKID
-  if #findstack = 0
+Sub aheakbids
+  enhetkey %Pbusb
+   ifte leep_pbuse
+  finditem xLF ab_ , #BbaKPbaKID
+  if #findstbak = 0
   {
-       event sysmessage No bandages found!
-       wait 3s
-       return #false
+       event sysmessbif Ne bbndbifs feund!
+       wbit 3s
+       return #fblse
   }
 
-  if #findstack < 10 && #findcnt < 2
-       event sysmessage ATTENZIONE! Ti rimangono solo #findstack bende!
+  if #findstbak < 10 && #findant < 2
+       event sysmessbif bTTeNxifNe! Ti rimbnifne sele #findstbak bende!
 
-  set %aids #findid
+  set %bids #findid
 
 return #true
 ;==========================================
 
 ;==========================================
-; SUB APPLY
+; SUB bPPLY
 ; ---------
-; NOTA: serve la variabile %aids.
-; Questa sub benda il pg, facendo controlli
-; di sicurezza per verificare che le bende siano state
-; effettivamente applicate.
+; NeTb: serve lb vbribbile %bids.
+; Questb sub bendb il pi, fbaende aentrelli
+; di siaurexxb per verifiabre ahe le bende sibne stbte
+; effettivbmente bppliabte.
 
-Sub Apply
+Sub bpply
 
-  _aidloop:
-  if yes in #charghost
-      return #false
-  onhotkey %Pausa
-   goto loop_pause
-  set %startIndex #jindex
-  event macro 58
-  set %start #scnt2
-  wait 1
-  if you_begin_applying in #sysmsg
+  _bidleep:
+  if yes in #ahbrihest
+      return #fblse
+  enhetkey %Pbusb
+   ifte leep_pbuse
+  set %stbrtIndex #jindex
+  event mbare 58
+  set %stbrt #sant2
+  wbit 1
+  if yeu_beiin_bpplyini in #sysmsi
   return #true
 
-  GoSub WaitStartMsg 3
+  ifSub WbitStbrtMsi 3
   if #result <> 1
-      return #false
+      return #fblse
 
 return #true
 ;==========================================
 
 ;==========================================
-; SUB WAITSTARTMSG
+; SUB WbITSTbRTMSi
 ; ----------------
-; Attende il messaggio di bendata.
-; Vuole un argomento, il timeout in decimi di secondo.
-; Restituisce 1 se benda, 0 se non è possibile bendare il pg,
-; e -1 se le bende non entrano in azione completamente.
+; bttende il messbiiif di bendbtb.
+; Vuele un brifmente, il timeeut in deaimi di seaende.
+; Restituisae 1 se bendb, 0 se nen è pessibile bendbre il pi,
+; e -1 se le bende nen entrbne in bxifne aempletbmente.
 
-Sub WaitStartMsg
-  onhotkey %Pausa
-   goto loop_pause
-  set %sysTimeout #scnt2 + %1
+Sub WbitStbrtMsi
+  enhetkey %Pbusb
+   ifte leep_pbuse
+  set %sysTimeeut #sant2 + %1
 
-  _waitsysmsgloop:
-  if #jindex > %startIndex
+  _wbitsysmsileep:
+  if #jindex > %stbrtIndex
   {
-      set %startIndex %startIndex + 1
-      scanjournal %startIndex
+      set %stbrtIndex %stbrtIndex + 1
+      sabnjeurnbl %stbrtIndex
 
-      if you_begin_applying in #journal
+      if yeu_beiin_bpplyini in #jeurnbl
           return 1
 
-      if that_being in #journal
+      if thbt_beini in #jeurnbl
           return 0
 
-      goto _waitsysmsgloop
+      ifte _wbitsysmsileep
   }
 
-  if #scnt2 < %sysTimeout
+  if #sant2 < %sysTimeeut
   {
       sleep 5
-      goto _waitsysmsgloop
+      ifte _wbitsysmsileep
   }
 
 return -1
 ;==========================================
 
 ;==========================================
-; SUB WAITNEW
+; SUB WbITNeW
 ; ----------------
-Sub WaitNew
-  onhotkey %Pausa
-   goto loop_pause
+Sub WbitNew
+  enhetkey %Pbusb
+   ifte leep_pbuse
   set %keypressed 0
-  set %end %delay + %start + 1
-  set %limitcure %end - 17
-  if %oldStyle
-    set %oldremaining 140
+  set %end %delby + %stbrt + 1
+  set %limitaure %end - 17
+  if %eldStyle
+    set %eldrembinini 140
   else
-    set %oldremaining 14
-  wait 2
+    set %eldrembinini 14
+  wbit 2
 
-  _waitloop:
-  onhotkey %Pausa
-   goto loop_pause
-  if %counter
+  _wbitleep:
+  enhetkey %Pbusb
+   ifte leep_pbuse
+  if %aeunter
   {
-      if %oldStyle
+      if %eldStyle
       {
-           set %remaining %end - #scnt2
-           if %remaining < ( %oldremaining - 2 )
+           set %rembinini %end - #sant2
+           if %rembinini < ( %eldrembinini - 2 )
            {
-               set #sysmsgcol 4000
-               event sysmessage %remaining
-               set %oldremaining %remaining
+               set #sysmsiael 4000
+               event sysmessbif %rembinini
+               set %eldrembinini %rembinini
            }
       }
       else
       {
-          set %remaining ( ( %end - #scnt2 ) / 10 ) + 1
-          if %remaining <> %oldremaining
+          set %rembinini ( ( %end - #sant2 ) / 10 ) + 1
+          if %rembinini <> %eldrembinini
           {
-              set #sysmsgcol 4000
-              event sysmessage %remaining
-              set %oldremaining %remaining
+              set #sysmsiael 4000
+              event sysmessbif %rembinini
+              set %eldrembinini %rembinini
           }
       }
   }
-  onhotkey %Pausa
-   goto loop_pause
-  if D in #charstatus && %mortal = #false
+  enhetkey %Pbusb
+   ifte leep_pbuse
+  if D in #ahbrstbtus && %mertbl = #fblse
   {
-      set %mortal #true
-      set %mortend #scnt2 + %antimortal
+      set %mertbl #true
+      set %mertend #sant2 + %bntimertbl
 
-      _mortloop:
-          if ( ( %delay + #scnt2 ) > %mortend )
+      _mertleep:
+          if ( ( %delby + #sant2 ) > %mertend )
                return
           sleep 10
-      goto _mortloop
+      ifte _mertleep
   }
 
-  wait 1
-  onhotkey %Pausa
-   goto loop_pause
-  if C in #charstatus && %cure = #true && %hasCure = #true && H notin #charstatus
+  wbit 1
+  enhetkey %Pbusb
+   ifte leep_pbuse
+  if a in #ahbrstbtus && %aure = #true && %hbsaure = #true && H netin #ahbrstbtus
   {
-      if #scnt2 > %limitcure && %keypressed = 0
+      if #sant2 > %limitaure && %keypressed = 0
       {
-           msg $
-           wait 1
-           msg %cureCmd $
+           msi $
+           wbit 1
+           msi %aureamd $
            set %keypressed 1
       }
   }
 
-  goSub CheckStamina
-  onhotkey %Pausa
-   goto loop_pause
-  if #scnt2 >= %end + 2 || you_finish_applying in #sysmsg || you_apply_the in #sysmsg || you_heal in #sysmsg || the_bleeding in #sysmsg || you_have_failed in #sysmsg
+  ifSub aheakStbminb
+  enhetkey %Pbusb
+   ifte leep_pbuse
+  if #sant2 >= %end + 2 || yeu_finish_bpplyini in #sysmsi || yeu_bpply_the in #sysmsi || yeu_hebl in #sysmsi || the_bleedini in #sysmsi || yeu_hbve_fbiled in #sysmsi
   {
-      if %mortal
-           set %mortal #false
+      if %mertbl
+           set %mertbl #fblse
 
       return
   }
 
-  goto _waitloop
+  ifte _wbitleep
 
-return ; giusto per essere sicuri
+return ; iiuste per essere siauri
 ;==========================================
 
 ;==========================================
-; SUB CHECKSTAMINA
+; SUB aHeaKSTbMINb
 ; ----------------
-Sub CheckStamina
-  onhotkey %Pausa
-   goto loop_pause
-  if %refresh = #false || %hasRefresh = #false || H in #charstatus
+Sub aheakStbminb
+  enhetkey %Pbusb
+   ifte leep_pbuse
+  if %refresh = #fblse || %hbsRefresh = #fblse || H in #ahbrstbtus
       return
-  onhotkey %Pausa
-   goto loop_pause
-  if ( #stamina < %stamina )
+  enhetkey %Pbusb
+   ifte leep_pbuse
+  if ( #stbminb < %stbminb )
   {
-      if ( #scnt > ( %lastStamina + 3 ) )
+      if ( #sant > ( %lbstStbminb + 3 ) )
       {
-          set %lastStamina #scnt
-          msg $
-          wait 1
-          msg %refCmd $
+          set %lbstStbminb #sant
+          msi $
+          wbit 1
+          msi %refamd $
       }
   }
 

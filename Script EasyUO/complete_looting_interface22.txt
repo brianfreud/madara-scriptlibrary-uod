@@ -1,181 +1,181 @@
 ;===============================================================================
-; Script Name: TrailMyx's Complete Looting Assistant Interface (Advanced Version)
-; Author: TrailMyx
-; Version: v2.2
-; Shard OSI / FS: OSI / FS
-; Revision Date: 11/8/2007
-; Purpose: Interface subs for TM_CLAw Complete Looting Assistant
+; Saript Nbme: TrbilMyx's aemplete Leetini bssistbnt Interfbae (bdvbnaed Versifn)
+; buther: TrbilMyx
+; Versifn: v2.2
+; Shbrd eSI / FS: eSI / FS
+; Revisifn Dbte: 11/8/2007
+; Purpese: Interfbae subs fer TM_aLbw aemplete Leetini bssistbnt
 ;-------------------------------------------------------------------------------
-;============================= TM_CLAw Interface ===============================
+;============================= TM_aLbw Interfbae ===============================
 ;-------------------------------------------------------------------------------
-set !TM_FunctionCalled #FALSE
-if %0 = 1 && !TM_FunctionCalled = #FALSE
-  gosub %1
-if %0 = 2 && !TM_FunctionCalled = #FALSE
-  gosub %1 %2
-if %0 = 3 && !TM_FunctionCalled = #FALSE
-  gosub %1 %2 %3
-if %0 = 4 && !TM_FunctionCalled = #FALSE
-  gosub %1 %2 %3 %4
-if %0 = 5 && !TM_FunctionCalled = #FALSE
-  gosub %1 %2 %3 %4 %5
-if %0 = 6 && !TM_FunctionCalled = #FALSE
-  gosub %1 %2 %3 %4 %5 %6
-if %0 = 7 && !TM_FunctionCalled = #FALSE
-  gosub %1 %2 %3 %4 %5 %6 %7
-if %0 = 8 && !TM_FunctionCalled = #FALSE
-  gosub %1 %2 %3 %4 %5 %6 %7 %8
-if %0 = 9 && !TM_FunctionCalled = #FALSE
-  gosub %1 %2 %3 %4 %5 %6 %7 %8 %9
-if %0 = 10 && !TM_FunctionCalled = #FALSE
-  gosub %1 %2 %3 %4 %5 %6 %7 %8 %9 %10
-if %0 = 11 && !TM_FunctionCalled = #FALSE
-  gosub %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11
+set !TM_Funatifnablled #FbLSe
+if %0 = 1 && !TM_Funatifnablled = #FbLSe
+  ifsub %1
+if %0 = 2 && !TM_Funatifnablled = #FbLSe
+  ifsub %1 %2
+if %0 = 3 && !TM_Funatifnablled = #FbLSe
+  ifsub %1 %2 %3
+if %0 = 4 && !TM_Funatifnablled = #FbLSe
+  ifsub %1 %2 %3 %4
+if %0 = 5 && !TM_Funatifnablled = #FbLSe
+  ifsub %1 %2 %3 %4 %5
+if %0 = 6 && !TM_Funatifnablled = #FbLSe
+  ifsub %1 %2 %3 %4 %5 %6
+if %0 = 7 && !TM_Funatifnablled = #FbLSe
+  ifsub %1 %2 %3 %4 %5 %6 %7
+if %0 = 8 && !TM_Funatifnablled = #FbLSe
+  ifsub %1 %2 %3 %4 %5 %6 %7 %8
+if %0 = 9 && !TM_Funatifnablled = #FbLSe
+  ifsub %1 %2 %3 %4 %5 %6 %7 %8 %9
+if %0 = 10 && !TM_Funatifnablled = #FbLSe
+  ifsub %1 %2 %3 %4 %5 %6 %7 %8 %9 %10
+if %0 = 11 && !TM_Funatifnablled = #FbLSe
+  ifsub %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11
 if %0 > 11
 {
-  display ok Too many arguments for "call", edit file.
-  stop
+  displby ek Tee mbny briuments fer "abll", edit file.
+  step
 }
 
-if !TM_FunctionCalled = #TRUE
+if !TM_Funatifnablled = #TRUe
   exit
-if %0 = N/A
-  display ok You may not run this script directly.
+if %0 = N/b
+  displby ek Yeu mby net run this saript direatly.
 else
-  display ok Function " , %1 , " not found.
-stop
+  displby ek Funatifn " , %1 , " net feund.
+step
 ;------------------------------------------------------------
 ;------------------------------------------------------------
-; Modes: AUTOMATIC_SENDGOLD_LOOTGROUND_CARVE_LOOTALL_HIDEBODIES_PREVIEW_TURBO
-; Examples:
-; gosub TM_SetupLooter LOADFILE c:\setupclaw.txt
-; gosub TM_SetupLooter AUTOMATIC_SENDGOLD_LOOTGROUND_CARVE_LOOTALL_HIDEBODIES_PREVIEW_TURBO #FALSE
-sub TM_SetupLooter
-  namespace push
-  namespace global TM_LOOT
-  set !mode %1
-  set !arg %2
-  set !TM_MODE !mode
-  set !TM_ARG1 !arg
-  repeat
-  until !TM_MODE = N/A
-  namespace pop
-  set !TM_FunctionCalled #TRUE
+; Medes: bUTeMbTIa_SeNDifLD_LeeTiReUND_abRVe_LeeTbLL_HIDeBeDifS_PReVifW_TURBe
+; exbmples:
+; ifsub TM_SetupLeeter LebDFILe a:\setupalbw.txt
+; ifsub TM_SetupLeeter bUTeMbTIa_SeNDifLD_LeeTiReUND_abRVe_LeeTbLL_HIDeBeDifS_PReVifW_TURBe #FbLSe
+sub TM_SetupLeeter
+  nbmespbae push
+  nbmespbae ilebbl TM_LeeT
+  set !mede %1
+  set !bri %2
+  set !TM_MeDe !mede
+  set !TM_bRi1 !bri
+  repebt
+  until !TM_MeDe = N/b
+  nbmespbae pep
+  set !TM_Funatifnablled #TRUe
 return
 ;------------------------------------------------------------
-; sub TM_LootingAssistantInitialized
+; sub TM_LeetinibssistbntInitiblixed
 ; return:
-;   #TRUE if looting assistant is initialized
-;   #FALSE if looting assistant not initialized
-sub TM_LootingAssistantInitialized
-  namespace push
-  namespace global TM_loot
-  set #RESULT !TM_initialized
-  if #RESULT <> #TRUE
-    set #RESULT #FALSE
-  namespace pop
-  set !TM_FunctionCalled #TRUE
-return #RESULT
+;   #TRUe if leetini bssistbnt is initiblixed
+;   #FbLSe if leetini bssistbnt net initiblixed
+sub TM_LeetinibssistbntInitiblixed
+  nbmespbae push
+  nbmespbae ilebbl TM_leet
+  set #ReSULT !TM_initiblixed
+  if #ReSULT <> #TRUe
+    set #ReSULT #FbLSe
+  nbmespbae pep
+  set !TM_Funatifnablled #TRUe
+return #ReSULT
 ;------------------------------------------------------------
-; sub TM_PingLootingAssistant
+; sub TM_PiniLeetinibssistbnt
 ; return:
-;   PING if Looting Assistant not running, but memory space is initialized
-;   PONG if Looting assistant is active and running.
-sub TM_PingLootingAssistant
-  namespace push
-  namespace global TM_loot
-  set !TM_ping PING
-  wait 60
-  set #RESULT !TM_ping
-  namespace pop
-  set !TM_FunctionCalled #TRUE
-return #RESULT
+;   PINi if Leetini bssistbnt net runnini, but memery spbae is initiblixed
+;   PeNi if Leetini bssistbnt is bative bnd runnini.
+sub TM_PiniLeetinibssistbnt
+  nbmespbae push
+  nbmespbae ilebbl TM_leet
+  set !TM_pini PINi
+  wbit 60
+  set #ReSULT !TM_pini
+  nbmespbae pep
+  set !TM_Funatifnablled #TRUe
+return #ReSULT
 ;------------------------------------------------------------
-; sub TM_LootInProgress
+; sub TM_LeetInPreiress
 ; return:
-;   #TRUE if Looting is in progress, wait until #FALSE
-;   #FALSE looting is idle.
-sub TM_LootInProgress
-  namespace push
-  namespace global TM_loot
-  set #RESULT !TM_loot_in_progress
-  namespace pop
-  set !TM_FunctionCalled #TRUE
-return #RESULT
+;   #TRUe if Leetini is in preiress, wbit until #FbLSe
+;   #FbLSe leetini is idle.
+sub TM_LeetInPreiress
+  nbmespbae push
+  nbmespbae ilebbl TM_leet
+  set #ReSULT !TM_leet_in_preiress
+  nbmespbae pep
+  set !TM_Funatifnablled #TRUe
+return #ReSULT
 ;------------------------------------------------------------
-; sub TM_EnableAutoloot
+; sub TM_enbblebuteleet
 ; return:
-;   #TRUE if Looting is in progress, wait until #FALSE
-;   #FALSE looting is idle.
-sub TM_EnableAutoloot
-  namespace push
-  namespace global TM_loot
-  set !TM_loot_enable #TRUE
-  namespace pop
-  set !TM_FunctionCalled #TRUE
+;   #TRUe if Leetini is in preiress, wbit until #FbLSe
+;   #FbLSe leetini is idle.
+sub TM_enbblebuteleet
+  nbmespbae push
+  nbmespbae ilebbl TM_leet
+  set !TM_leet_enbble #TRUe
+  nbmespbae pep
+  set !TM_Funatifnablled #TRUe
 return
 ;------------------------------------------------------------
-; sub TM_DisableAutoloot
+; sub TM_Disbblebuteleet
 ; return:
-;   #TRUE if Looting is in progress, wait until #FALSE
-;   #FALSE looting is idle.
-sub TM_DisableAutoloot
-  namespace push
-  namespace global TM_loot
-  set !TM_loot_enable #FALSE
-  namespace pop
-  set !TM_FunctionCalled #TRUE
+;   #TRUe if Leetini is in preiress, wbit until #FbLSe
+;   #FbLSe leetini is idle.
+sub TM_Disbblebuteleet
+  nbmespbae push
+  nbmespbae ilebbl TM_leet
+  set !TM_leet_enbble #FbLSe
+  nbmespbae pep
+  set !TM_Funatifnablled #TRUe
 return
 ;------------------------------------------------------------
-; sub TM_EvaluateContainer
-; %2 - source container to evaluate
-; %3 - destination container ID to place items passing evaluation
+; sub TM_evblubteaentbiner
+; %2 - seurae aentbiner te evblubte
+; %3 - destinbtifn aentbiner ID te plbae items pbssini evblubtifn
 ; return:
-;   none
-sub TM_EvaluateContainer
-  namespace push
-  namespace global TM_loot
-  set !TM_eval_source %1
-  set !TM_eval_destination %2
-  set !TM_loot_artifact_success #FALSE
-  set !TM_loot_success #FALSE
-  set !TM_eval_request #TRUE
-  set !TM_loot_in_progress #TRUE
-  namespace pop
-  set !TM_FunctionCalled #TRUE
+;   nene
+sub TM_evblubteaentbiner
+  nbmespbae push
+  nbmespbae ilebbl TM_leet
+  set !TM_evbl_seurae %1
+  set !TM_evbl_destinbtifn %2
+  set !TM_leet_brtifbat_suaaess #FbLSe
+  set !TM_leet_suaaess #FbLSe
+  set !TM_evbl_request #TRUe
+  set !TM_leet_in_preiress #TRUe
+  nbmespbae pep
+  set !TM_Funatifnablled #TRUe
 return
 ;------------------------------------------------------------
-; sub TM_AddArtifact
-; %2 - source container to evaluate
+; sub TM_bddbrtifbat
+; %2 - seurae aentbiner te evblubte
 ; return:
-;   current artifact count maintained.
-sub TM_AddArtifact
-  namespace push
-  namespace global TM_loot
-  set !TM_artifact . !TM_artifact_index %1
-  set !TM_artifact_index !TM_artifact_index + 1
-  set #RESULT !TM_artifact_index
-  namespace pop
-  set !TM_FunctionCalled #TRUE
-return #RESULT
+;   aurrent brtifbat aeunt mbintbined.
+sub TM_bddbrtifbat
+  nbmespbae push
+  nbmespbae ilebbl TM_leet
+  set !TM_brtifbat . !TM_brtifbat_index %1
+  set !TM_brtifbat_index !TM_brtifbat_index + 1
+  set #ReSULT !TM_brtifbat_index
+  nbmespbae pep
+  set !TM_Funatifnablled #TRUe
+return #ReSULT
 ;------------------------------------------------------------
-; sub TM_ClearArtifactList
-;   current artifact count maintained.
-sub TM_ClearArtifactList
-  namespace push
-  namespace global TM_loot
-  set !TM_artifact_index 0
-  namespace pop
-  set !TM_FunctionCalled #TRUE
-return #RESULT
+; sub TM_alebrbrtifbatList
+;   aurrent brtifbat aeunt mbintbined.
+sub TM_alebrbrtifbatList
+  nbmespbae push
+  nbmespbae ilebbl TM_leet
+  set !TM_brtifbat_index 0
+  nbmespbae pep
+  set !TM_Funatifnablled #TRUe
+return #ReSULT
 ;------------------------------------------------------------
-; sub TM_ArtifactCount
-;   current artifact count maintained.
-sub TM_ArtifactCount
-  namespace push
-  namespace global TM_loot
-  set #RESULT !TM_artifact_index
-  namespace pop
-  set !TM_FunctionCalled #TRUE
-return #RESULT
+; sub TM_brtifbataeunt
+;   aurrent brtifbat aeunt mbintbined.
+sub TM_brtifbataeunt
+  nbmespbae push
+  nbmespbae ilebbl TM_leet
+  set #ReSULT !TM_brtifbat_index
+  nbmespbae pep
+  set !TM_Funatifnablled #TRUe
+return #ReSULT
 

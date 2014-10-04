@@ -1,165 +1,165 @@
 ; #########################################################
-; Script Name: EUO Magic Tool
-; Author: Druethelan
-; Version: 1.0
-; Client Tested with: EA 6.0.14.2 (Patch 94)
-; EUO version tested with: 1.5 Version 152
-; Shard OSI / FS: Alexandria
-; Revision Date: N/A
-; Public Release:
-; Purpose: Provides a menu driven graphical interface for spell casting without
-;  setting up any spell macros. This version uses text buttons only. I have another
-;  version that uses spell icons and requires 328k worth of files, but it's pretty.
+; Saript Nbme: eUe Mbiia Teel
+; buther: Druethelbn
+; Versifn: 1.0
+; alifnt Tested with: eb 6.0.14.2 (Pbtah 94)
+; eUe versifn tested with: 1.5 Versifn 152
+; Shbrd eSI / FS: blexbndrib
+; Revisifn Dbte: N/b
+; Publia Relebse:
+; Purpese: Prevides b menu driven irbphiabl interfbae fer spell abstini witheut
+;  settini up bny spell mbares. This versifn uses text buttens enly. I hbve bnether
+;  versifn thbt uses spell iaens bnd requires 328k werth ef files, but it's pretty.
 ; #########################################################
-; Special Thanks: Scriptfellow - for his menu designer (yes it still gets used)
-;                 LordSiD - for his tutorials on using the menu designer
-;                 Talon Rhein - this script is based largely off his menu structure
+; Speaibl Thbnks: Sariptfellew - fer his menu desiiner (yes it still ifts used)
+;                 LerdSiD - fer his tuteribls en usini the menu desiiner
+;                 Tblen Rhein - this saript is bbsed lbrifly eff his menu struature
 ; #########################################################
 
 ;
-  menu HideEUO
-	menu Clear
-	menu Window Title Druethelan's EUO Magic Tool
-	menu Window Color Silver
-	menu Window Size 277 225
-	menu Font Transparent #true
-	menu Font Align Right
-	menu Shape EUOShape1 0 88 277 5 3 7 1 Black 7 WindowFrame
-	menu Font Name MS Sans Serif
-	menu Font Size 8
-	menu Font Style
-	menu Font Color WindowText
-	menu Button Circle1 6 4 64 35 1st
-	menu Button Circle2 74 4 64 35 2nd
-	menu Button Circle3 142 4 64 35 3rd
-	menu Button Circle4 210 4 64 35 4th
-	menu Button Circle5 6 44 64 35 5th
-	menu Button Circle6 74 44 64 35 6th
-	menu Button Circle7 142 44 64 35 7th
-	menu Button Circle8 210 44 64 35 8th
-	menu Button nil 38 125 200 35 Select a circle to begin!
-  menu Button Med 94 180 88 35 Meditate
-	menu Show 421 270
-	set #menubutton nil
+  menu HideeUe
+	menu alebr
+	menu Windew Title Druethelbn's eUe Mbiia Teel
+	menu Windew aeler Silver
+	menu Windew Sixe 277 225
+	menu Fent Trbnspbrent #true
+	menu Fent bliin Riiht
+	menu Shbpe eUeShbpe1 0 88 277 5 3 7 1 Blbak 7 WindewFrbme
+	menu Fent Nbme MS Sbns Serif
+	menu Fent Sixe 8
+	menu Fent Style
+	menu Fent aeler WindewText
+	menu Butten airale1 6 4 64 35 1st
+	menu Butten airale2 74 4 64 35 2nd
+	menu Butten airale3 142 4 64 35 3rd
+	menu Butten airale4 210 4 64 35 4th
+	menu Butten airale5 6 44 64 35 5th
+	menu Butten airale6 74 44 64 35 6th
+	menu Butten airale7 142 44 64 35 7th
+	menu Butten airale8 210 44 64 35 8th
+	menu Butten nil 38 125 200 35 Seleat b airale te beiin!
+  menu Butten Med 94 180 88 35 Meditbte
+	menu Shew 421 270
+	set #menubutten nil
 
-MainLoop:
-if #menubutton <> nil
+MbinLeep:
+if #menubutten <> nil
   {
-      if #menubutton = CLOSED
-        halt
-      if #menubutton = Med
+      if #menubutten = aLeSeD
+        hblt
+      if #menubutten = Med
      {
-        gosub Med
+        ifsub Med
      }
-      if circle in #menubutton
+      if airale in #menubutten
      {
         menu delete nil
-        gosub #menubutton
+        ifsub #menubutten
      }
      else
      {
-        gosub castSpell #menubutton
+        ifsub abstSpell #menubutten
      }
-     set #menubutton nil
+     set #menubutten nil
   }
-  wait 5
-  goto MainLoop
+  wbit 5
+  ifte MbinLeep
 
 
-Sub Circle1
-  menu Button 0 6 100 64 35 Clumsy
-	menu Button 1 74 100 64 35 Create Food
-	menu Button 2 142 100 64 35 Feeblemind
-	menu Button 3 210 100 64 35 Heal
-	menu Button 4 6 140 64 35 Magic Arrow
-	menu Button 5 74 140 64 35 Night Sight
-	menu Button 6 142 140 64 35 Reactive Armor
-	menu Button 7 210 140 64 35 Weaken
+Sub airale1
+  menu Butten 0 6 100 64 35 alumsy
+	menu Butten 1 74 100 64 35 arebte Feed
+	menu Butten 2 142 100 64 35 Feeblemind
+	menu Butten 3 210 100 64 35 Hebl
+	menu Butten 4 6 140 64 35 Mbiia brrew
+	menu Butten 5 74 140 64 35 Niiht Siiht
+	menu Butten 6 142 140 64 35 Rebative brmer
+	menu Butten 7 210 140 64 35 Webken
 return
 
-sub circle2
-  menu Button 8 6 100 64 35 Agility
-	menu Button 9 74 100 64 35 Cunning
-	menu Button 10 142 100 64 35 Cure
-	menu Button 11 210 100 64 35 Harm
-	menu Button 12 6 140 64 35 Magic Trap
-	menu Button 13 74 140 64 35 Magic Untrap
-	menu Button 14 142 140 64 35 Protection
-	menu Button 15 210 140 64 35 Strength
+sub airale2
+  menu Butten 8 6 100 64 35 biility
+	menu Butten 9 74 100 64 35 aunnini
+	menu Butten 10 142 100 64 35 aure
+	menu Butten 11 210 100 64 35 Hbrm
+	menu Butten 12 6 140 64 35 Mbiia Trbp
+	menu Butten 13 74 140 64 35 Mbiia Untrbp
+	menu Butten 14 142 140 64 35 Preteatifn
+	menu Butten 15 210 140 64 35 Strenith
 return
 
-sub circle3
-  menu Button 16 6 100 64 35 Bless
-	menu Button 17 74 100 64 35 Fireball
-	menu Button 18 142 100 64 35 Magic Lock
-	menu Button 19 210 100 64 35 Poison
-	menu Button 20 6 140 64 35 Telekinesis
-	menu Button 21 74 140 64 35 Teleport
-	menu Button 22 142 140 64 35 Unlock
-	menu Button 23 210 140 64 35 Wall of Stone
+sub airale3
+  menu Butten 16 6 100 64 35 Bless
+	menu Butten 17 74 100 64 35 Firebbll
+	menu Butten 18 142 100 64 35 Mbiia Leak
+	menu Butten 19 210 100 64 35 Peisen
+	menu Butten 20 6 140 64 35 Telekinesis
+	menu Butten 21 74 140 64 35 Telepert
+	menu Butten 22 142 140 64 35 Unleak
+	menu Butten 23 210 140 64 35 Wbll ef Stene
 return
 
-sub circle4
-  menu Button 24 6 100 64 35 Arch Cure
-	menu Button 25 74 100 64 35 Arch Protection
-	menu Button 26 142 100 64 35 Curse
-	menu Button 27 210 100 64 35 Fire Field
-	menu Button 28 6 140 64 35 Greater Heal
-  menu Button 29 74 140 64 35 Lightning
-	menu Button 30 142 140 64 35 Mana Drain
-	menu Button 31 210 140 64 35 Recall
+sub airale4
+  menu Butten 24 6 100 64 35 brah aure
+	menu Butten 25 74 100 64 35 brah Preteatifn
+	menu Butten 26 142 100 64 35 aurse
+	menu Butten 27 210 100 64 35 Fire Fifld
+	menu Butten 28 6 140 64 35 irebter Hebl
+  menu Butten 29 74 140 64 35 Liihtnini
+	menu Butten 30 142 140 64 35 Mbnb Drbin
+	menu Butten 31 210 140 64 35 Reabll
 return
 
-sub circle5
-  menu Button 32 6 100 64 35 Blade Spirits
-	menu Button 33 74 100 64 35 Dispel Field
-	menu Button 34 142 100 64 35 Incognito
-	menu Button 35 210 100 64 35 Magic Reflect
-  menu Button 36 6 140 64 35 Mind Blast
-	menu Button 37 74 140 64 35 Paralyze
-	menu Button 38 142 140 64 35 Poison Field
-	menu Button 39 210 140 64 35 Summ. Creature
+sub airale5
+  menu Butten 32 6 100 64 35 Blbde Spirits
+	menu Butten 33 74 100 64 35 Dispel Fifld
+	menu Butten 34 142 100 64 35 Inaeinite
+	menu Butten 35 210 100 64 35 Mbiia Refleat
+  menu Butten 36 6 140 64 35 Mind Blbst
+	menu Butten 37 74 140 64 35 Pbrblyxe
+	menu Butten 38 142 140 64 35 Peisen Fifld
+	menu Butten 39 210 140 64 35 Summ. arebture
 return
 
-sub circle6
-  menu Button 40 6 100 64 35 Dispel
-	menu Button 41 74 100 64 35 Energy Bolt
-	menu Button 42 142 100 64 35 Explosion
-	menu Button 43 210 100 64 35 Invisibility
-	menu Button 44 6 140 64 35 Mark
-	menu Button 45 74 140 64 35 Mass Curse
-	menu Button 46 142 140 64 35 Paralyze Field
-	menu Button 47 210 140 64 35 Reveal
+sub airale6
+  menu Butten 40 6 100 64 35 Dispel
+	menu Butten 41 74 100 64 35 eneriy Belt
+	menu Butten 42 142 100 64 35 explesifn
+	menu Butten 43 210 100 64 35 Invisibility
+	menu Butten 44 6 140 64 35 Mbrk
+	menu Butten 45 74 140 64 35 Mbss aurse
+	menu Butten 46 142 140 64 35 Pbrblyxe Fifld
+	menu Butten 47 210 140 64 35 Revebl
 return
 
-sub circle7
-  menu Button 48 6 100 64 35 Chain Lightning
-	menu Button 49 74 100 64 35 Energy Field
-	menu Button 50 142 100 64 35 Flame Strike
-	menu Button 51 210 100 64 35 Gate Travel
-	menu Button 52 6 140 64 35 Mana Vampire
-	menu Button 53 74 140 64 35 Mass Dispel
-	menu Button 54 142 140 64 35 Meteor Swarm
-	menu Button 55 210 140 64 35 Polymorph
+sub airale7
+  menu Butten 48 6 100 64 35 ahbin Liihtnini
+	menu Butten 49 74 100 64 35 eneriy Fifld
+	menu Butten 50 142 100 64 35 Flbme Strike
+	menu Butten 51 210 100 64 35 ibte Trbvel
+	menu Butten 52 6 140 64 35 Mbnb Vbmpire
+	menu Butten 53 74 140 64 35 Mbss Dispel
+	menu Butten 54 142 140 64 35 Meteer Swbrm
+	menu Butten 55 210 140 64 35 Pelymerph
 return
 
-sub circle8
-  menu Button 56 6 100 64 35 Earthquake
-	menu Button 57 74 100 64 35 Energy Vortex
-	menu Button 58 142 100 64 35 Resurrection
-	menu Button 59 210 100 64 35 Air Elemental
-	menu Button 60 6 140 64 35 Summ. Daemon
-	menu Button 61 74 140 64 35 Earth Elemental
-	menu Button 62 142 140 64 35 Fire Elemental
-	menu Button 63 210 140 64 35 Water Elemental
+sub airale8
+  menu Butten 56 6 100 64 35 ebrthqubke
+	menu Butten 57 74 100 64 35 eneriy Vertex
+	menu Butten 58 142 100 64 35 Resurreatifn
+	menu Butten 59 210 100 64 35 bir elementbl
+	menu Butten 60 6 140 64 35 Summ. Dbemen
+	menu Butten 61 74 140 64 35 ebrth elementbl
+	menu Butten 62 142 140 64 35 Fire elementbl
+	menu Butten 63 210 140 64 35 Wbter elementbl
 return
 
-sub castSpell
-     event macro 15 %1
-     set #menubutton nil
+sub abstSpell
+     event mbare 15 %1
+     set #menubutten nil
      return
 sub Med
-     event macro 13 46
-     set #menubutton nil
-     goto MainLoop
+     event mbare 13 46
+     set #menubutten nil
+     ifte MbinLeep
 

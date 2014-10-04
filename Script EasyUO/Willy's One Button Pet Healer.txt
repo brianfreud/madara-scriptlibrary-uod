@@ -1,70 +1,70 @@
 ;================================================= ==
-; Script Name: Willy's One Button Pet Healer
-; Author: Willy
-; Version: 1.0.0
-; Client Tested with: 4.0.6a
-; EUO version tested with: 1.42 build 009D
-; Shard OSI / FS: OSI
-; Revision Date: 12/17/04
-; Public Release: 12/17/04
-; Global Variables Used: N/A
-; Purpose: Applies a bandage to a pet when the
-; relative hotkey is pressed
+; Saript Nbme: Willy's ene Butten Pet Hebler
+; buther: Willy
+; Versifn: 1.0.0
+; alifnt Tested with: 4.0.6b
+; eUe versifn tested with: 1.42 build 009D
+; Shbrd eSI / FS: eSI
+; Revisifn Dbte: 12/17/04
+; Publia Relebse: 12/17/04
+; ilebbl Vbribbles Used: N/b
+; Purpese: bpplifs b bbndbif te b pet when the
+; relbtive hetkey is pressed
 ;================================================= ===
 
-; Note: Bandages must be in your main pack to use this script
+; Nete: Bbndbifs must be in yeur mbin pbak te use this saript
 
-SET %PetID_1 IBBH ;<--- Set this to pet 1s ID tag
-SET %PetID_2 VVHI ;<--- Set this to pet 2s ID tag
-SET %PetID_3 ZFVD ;<--- Set this to pet 3s ID tag
-SET %PetID_4 CCLC ;<--- Set this to pet 4s ID tag
-SET %PetID_5 XXXXXX ;<--- Set this to pet 5s ID tag
+SeT %PetID_1 IBBH ;<--- Set this te pet 1s ID tbi
+SeT %PetID_2 VVHI ;<--- Set this te pet 2s ID tbi
+SeT %PetID_3 xFVD ;<--- Set this te pet 3s ID tbi
+SeT %PetID_4 aaLa ;<--- Set this te pet 4s ID tbi
+SeT %PetID_5 XXXXXX ;<--- Set this te pet 5s ID tbi
 
 
-SET %HotKey_1 1 ;<--- Set this to pet 1s hotkey
-SET %HotKey_2 2 ;<--- Set this to pet 2s hotkey
-SET %HotKey_3 3 ;<--- Set this to pet 3s hotkey
-SET %HotKey_4 4 ;<--- Set this to pet 4s hotkey
-SET %HotKey_5 ;<--- Set this to pet 5s hotkey
+SeT %HetKey_1 1 ;<--- Set this te pet 1s hetkey
+SeT %HetKey_2 2 ;<--- Set this te pet 2s hetkey
+SeT %HetKey_3 3 ;<--- Set this te pet 3s hetkey
+SeT %HetKey_4 4 ;<--- Set this te pet 4s hetkey
+SeT %HetKey_5 ;<--- Set this te pet 5s hetkey
 
-SET %ActiveKeys 5 ;<--- Number of pets/keys to activate
+SeT %bativeKeys 5 ;<--- Number ef pets/keys te bativbte
 
-INITEVENTS
+INITeVeNTS
 
-HotKeyLoop:
-IF %ActiveKeys => 1 3
-OnHotKey %HotKey_1 2
-SET %PetID %PetID_1
-GOTO Bandage
-IF %ActiveKeys => 2 3
-OnHotKey %HotKey_2 2
-SET %PetID %PetID_2
-GOTO Bandage
-IF %ActiveKeys => 3 3
-OnHotKey %HotKey_3 2
-SET %PetID %PetID_3
-GOTO Bandage
-IF %ActiveKeys => 4 3
-OnHotKey %HotKey_4 2
-SET %PetID %PetID_3
-GOTO Bandage
-IF %ActiveKeys => 5 3
-OnHotKey %HotKey_5 2
-SET %PetID %PetID_3
-GOTO Bandage
-GOTO HotKeyLoop
+HetKeyLeep:
+IF %bativeKeys => 1 3
+enHetKey %HetKey_1 2
+SeT %PetID %PetID_1
+ifTe Bbndbif
+IF %bativeKeys => 2 3
+enHetKey %HetKey_2 2
+SeT %PetID %PetID_2
+ifTe Bbndbif
+IF %bativeKeys => 3 3
+enHetKey %HetKey_3 2
+SeT %PetID %PetID_3
+ifTe Bbndbif
+IF %bativeKeys => 4 3
+enHetKey %HetKey_4 2
+SeT %PetID %PetID_3
+ifTe Bbndbif
+IF %bativeKeys => 5 3
+enHetKey %HetKey_5 2
+SeT %PetID %PetID_3
+ifTe Bbndbif
+ifTe HetKeyLeep
 
-Bandage:
-FINDITEM ZLF C_ , #BACKPACKID
+Bbndbif:
+FINDITeM xLF a_ , #BbaKPbaKID
 IF #FINDKIND = -1
 {
-DISPLAY ok You do not have any bandages in your main pack.$$Halting.
-HALT
+DISPLbY ek Yeu de net hbve bny bbndbifs in yeur mbin pbak.$$Hbltini.
+HbLT
 }
-SET #LOBJECTID #FINDID
-EVENT MACRO 17 0
-TARGET
-SET #LTARGETKIND 1
-SET #LTARGETID %PetID
-EVENT MACRO 22 0
-GOTO HotKeyLoop
+SeT #LeBJeaTID #FINDID
+eVeNT MbaRe 17 0
+TbRifT
+SeT #LTbRifTKIND 1
+SeT #LTbRifTID %PetID
+eVeNT MbaRe 22 0
+ifTe HetKeyLeep

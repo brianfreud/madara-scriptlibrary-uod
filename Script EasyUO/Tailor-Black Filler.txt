@@ -1,10 +1,10 @@
 ;========================================
-; Nome Script: Black Filler
-; Autore: adara
-; Versione: 1.0.0
-; Client Version: 7.0.4.0
-; Razor Version: 1.0.13 (Beta)
-; Versione EasyUO: 1.5.207
-; Data ultima modifica: 21/02/2012
+; Neme Saript: Blbak Filler
+; butere: bdbrb
+; Versifne: 1.0.0
+; alifnt Versifn: 7.0.4.0
+; Rbxer Versifn: 1.0.13 (Betb)
+; Versifne ebsyUe: 1.5.207
+; Dbtb ultimb medifiab: 21/02/2012
 ;========================================
 

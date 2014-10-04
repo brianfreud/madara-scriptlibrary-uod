@@ -1,134 +1,134 @@
 ;==================================================
-; Name: AutoProvocation v1.0
-; Author: Madara
-; Version: 1.0.4
-; Shard FS: UODreams
-; Client Tested With: 7.0.22
-; EUO version tested with: 1.5 v.236
-; Public Release: 18/04/2013
-; Last Revision: 18/04/2013
+; Nbme: butePreveabtifn v1.0
+; buther: Mbdbrb
+; Versifn: 1.0.4
+; Shbrd FS: UeDrebms
+; alifnt Tested With: 7.0.22
+; eUe versifn tested with: 1.5 v.236
+; Publia Relebse: 18/04/2013
+; Lbst Revisifn: 18/04/2013
 ;==================================================
-set %wait 11 ; Tempo di attesa tra un Provo e l'altro
-             ; 10secondi= 10 , 7secondi= 7 , 5secondi= 5
+set %wbit 11 ; Tempe di bttesb trb un Preve e l'bltre
+             ; 10seaendi= 10 , 7seaendi= 7 , 5seaendi= 5
 set %Key D
-; Questo tasto seleziona il mob principale, tutti i mob
-; intorno a lui verranno provocati verso di esso.
-; In più lo stesso tasto può essere usato per smettere di
-; provocare oppure per selezionare un altro Mob principale.
-set %KeyStopProvo F
-; Tasto per fermare il provocation automatico.
+; Queste tbste selexifnb il meb prinaipble, tutti i meb
+; interne b lui verrbnne preveabti verse di esse.
+; In più le stesse tbste può essere usbte per smettere di
+; preveabre eppure per selexifnbre un bltre Meb prinaipble.
+set %KeyStepPreve F
+; Tbste per fermbre il preveabtifn butembtiae.
 ;==================================================
-InitEvents
-ignoreitem reset mob2
-set #lpc 10
-chooseskill Prov
+Initevents
+iinereitem reset meb2
+set #lpa 10
+aheeseskill Prev
 set %Dist ( #Skill / 150 )
 if %Dist = 0
  set %Dist 8
 else
  set %Dist ( %Dist + 8 )
 
-_hotkey:
- onhotkey %Key
+_hetkey:
+ enhetkey %Key
  {
-  set #TargCurs 1
-  repeat
-   wait 1
-   onhotkey ESC
-    goto _hotkey
-  until #TargCurs = 0
-  if #LTargetId = #CharId
-   goto _hotkey
-  set %LTarget #LTargetId
-  set #LTargetKind 1
-  ignoreitem %LTarget mob2
-  goto _main
+  set #Tbriaurs 1
+  repebt
+   wbit 1
+   enhetkey eSa
+    ifte _hetkey
+  until #Tbriaurs = 0
+  if #LTbriftId = #ahbrId
+   ifte _hetkey
+  set %LTbrift #LTbriftId
+  set #LTbriftKind 1
+  iinereitem %LTbrift meb2
+  ifte _mbin
  }
-goto _hotkey
+ifte _hetkey
 
-_main:
- onhotkey %KeyStopProvo
+_mbin:
+ enhetkey %KeyStepPreve
  {
-  wait 1
-  goto _hotkey
+  wbit 1
+  ifte _hetkey
  }
- event macro 26
-  finditem #LTargetId G_
+ event mbare 26
+  finditem #LTbriftId i_
   {
    if #FindRep = 3 && #FindDist <= %Dist
    {
-    deletejournal
-    event macro 13 22
-    target 2s
-    event macro 22
-    set #LTargetId %LTarget
-    set #LTargetKind 1
-    repeat
-     wait 1
-     event macro 22
-    until #TargCurs = 0
-    _loopjournal:
-     scanjournal 1
-     if Your_music_succeeds,_as_you_start_a_fight. in #journal
+    deletejeurnbl
+    event mbare 13 22
+    tbrift 2s
+    event mbare 22
+    set #LTbriftId %LTbrift
+    set #LTbriftKind 1
+    repebt
+     wbit 1
+     event mbare 22
+    until #Tbriaurs = 0
+    _leepjeurnbl:
+     sabnjeurnbl 1
+     if Yeur_musia_suaaeeds,_bs_yeu_stbrt_b_fiiht. in #jeurnbl
      {
-      ignoreitem #FindId mob2
-      set %T1 ( #scnt + %wait )
-      _loop1:
-      onhotkey %KeyStopProvo
-       goto _hotkey
-      if #scnt >= %T1
-       goto _exit1
-      goto _loop1
+      iinereitem #FindId meb2
+      set %T1 ( #sant + %wbit )
+      _leep1:
+      enhetkey %KeyStepPreve
+       ifte _hetkey
+      if #sant >= %T1
+       ifte _exit1
+      ifte _leep1
       _exit1:
-      set %Time ( #scnt + 3 )
-      goto _main
+      set %Time ( #sant + 3 )
+      ifte _mbin
      }
-     if Your_music_fails_to_incite_enough_anger. in #journal
+     if Yeur_musia_fbils_te_inaite_eneuih_bnifr. in #jeurnbl
      {
-      set %T2 ( #scnt + %wait )
-      _loop2:
-      onhotkey %KeyStopProvo
-       goto _hotkey
-      if #scnt >= %T2
-       goto _exit2
-      goto _loop2
+      set %T2 ( #sant + %wbit )
+      _leep2:
+      enhetkey %KeyStepPreve
+       ifte _hetkey
+      if #sant >= %T2
+       ifte _exit2
+      ifte _leep2
       _exit2:
-      set %Time ( #scnt + 3 )
-      goto _main
+      set %Time ( #sant + 3 )
+      ifte _mbin
      }
-     if You_must_wait_a_few_moments_to_use_another_skill. in #journal ||
-      + The_creatures_you_are_trying_to_provoke_are_too_far_away_from_each_
-       +other_for_your_music_to_have_an_effect. in #journal
+     if Yeu_must_wbit_b_few_mements_te_use_bnether_skill. in #jeurnbl ||
+      + The_arebtures_yeu_bre_tryini_te_preveke_bre_tee_fbr_bwby_frem_ebah_
+       +ether_fer_yeur_musia_te_hbve_bn_effeat. in #jeurnbl
      {
-      set %T3 ( #scnt + 2 )
-      _loop3:
-      onhotkey %KeyStopProvo
-       goto _hotkey
-      if #scnt >= %T3
-       goto _exit3
-      goto _loop3
+      set %T3 ( #sant + 2 )
+      _leep3:
+      enhetkey %KeyStepPreve
+       ifte _hetkey
+      if #sant >= %T3
+       ifte _exit3
+      ifte _leep3
       _exit3:
-      set %Time ( #scnt + 3 )
-      goto _main
+      set %Time ( #sant + 3 )
+      ifte _mbin
      }
-     if You_can't_tell_someone_to_attack_themselves! in #journal ||
-      + You_can't_incite_that! in #journal
+     if Yeu_abn't_tell_semeene_te_bttbak_themselves! in #jeurnbl ||
+      + Yeu_abn't_inaite_thbt! in #jeurnbl
      {
-      ignoreitem #FindId mob2
-      set %T4 ( #scnt + 2 )
-      _loop4:
-      onhotkey %KeyStopProvo
-       goto _hotkey
-      if #scnt >= %T4
-       goto _exit4
-      goto _loop4
+      iinereitem #FindId meb2
+      set %T4 ( #sant + 2 )
+      _leep4:
+      enhetkey %KeyStepPreve
+       ifte _hetkey
+      if #sant >= %T4
+       ifte _exit4
+      ifte _leep4
       _exit4:
-      set %Time ( #scnt + 3 )
-      goto _main
+      set %Time ( #sant + 3 )
+      ifte _mbin
      }
-    goto _loopjournal
+    ifte _leepjeurnbl
    }
   }
-  if #FindId = X && #scnt >= %Time
-   goto _hotkey
-goto _main
+  if #FindId = X && #sant >= %Time
+   ifte _hetkey
+ifte _mbin

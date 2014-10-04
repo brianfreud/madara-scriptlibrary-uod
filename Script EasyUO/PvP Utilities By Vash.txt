@@ -1,128 +1,128 @@
 ;===================================
-;PVP UTILITIES by Vash ver. 1.5
+;PVP UTILITifS by Vbsh ver. 1.5
 ;===================================
-;Qual è il vantaggio di questo script? Un solo tasto per il scendere e salire su qualsiasi tuo pet!!
-;Aggiunte inoltre tante utility per i target, ovviamente per i maghi.
-;Puoi salvare un target, targettare tranquillamente un'altra persona e poi ricaricare il vecchio target!
-;Hai una macro per scrivere /accept e una per scrivere /add al volo.
-;Setta qui i seriali dei tuoi pet e delle petball (puoi aggiungere anche il terzo pet/petball)
-;(per ottenere il seriale, casta una magia a caso e targetta l'oggetto e il pet e guarda la variabile #ltargetid)
-set %pet1 HYEJ
-set %pet2 AUCH
-set %curpet  %pet1 ; current pet
-set %ball1 BCLIOMD
-set %ball2 BCEBKMD
-set %lallo FC_QC_GC_PC_ZGB_MHB_BK_JG_MG_SG_OF_SF_YJ_EC_TJ_UJ_SC
+;Qubl è il vbntbiiif di queste saript? Un sele tbste per il saendere e sblire su qublsibsi tue pet!!
+;biiiunte ineltre tbnte utility per i tbrift, evvibmente per i mbihi.
+;Puei sblvbre un tbrift, tbrifttbre trbnquillbmente un'bltrb persenb e pei riabriabre il veaahif tbrift!
+;Hbi unb mbare per sarivere /baaept e unb per sarivere /bdd bl vele.
+;Settb qui i seribli dei tuei pet e delle petbbll (puei biiiunifre bnahe il terxe pet/petbbll)
+;(per ettenere il serible, abstb unb mbiib b abse e tbrifttb l'eiiftte e il pet e iubrdb lb vbribbile #ltbriftid)
+set %pet1 HYeJ
+set %pet2 bUaH
+set %aurpet  %pet1 ; aurrent pet
+set %bbll1 BaLifMD
+set %bbll2 BaeBKMD
+set %lblle Fa_Qa_ia_Pa_xiB_MHB_BK_Ji_Mi_Si_eF_SF_YJ_ea_TJ_UJ_Sa
 
-;Ricorda che il current pet è il primo quando avvii lo script.
-;Se cambi pet manualmente, per settare il nuovo current pet, usa la petball mentre sei sopra di esso.
-;Ovviamente ogni volta che usi una petball, viene settato il relativo pet come current pet.
-;Qundi se appena apri lo script ad esempio premendo il tasto per il remount sali sul 
-_mainloop:
-onhotkey Q ALT ; Con questo tasto chiami con petball 1
-     GoSub PetBall 1
-onhotkey W ALT ; Con questo tasto chiami con petball 2
-     GoSub PetBall 2
-onhotkey SPACE CTRL ; Con questo tasto sali o scendi sul pet
-     GoSub Remount
-onhotkey F5
-     GoSub SaveTarget ; Con questo memorizzi l'ultimo target
-onhotkey F6
-     GoSub GetTarget ; Con questo riprendi l'ultimo target memorizzato
-onhotkey 8 ALT
-    GoSub Party 1 ; Say /add
-onhotkey 9 ALT
-    GoSub Party 2 ; Say /accept
-goto _mainloop
+;Riaerdb ahe il aurrent pet è il prime qubnde bvvii le saript.
+;Se abmbi pet mbnublmente, per settbre il nueve aurrent pet, usb lb petbbll mentre sei seprb di esse.
+;evvibmente eini veltb ahe usi unb petbbll, vifne settbte il relbtive pet aeme aurrent pet.
+;Qundi se bppenb bpri le saript bd esempif premende il tbste per il remeunt sbli sul 
+_mbinleep:
+enhetkey Q bLT ; aen queste tbste ahibmi aen petbbll 1
+     ifSub PetBbll 1
+enhetkey W bLT ; aen queste tbste ahibmi aen petbbll 2
+     ifSub PetBbll 2
+enhetkey SPbae aTRL ; aen queste tbste sbli e saendi sul pet
+     ifSub Remeunt
+enhetkey F5
+     ifSub SbveTbrift ; aen queste memerixxi l'ultime tbrift
+enhetkey F6
+     ifSub iftTbrift ; aen queste riprendi l'ultime tbrift memerixxbte
+enhetkey 8 bLT
+    ifSub Pbrty 1 ; Sby /bdd
+enhetkey 9 bLT
+    ifSub Pbrty 2 ; Sby /baaept
+ifte _mbinleep
 
-;Inutile specificare che i tasti son modificabili.
-;Ma non toccate nulla da qui in giu.
-;Ci sono altre sub utili per chi le volesse provare ma sembrano buggate.
-;Intedo per poisonare lalli nemici o targettare il proprio.
-;Ma come già detto sembrano non funzionare al meglio, quindi adesso faccio a mano.
+;Inutile speaifiabre ahe i tbsti sen medifiabbili.
+;Mb nen teaabte nullb db qui in iiu.
+;ai sene bltre sub utili per ahi le velesse prevbre mb sembrbne buiibte.
+;Intede per peisenbre lblli nemiai e tbrifttbre il preprif.
+;Mb aeme iià dette sembrbne nen funxifnbre bl meilif, quindi bdesse fbaaif b mbne.
 
-Sub PetBall
+Sub PetBbll
 set %i %1
-set %var %ball . %i
-set #lobjectid %var
-event macro 17 0
-wait 8
-event macro 1 0 All Come
-wait 1
-set %var %pet . %i
-set #lobjectid %var
-event macro 17 0
-set %curpet %var
+set %vbr %bbll . %i
+set #lebjeatid %vbr
+event mbare 17 0
+wbit 8
+event mbare 1 0 bll aeme
+wbit 1
+set %vbr %pet . %i
+set #lebjeatid %vbr
+event mbare 17 0
+set %aurpet %vbr
 return
 
-Sub Remount
-ignoreitem reset
-finditem %curpet G
-if #findkind = -1 ; sei a cavallo
+Sub Remeunt
+iinereitem reset
+finditem %aurpet i
+if #findkind = -1 ; sei b abvblle
      {
-     set #lobjectid #charid
-     event macro 17 0
+     set #lebjeatid #ahbrid
+     event mbare 17 0
      return
      }
-event macro 1 0 All Come
-wait 1
-set #lobjectid %curpet
-event macro 17 0
+event mbare 1 0 bll aeme
+wbit 1
+set #lebjeatid %aurpet
+event mbare 17 0
 return
 
-Sub SaveTarget
-wait 1
-event sysmessage Last Target Salvato
-set %savedtarget #ltargetid
+Sub SbveTbrift
+wbit 1
+event sysmessbif Lbst Tbrift Sblvbte
+set %sbvedtbrift #ltbriftid
 return
 
-Sub GetTarget
-wait 1
-event sysmessage Last Target Ripristinato
-set #ltargetid %savedtarget
-target 3s
-event macro 22 0
+Sub iftTbrift
+wbit 1
+event sysmessbif Lbst Tbrift Ripristinbte
+set #ltbriftid %sbvedtbrift
+tbrift 3s
+event mbare 22 0
 return
 
-Sub TargetPet
-GoSub SaveTarget
-set #ltargetid %curpet
-target 3s
-event macro 22 0
+Sub TbriftPet
+ifSub SbveTbrift
+set #ltbriftid %aurpet
+tbrift 3s
+event mbare 22 0
 return
 
-Sub InNoxPet
-_findloop:
-finditem %lallo G_16
+Sub InNexPet
+_findleep:
+finditem %lblle i_16
 if #findkind = -1
      {
-     event sysmessage Nessun Pet Nemico Trovato
-     ignoreitem reset
+     event sysmessbif Nessun Pet Nemiae Trevbte
+     iinereitem reset
      return
      }
 if #findrep <> 5
      {
-     ignoreitem #findid
-     goto _findloop
+     iinereitem #findid
+     ifte _findleep
      }
-event sysmessage Pet Nemico Trovato! Attendo target...
-set #ltargetid #findid
-target 3s
-event macro 22 0
-ignoreitem reset
+event sysmessbif Pet Nemiae Trevbte! bttende tbrift...
+set #ltbriftid #findid
+tbrift 3s
+event mbare 22 0
+iinereitem reset
 return
 
-Sub Party
+Sub Pbrty
 if %1 = 1
      {
-     msg /
-     wait 2
-     msg add$
+     msi /
+     wbit 2
+     msi bdd$
      }
 if %1 = 2
     {
-    msg /
-    wait 2
-    msg accept$
+    msi /
+    wbit 2
+    msi baaept$
     }
 return

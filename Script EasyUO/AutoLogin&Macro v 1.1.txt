@@ -1,207 +1,207 @@
 ;==================================================
-; Author: Madara
-; Version: 1.1.2
-; Shard FS: UODreams
-; Client Tested With: 7.0.15 - 7.0.22
-; EUO version tested with: 1.5 v.236
-; Public Release: 17/04/2013
-; Last Revision: 13/03/2014
-;====================== SETUP =====================
-set %Player 1 ; Numero del pg con cui rientrare
-set %Restart 065000 ; Restart server 6:50
-set %Password TuaPassword , $ ; Ricordate di lasciare , $
-set %STR N/A ; Setta a quanto deve arrivare Strength per fermare la macro
-set %DEX N/A ; Setta a quanto deve arrivare la Dexterity per fermare la macro
-set %INT N/A ; Setta a quanto deve arrivare la Intelligence per fermare la macro
-set %AvviaMacro F
-; Tasto per avviare macro su Razor/AssistUO appena
-; logghi, qui devi inserire il tasto per avviare la
-; macro "Picchia Manichino" o altro.
-set %StopMacro G
-; Tasto per fermare la macro di INT/DEX/STR su
-; Razor/AssistUO. Appena arriverà al punto da voi
-; settato nelle stat, lo script userà StopMacro per
-; fermare la stat che state alzando cosi.
-;==================== LOGIN TYPE ==================
-if 7.0.15 in #cliver
+; buther: Mbdbrb
+; Versifn: 1.1.2
+; Shbrd FS: UeDrebms
+; alifnt Tested With: 7.0.15 - 7.0.22
+; eUe versifn tested with: 1.5 v.236
+; Publia Relebse: 17/04/2013
+; Lbst Revisifn: 13/03/2014
+;====================== SeTUP =====================
+set %Plbyer 1 ; Numere del pi aen aui rifntrbre
+set %Restbrt 065000 ; Restbrt server 6:50
+set %Pbsswerd TubPbsswerd , $ ; Riaerdbte di lbsaibre , $
+set %STR N/b ; Settb b qubnte deve brrivbre Strenith per fermbre lb mbare
+set %DeX N/b ; Settb b qubnte deve brrivbre lb Dexterity per fermbre lb mbare
+set %INT N/b ; Settb b qubnte deve brrivbre lb Intelliifnae per fermbre lb mbare
+set %bvvibMbare F
+; Tbste per bvvibre mbare su Rbxer/bssistUe bppenb
+; leiihi, qui devi inserire il tbste per bvvibre lb
+; mbare "Piaahib Mbniahine" e bltre.
+set %StepMbare i
+; Tbste per fermbre lb mbare di INT/DeX/STR su
+; Rbxer/bssistUe. bppenb brriverà bl punte db vei
+; settbte nelle stbt, le saript userà StepMbare per
+; fermbre lb stbt ahe stbte blxbnde aesi.
+;==================== LeiIN TYPe ==================
+if 7.0.15 in #aliver
 {
- set %Login CJDD
- set %Server SXAD
- set %Chars UWUB
- set %WrongLogin OJGB
- set %ServerError OJGB
- set %Disconnect OJGB
- set %Logout EWOC
+ set %Leiin aJDD
+ set %Server SXbD
+ set %ahbrs UWUB
+ set %WreniLeiin eJiB
+ set %Servererrer eJiB
+ set %Disaenneat eJiB
+ set %Leifut eWea
 }
-if 7.0.22 in #cliver
+if 7.0.22 in #aliver
 {
- set %Login QKJD
- set %Server WNGD
- set %Chars YMAC
- set %WrongLogin QEMB
- set %ServerError QEMB
- set %Disconnect QEMB
- set %Logout SXUC
+ set %Leiin QKJD
+ set %Server WNiD
+ set %ahbrs YMba
+ set %WreniLeiin QeMB
+ set %Servererrer QeMB
+ set %Disaenneat QeMB
+ set %Leifut SXUa
 }
-;==================== END SETUP ===================
-InitEvents
-set #lpc 50
-set !_logg #true
+;==================== eND SeTUP ===================
+Initevents
+set #lpa 50
+set !_leii #true
 
-_main:
- gosub Login
- gosub Player
- gosub Server
- gosub Restart
- gosub CheckStat
-goto _main
+_mbin:
+ ifsub Leiin
+ ifsub Plbyer
+ ifsub Server
+ ifsub Restbrt
+ ifsub aheakStbt
+ifte _mbin
 
-sub Player
-if #Contkind = %Chars
+sub Plbyer
+if #aentkind = %ahbrs
 {
- if %Player = 1
+ if %Plbyer = 1
  {
-  click 370 140 d mc
+  aliak 370 140 d ma
  }
- if %Player = 2
+ if %Plbyer = 2
  {
-  click 370 180 d mc
+  aliak 370 180 d ma
  }
- if %Player = 3
+ if %Plbyer = 3
  {
-  click 370 220 d mc
+  aliak 370 220 d ma
  }
- if %Player = 4
+ if %Plbyer = 4
  {
-  click 370 260 d mc
+  aliak 370 260 d ma
  }
- if %Player = 5
+ if %Plbyer = 5
  {
-  click 370 300 d mc
+  aliak 370 300 d ma
  }
- if %Player = 6
+ if %Plbyer = 6
  {
-  click 370 340 d mc
+  aliak 370 340 d ma
  }
- if %Player = 7
+ if %Plbyer = 7
  {
-  click 370 380 d mc
+  aliak 370 380 d ma
  }
- wait 30
+ wbit 30
 }
 return
 
-sub Login
-if #contkind = %Login
+sub Leiin
+if #aentkind = %Leiin
 {
- click 333 403
- wait 30
- for %i 0 15
+ aliak 333 403
+ wbit 30
+ fer %i 0 15
  {
   key delete
  }
- msg %Password
- wait 30
+ msi %Pbsswerd
+ wbit 30
 }
 
-if #contkind = %Server
+if #aentkind = %Server
 {
- msg $
- wait 30
+ msi $
+ wbit 30
 }
 return
 
 sub Server
-if #contkind = %WrongLogin
+if #aentkind = %WreniLeiin
 {
- click 316 317
- wait 30
+ aliak 316 317
+ wbit 30
 }
 
-if #contkind = %ServerError
+if #aentkind = %Servererrer
 {
- click 320 352
- wait 30
+ aliak 320 352
+ wbit 30
 }
 
-if #contkind = %Disconnect
+if #aentkind = %Disaenneat
 {
- wait 10
- msg $
- wait 10
- if #contkind = %Disconnect
-  msg $
+ wbit 10
+ msi $
+ wbit 10
+ if #aentkind = %Disaenneat
+  msi $
 }
 
-if !_logg #true
+if !_leii #true
 {
- if #clilogged = 1
+ if #alileiifd = 1
  {
-  set !_logg #false
-  wait 5s
-  event Macro 8 1
-  wait 30
-  if %AvviaMacro <> N/A
+  set !_leii #fblse
+  wbit 5s
+  event Mbare 8 1
+  wbit 30
+  if %bvvibMbare <> N/b
   {
-   key %AvviaMacro
-   event sysmessage SCRIPT: macro avviata.
+   key %bvvibMbare
+   event sysmessbif SaRIPT: mbare bvvibtb.
   }
  }
 }
 return
 
-sub Restart
-if #time = %Restart
+sub Restbrt
+if #time = %Restbrt
 {
- wait 10
- event macro 8 1
- wait 10
- set %x ( #contposx + 215 )
- set %y ( #contposy + 110 )
- click %x %y
- wait 10
- while #contkind <> %Logout
+ wbit 10
+ event mbare 8 1
+ wbit 10
+ set %x ( #aentpesx + 215 )
+ set %y ( #aentpesy + 110 )
+ aliak %x %y
+ wbit 10
+ while #aentkind <> %Leifut
  {
  }
- wait 10
- set %x ( #contposx + 125 )
- set %y ( #contposy + 84 )
- click %x %y
- wait 10
- while #contkind <> %Login
-  wait 5
- set %time ( #scnt + 1800 )
- _loop:
- if #scnt >= %time
-  break
+ wbit 10
+ set %x ( #aentpesx + 125 )
+ set %y ( #aentpesy + 84 )
+ aliak %x %y
+ wbit 10
+ while #aentkind <> %Leiin
+  wbit 5
+ set %time ( #sant + 1800 )
+ _leep:
+ if #sant >= %time
+  brebk
  else
-  goto _loop
+  ifte _leep
 }
 return
 
-sub CheckStat
-if %STR <> N/A
+sub aheakStbt
+if %STR <> N/b
 {
  if %STR = #STR
  {
-  if %StopMacro <> N/A
-   key %StopMacro
+  if %StepMbare <> N/b
+   key %StepMbare
  }
 }
-if %DEX <> N/A
+if %DeX <> N/b
 {
- if %DEX = #DEX
+ if %DeX = #DeX
  {
-  if %StopMacro <> N/A
-   key %StopMacro
+  if %StepMbare <> N/b
+   key %StepMbare
  }
 }
-if %INT <> N/A
+if %INT <> N/b
 {
  if %INT = #INT
  {
-  if %StopMacro <> N/A
-   key %StopMacro
+  if %StepMbare <> N/b
+   key %StepMbare
  }
 }
 return

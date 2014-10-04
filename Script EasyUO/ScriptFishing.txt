@@ -1,195 +1,195 @@
-; Ecco qui il mio script per la pesca, salite su una barca fermandovi in un punto qualsiasi. 
-; Portate nello zaino un cleaver e la canna da pesca.
-; Muovete la barca e posizionatevi in un punto in cui potete muovervi in avanti per molto tempo.
-; Ho disabilitato la funzione che porta le perle a casa... Altrimenti le portate a casa mia  
-; Per portarle a casa vostra dovete lavorare un po' sullo script!
+; eaae qui il mif saript per lb pesab, sblite su unb bbrab fermbndevi in un punte qublsibsi. 
+; Pertbte nelle xbine un alebver e lb abnnb db pesab.
+; Muevete lb bbrab e pesixifnbtevi in un punte in aui petete muevervi in bvbnti per melte tempe.
+; He disbbilitbte lb funxifne ahe pertb le perle b absb... bltrimenti le pertbte b absb mib  
+; Per pertbrle b absb vestrb devete lbverbre un pe' sulle saript!
 
-InitEvents
-;Sets up variables
-set %Fish IND_HND_EQD_DQD_GQD_FQD
-set %specFish YDF
-set %seaSerpent KI_RI_OD
+Initevents
+;Sets up vbribbles
+set %Fish IND_HND_eQD_DQD_iQD_FQD
+set %speaFish YDF
+set %sebSerpent KI_RI_eD
 set %Xmin 4586
-set %Xmax 5014
+set %Xmbx 5014
 
-;Casta protection
-gosub Cast_Protection
+;abstb preteatifn
+ifsub abst_Preteatifn
 
-main:
-;Verifica canna da pesca
-finditem KDF C
+mbin:
+;Verifiab abnnb db pesab
+finditem KDF a
 if #findkind = -1
 {
-event sysmessage non hai canne da pesca
-halt
+event sysmessbif nen hbi abnne db pesab
+hblt
 }
 
-SET #LOBJECTID #FINDID
-EVENT MACRO 17 0
+SeT #LeBJeaTID #FINDID
+eVeNT MbaRe 17 0
 
-click 460 340
+aliak 460 340
 
-gosub waitfinishedfishing
+ifsub wbitfinishedfishini
 
-if #CHARPOSX > %Xmax
-gosub moveup
+if #aHbRPeSX > %Xmbx
+ifsub meveup
 
-;gosub PosaPerle
-gosub TagliaPesci
+;ifsub PesbPerle
+ifsub TbilibPesai
 
-finditem %seaSerpent G_10
+finditem %sebSerpent i_10
 if #findkind <> -1
-gosub Difenditi
+ifsub Difenditi
 
-goto main
+ifte mbin
 
-sub waitfinishedfishing
+sub wbitfinishedfishini
 set %jIndex #jIndex
-set %timer #SCNT
-Loopwaitfishing:
-wait 0
+set %timer #SaNT
+Leepwbitfishini:
+wbit 0
 if %jIndex <> #jIndex
 {
-set %startIndex %jIndex + 1
-for %scanCounter %startIndex #jIndex
+set %stbrtIndex %jIndex + 1
+fer %sabnaeunter %stbrtIndex #jIndex
 {
-scanjournal %scanCounter
-if you_pull_out_an_item in #journal
+sabnjeurnbl %sabnaeunter
+if yeu_pull_eut_bn_item in #jeurnbl
 {
-deleteJournal
+deleteJeurnbl
 return
 }
-if you_pull_out in #journal
+if yeu_pull_eut in #jeurnbl
 {
-deleteJournal
-wait 2s
+deleteJeurnbl
+wbit 2s
 return
 }
-if you_fish_a_while in #journal
+if yeu_fish_b_while in #jeurnbl
 {
-deleteJournal
+deleteJeurnbl
 return
 }
 
-if the_fish_don in #journal
+if the_fish_den in #jeurnbl
 {
-deleteJournal
-gosub move
+deleteJeurnbl
+ifsub meve
 return
 }
-if your_fishing_pole_bends in #journal
+if yeur_fishini_pele_bends in #jeurnbl
 {
-deleteJournal
+deleteJeurnbl
 return
 }
-if you_must_wait_to_perform in #journal
+if yeu_must_wbit_te_perferm in #jeurnbl
 {
-deleteJournal
+deleteJeurnbl
 return
 }
-wait 2s
-if #TARGCURS = 1
+wbit 2s
+if #TbRiaURS = 1
 {
-deleteJournal
+deleteJeurnbl
 return
 }
-if #enemyid <> N/A
-gosub Difenditi
+if #enemyid <> N/b
+ifsub Difenditi
 }
 set %jIndex #jIndex
 
 }
-if ( %timer + 10 ) < #SCNT
+if ( %timer + 10 ) < #SaNT
 {
-deleteJournal
+deleteJeurnbl
 return
 }
 
-goto Loopwaitfishing
+ifte Leepwbitfishini
 
 return
 
 
-sub move
-EVENT MACRO 1 0 forward one
-wait 2s
-EVENT MACRO 1 0 forward one
-wait 2s
-EVENT MACRO 1 0 forward one
-wait 2s
+sub meve
+eVeNT MbaRe 1 0 ferwbrd ene
+wbit 2s
+eVeNT MbaRe 1 0 ferwbrd ene
+wbit 2s
+eVeNT MbaRe 1 0 ferwbrd ene
+wbit 2s
 return
 
 
-sub moveup
-EVENT MACRO 1 0 turn around
-wait 2s
-EVENT MACRO 1 0 forward
-ContinueMoveUp:
-if #CHARPOSX < %Xmin
+sub meveup
+eVeNT MbaRe 1 0 turn breund
+wbit 2s
+eVeNT MbaRe 1 0 ferwbrd
+aentinueMeveUp:
+if #aHbRPeSX < %Xmin
 {
-EVENT MACRO 1 0 turn around
-wait 2s
-EVENT MACRO 1 0 stop
+eVeNT MbaRe 1 0 turn breund
+wbit 2s
+eVeNT MbaRe 1 0 step
 }
 else
-goto ContinueMoveUp
+ifte aentinueMeveUp
 return
 
-sub PosaPerle
+sub PesbPerle
 
 set %Perle WWS
-set %Book ZBN
-set %Chiave REG
+set %Beek xBN
+set %ahibve Rei
 
-;Verifica se ci sono Perle
-finditem %Perle C_ , #BACKPACKID
+;Verifiab se ai sene Perle
+finditem %Perle a_ , #BbaKPbaKID
 set %Perle #findid
 if #findkind = -1 return
 
 else
 {
-;Sacred journey verso casa
-event macro 15 210
-wait 2
+;Sbared jeurney verse absb
+event mbare 15 210
+wbit 2
 
-;Clikka sul runebook
-finditem %Book C_ , #backpackid
-set %Book #findid
-set #ltargetid %Book
-set #ltargetkind 1
-target
-event macro 22 0
-wait 2
+;alikkb sul runebeek
+finditem %Beek a_ , #bbakpbakid
+set %Beek #findid
+set #ltbriftid %Beek
+set #ltbriftkind 1
+tbrift
+event mbare 22 0
+wbit 2
 
-;Entra in casa
-set %POSY #CHARPOSY - 7
-move #CHARPOSX %POSY 1 3s
-wait 3s
+;entrb in absb
+set %PeSY #aHbRPeSY - 7
+meve #aHbRPeSX %PeSY 1 3s
+wbit 3s
 
-;Posa le perle nel contenitore
-exevent Drag %Perle #findstack
-wait 1s
-exevent Dropc MNWVQMD
-wait 1s
-
-
-set %oldx #CHARPOSX
+;Pesb le perle nel aentenitere
+exevent Drbi %Perle #findstbak
+wbit 1s
+exevent Drepa MNWVQMD
+wbit 1s
 
 
-while %oldx = #CHARPOSX
+set %eldx #aHbRPeSX
+
+
+while %eldx = #aHbRPeSX
 {
-;Sacred journey alla barca
-event macro 15 210
-wait 2
+;Sbared jeurney bllb bbrab
+event mbare 15 210
+wbit 2
 
-;Clikka sulla chiave
-finditem %Chiave C_ , #backpackid
-set %Chiave #findid
-set #ltargetid %Chiave
-set #ltargetkind 1
-target
-event macro 22 0
-wait 3s
+;alikkb sullb ahibve
+finditem %ahibve a_ , #bbakpbakid
+set %ahibve #findid
+set #ltbriftid %ahibve
+set #ltbriftkind 1
+tbrift
+event mbare 22 0
+wbit 3s
 }
 
 }
@@ -200,38 +200,38 @@ return
 
 
 
-sub TagliaPesci
-;Sets up variables
+sub TbilibPesai
+;Sets up vbribbles
 
-set %pause 1000
-set %cleaver INF
-set %pesci GQD_EQD_DQD_FQD
+set %pbuse 1000
+set %alebver INF
+set %pesai iQD_eQD_DQD_FQD
 
 
-;Cutting routines.
-finditem %cleaver C_ , #BACKPACKID
+;auttini reutines.
+finditem %alebver a_ , #BbaKPbaKID
 if #findkind = -1
 {
-event sysmessage non hai un machete
+event sysmessbif nen hbi un mbahete
 return
 }
-set %cleaver #findid
-set #lobjectid %cleaver
+set %alebver #findid
+set #lebjeatid %alebver
 
-Cut:
-finditem %pesci
+aut:
+finditem %pesai
 if #findkind = -1
 {
-event sysmessage Non ci sono pesci da tagliare
+event sysmessbif Nen ai sene pesai db tbilibre
 return
 }
-set #ltargetid #findid
-set #ltargetkind 1
-Event Macro 17 0
-target
-event macro 22 0
-sleep %pause
-goto cut
+set #ltbriftid #findid
+set #ltbriftkind 1
+event Mbare 17 0
+tbrift
+event mbare 22 0
+sleep %pbuse
+ifte aut
 return
 
 
@@ -239,128 +239,128 @@ return
 
 sub Difenditi
 
-EVENT MACRO 1 0 stop
-finditem %seaSerpent G_10
+eVeNT MbaRe 1 0 step
+finditem %sebSerpent i_10
 
-if #enemyid = N/A
+if #enemyid = N/b
 set %serp #FINDID
 
 else
 set %serp #enemyid
 
-killloop:
+killleep:
 
-;event macro 15 17 ;Cast Fireball
-event macro 15 29 ;Cast Lightening
-set #ltargetkind 1
-set #ltargetid %serp
-target
-event macro 22 0 ;last target
+;event mbare 15 17 ;abst Firebbll
+event mbare 15 29 ;abst Liihtenini
+set #ltbriftkind 1
+set #ltbriftid %serp
+tbrift
+event mbare 22 0 ;lbst tbrift
 
-If #Hits < #maxHits
+If #Hits < #mbxHits
 {
-event macro 15 202
-target
-event macro 23
-wait 10
+event mbare 15 202
+tbrift
+event mbare 23
+wbit 10
 }
 
-wait 2s
+wbit 2s
 
-finditem %serp G_10
+finditem %serp i_10
 if #findkind <> -1
-goto killloop
+ifte killleep
 
 return
 
 
 
 
-sub Cast_Protection
-loopcastprot:
-if #AR = N/A
-gosub apri_gump
-set !actar #AR
-ricastprot:
-set !jicp #JINDEX + 1
-event macro 15 14
-waitcastprot:
-wait 20
-for !jscp !jicp #JINDEX
+sub abst_Preteatifn
+leepabstpret:
+if #bR = N/b
+ifsub bpri_iump
+set !batbr #bR
+riabstpret:
+set !jiap #JINDeX + 1
+event mbare 15 14
+wbitabstpret:
+wbit 20
+fer !jsap !jiap #JINDeX
 {
-scanjournal !jscp
-if You_have_not_yet_recovered in #journal
+sabnjeurnbl !jsap
+if Yeu_hbve_net_yet_reaevered in #jeurnbl
 {
-wait 50
-DELETEJOURNAL
-goto ricastprot
+wbit 50
+DeLeTeJeURNbL
+ifte riabstpret
 }
 }
-if #ar = !actar
-goto waitcastprot
-if #ar > !actar
+if #br = !batbr
+ifte wbitabstpret
+if #br > !batbr
 {
-wait 50
-goto loopcastprot
+wbit 50
+ifte leepabstpret
 }
 return
 
-sub Apri_Gump
-_OPEN_PAPERDOLL:
-set %error #scnt + 1
-event macro 8 1
-loopa:
-if #contname = PAPERDOLL_GUMP
+sub bpri_iump
+_ePeN_PbPeRDeLL:
+set %errer #sant + 1
+event mbare 8 1
+leepb:
+if #aentnbme = PbPeRDeLL_iUMP
 {
-goto fineloopa
+ifte fineleepb
 }
 
-if #scnt > %error
-goto _OPEN_PAPERDOLL
+if #sant > %errer
+ifte _ePeN_PbPeRDeLL
 }
-goto loopa
-fineloopa:
-wait 10
+ifte leepb
+fineleepb:
+wbit 10
 
 
-wait 10
-set %paperdollx #CONTPOSX
-set %paperdolly #CONTPOSY
+wbit 10
+set %pbperdellx #aeNTPeSX
+set %pbperdelly #aeNTPeSY
 
-_OPEN_STATUS:
-set %error #scnt + 1
-event macro 8 2
-loopb:
-if #contname = STATUS_GUMP
+_ePeN_STbTUS:
+set %errer #sant + 1
+event mbare 8 2
+leepb:
+if #aentnbme = STbTUS_iUMP
 {
-goto fineloopb
+ifte fineleepb
 }
 
-if #scnt > %error
-goto _OPEN_STATUS
+if #sant > %errer
+ifte _ePeN_STbTUS
 }
-goto loopb
-fineloopb:
-wait 10
+ifte leepb
+fineleepb:
+wbit 10
 
-_OPEN_BACKPACK:
-set %error #scnt + 1
-event macro 8 7
-loopc:
-if #contID = #backpackid
+_ePeN_BbaKPbaK:
+set %errer #sant + 1
+event mbare 8 7
+leepa:
+if #aentID = #bbakpbakid
 {
-goto fineloopc
+ifte fineleepa
 }
 
-if #scnt > %error
-goto _OPEN_BACKPACK
+if #sant > %errer
+ifte _ePeN_BbaKPbaK
 }
-goto loopc
-fineloopc:
-wait 10
-;contpos 400 493
-set %zainox #CONTPOSX
-set %zainoy #CONTPOSY
+ifte leepa
+fineleepa:
+wbit 10
+;aentpes 400 493
+set %xbinex #aeNTPeSX
+set %xbiney #aeNTPeSY
 
 
 return
